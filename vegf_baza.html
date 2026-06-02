@@ -93,6 +93,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .date-combo .cal-btn:hover{color:#333;}
 .date-combo input[type="date"]{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:0;right:0;}
 .loading{text-align:center;padding:2rem;color:#888;font-size:14px;}
+.report-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-start;justify-content:center;z-index:150;padding:2rem 1rem;overflow-y:auto;}
+.report-modal{background:#fff;border-radius:12px;padding:1.5rem;width:660px;max-width:100%;border:1px solid #e5e5e5;margin:auto;}
+.report-text{font-family:'Menlo','Consolas',monospace;font-size:12px;line-height:1.8;background:#f9f9f7;border:1px solid #e5e5e5;border-radius:8px;padding:1rem;white-space:pre-wrap;color:#1a1a1a;min-height:200px;max-height:60vh;overflow-y:auto;user-select:all;}
+.copy-success{background:#e6f4ea;color:#1a7f5a;border-radius:6px;padding:6px 12px;font-size:12px;display:none;align-items:center;gap:6px;}
 .dr-manager{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:10px 12px;margin-top:6px;}
 .dr-manager-title{font-size:12px;font-weight:500;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px;cursor:pointer;}
 .dr-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
@@ -229,7 +233,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <div style="font-size:13px;color:#888;" id="m-meta"></div>
           </div>
         </div>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="btn" onclick="generateReport()" style="color:#1a7f5a;border-color:#b6e4d3;"><i class="ti ti-file-text"></i> Izveštaj</button>
           <button class="btn btn-edit" onclick="editPatient()"><i class="ti ti-edit"></i> Izmeni podatke</button>
           <button class="btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
         </div>
@@ -470,11 +475,11 @@ function renderPatients(filter) {
   const total = patients.length, totalDoses = doses.length;
   const avgDoses = total ? (totalDoses/total).toFixed(1) : 0;
   const pending = doses.filter(d => d.kontrola && String(d.completed).toLowerCase()!=='true' && parseDate(d.kontrola) >= new Date()).length;
-  document.getElementById('statsBar').innerHTML = `
-    <div class="stat"><div class="stat-label">Pacijenti</div><div class="stat-value">${total}</div></div>
-    <div class="stat"><div class="stat-label">Ukupno doza</div><div class="stat-value">${totalDoses}</div></div>
-    <div class="stat"><div class="stat-label">Avg. doza/pac.</div><div class="stat-value">${avgDoses}</div></div>
-    <div class="stat"><div class="stat-label">Zakazane kontrole</div><div class="stat-value">${pending}</div></div>`;
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat"><div class="stat-label">Pacijenti</div><div class="stat-value">'+total+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Ukupno doza</div><div class="stat-value">'+totalDoses+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Avg. doza/pac.</div><div class="stat-value">'+avgDoses+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Zakazane kontrole</div><div class="stat-value">'+pending+'</div></div>';
   let pts = patients;
   if (filter) { const f=filter.toLowerCase(); pts=pts.filter(p=>(p.ime+' '+p.prezime).toLowerCase().includes(f)||(p.dx||'').toLowerCase().includes(f)||(p.pid||'').toLowerCase().includes(f)); }
   document.getElementById('patCount').textContent = pts.length + ' pacijent' + (pts.length===1?'':pts.length<5?'a':'a');
@@ -883,6 +888,106 @@ function exportExcel() {
   showAlert('Excel fajl exportovan (' + patients.length + ' pacijenata, ' + doses.length + ' doza).', 'success');
 }
 
+/* ===== REPORT GENERATOR ===== */
+function generateReport() {
+  const p = patients.find(x => x.id === currentPid);
+  if (!p) return;
+
+  const pd = doses
+    .filter(d => d.pid === currentPid)
+    .sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+
+  const today = new Date();
+  const todayStr = String(today.getDate()).padStart(2,'0') + '.' +
+                   String(today.getMonth()+1).padStart(2,'0') + '.' +
+                   today.getFullYear() + '.';
+
+  const lastDose = pd.length ? pd[pd.length-1] : null;
+  const nextCtrl = pd
+    .filter(d => d.kontrola && String(d.completed).toLowerCase() !== 'true')
+    .sort((a,b) => parseDate(a.kontrola) - parseDate(b.kontrola))[0];
+
+  let lines = [];
+
+  lines.push('ANTI-VEGF TERAPIJA — PREGLED LEČENJA');
+  lines.push('Datum izveštaja: ' + todayStr);
+  lines.push('═'.repeat(50));
+  lines.push('');
+
+  // Dijagnoza i status
+  lines.push('DIJAGNOZA: ' + (p.dx || '—'));
+  if (p.napomena) lines.push('Napomena: ' + p.napomena);
+  lines.push('');
+
+  // Sažetak terapije
+  lines.push('SAŽETAK TERAPIJE:');
+  lines.push('Ukupan broj doza: ' + pd.length);
+  if (pd.length > 0) {
+    lines.push('Prva doza: ' + fmtDate(pd[0].datum) +
+      (pd[0].drug ? ' (' + pd[0].drug.split(' ')[0] + ')' : ''));
+    lines.push('Poslednja doza: ' + fmtDate(lastDose.datum) +
+      (lastDose.drug ? ' (' + lastDose.drug.split(' ')[0] + ')' : ''));
+  }
+  if (nextCtrl) {
+    const kd = parseDate(nextCtrl.kontrola);
+    const kd0 = new Date(kd); kd0.setHours(0,0,0,0);
+    const t0 = new Date(); t0.setHours(0,0,0,0);
+    const status = kd0 < t0 ? ' [PREKORAČENO]' : '';
+    lines.push('Sledeća kontrola: ' + fmtDate(nextCtrl.kontrola) + status);
+  }
+  lines.push('');
+
+  // Hronološki pregled doza
+  if (pd.length > 0) {
+    lines.push('HRONOLOŠKI PREGLED DOZA:');
+    lines.push('─'.repeat(50));
+    pd.forEach((d, i) => {
+      const napomena = (d.napomena||'').trim();
+      const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
+      const completed = String(d.completed).toLowerCase() === 'true';
+
+      lines.push('Doza ' + (i+1) + ': ' + fmtDate(d.datum));
+      lines.push('  Lek:    ' + (d.drug || '—') + (d.doza ? ', ' + d.doza + ' mg' : ''));
+      lines.push('  Oko:    ' + (d.oko || '—'));
+      if (d.lekar) lines.push('  Lekar:  ' + d.lekar);
+      if (d.kontrola) {
+        const kd = parseDate(d.kontrola);
+        const kd0 = new Date(kd); kd0.setHours(0,0,0,0);
+        const t0 = new Date(); t0.setHours(0,0,0,0);
+        const kStatus = completed ? ' [obavljeno]' : kd0 < t0 ? ' [PREKORAČENO]' : ' [zakazano]';
+        lines.push('  Kontrola: ' + fmtDate(d.kontrola) + kStatus);
+      }
+      if (napClean) lines.push('  Napomena: ' + napClean);
+      if (i < pd.length - 1) lines.push('');
+    });
+    lines.push('─'.repeat(50));
+  }
+
+  lines.push('');
+  lines.push('Izveštaj generisan: ' + todayStr + ' | Anti-VEGF Studija');
+
+  const text = lines.join('\n');
+  document.getElementById('reportText').textContent = text;
+  document.getElementById('reportSubtitle').textContent =
+    p.dx + ' · ' + pd.length + ' doz' + (pd.length===1?'a':pd.length<5?'e':'a');
+  document.getElementById('reportOverlay').style.display = 'block';
+  document.getElementById('copySuccess').style.display = 'none';
+}
+
+function copyReport() {
+  const text = document.getElementById('reportText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById('copySuccess');
+    el.style.display = 'flex';
+    setTimeout(() => el.style.display = 'none', 2500);
+  });
+}
+
+function closeReportOutside(e) {
+  if (e.target === document.getElementById('reportOverlay'))
+    document.getElementById('reportOverlay').style.display = 'none';
+}
+
 /* ===== DOCTOR MANAGEMENT ===== */
 const DR_KEY = 'vegf_lekari';
 function getDoctors() {
@@ -938,6 +1043,27 @@ function removeDoctor(idx) {
 
 loadData();
 </script>
+<!-- REPORT MODAL -->
+<div id="reportOverlay" style="display:none;" onclick="closeReportOutside(event)">
+  <div class="report-overlay">
+    <div class="report-modal" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div>
+          <div style="font-size:15px;font-weight:500;">Klinički izveštaj</div>
+          <div style="font-size:12px;color:#888;margin-top:2px;" id="reportSubtitle"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="copy-success" id="copySuccess"><i class="ti ti-check"></i> Kopirano!</div>
+          <button class="btn btn-primary" onclick="copyReport()"><i class="ti ti-copy"></i> Kopiraj tekst</button>
+          <button class="btn" onclick="document.getElementById('reportOverlay').style.display='none'"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+      <div class="report-text" id="reportText"></div>
+      <div style="font-size:11px;color:#aaa;margin-top:8px;text-align:right;">Kliknite unutar teksta da selektujete sve (Ctrl+A), ili koristite dugme Kopiraj tekst</div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div id="confirmOverlay" style="display:none;">
   <div class="confirm-overlay">

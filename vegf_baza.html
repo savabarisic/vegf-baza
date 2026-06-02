@@ -97,6 +97,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .clin-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
 .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
 .clin-badge{display:inline-block;font-size:10px;background:#1a73e8;color:#fff;border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:1px;}
+.va-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.va-row input{border:1px solid #c5d9f8;border-radius:6px;padding:5px 6px;font-size:13px;background:#fff;outline:none;min-width:0;}
+.va-row input:focus{border-color:#1a73e8;}
+.va-row .va-lbl{font-size:12px;color:#1a4f8a;font-weight:500;white-space:nowrap;}
+.va-row .va-sign{font-size:14px;color:#1a4f8a;font-weight:600;padding:0 1px;}
+.va-row .w-vn{width:46px;}
+.va-row .w-sph{width:54px;}
+.va-row .w-cyl{width:54px;}
+.va-row .w-ax{width:46px;}
+.va-row .w-bcva{width:54px;}
+.va-group{background:#fff;border:1px solid #c5d9f8;border-radius:8px;padding:8px 10px;margin-bottom:8px;}
+.va-group-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
 .report-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-start;justify-content:center;z-index:150;padding:2rem 1rem;overflow-y:auto;}
 .report-modal{background:#fff;border-radius:12px;padding:1.5rem;width:660px;max-width:100%;border:1px solid #e5e5e5;margin:auto;}
 .report-text{font-family:'Menlo','Consolas',monospace;font-size:12px;line-height:1.8;background:#f9f9f7;border:1px solid #e5e5e5;border-radius:8px;padding:1rem;white-space:pre-wrap;color:#1a1a1a;min-height:200px;max-height:60vh;overflow-y:auto;user-select:all;}
@@ -324,16 +336,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <!-- Klinička merenja pre injekcije -->
         <div class="clin-section">
           <div class="clin-title"><i class="ti ti-eye"></i> Klinička merenja <span style="font-size:10px;font-weight:400;color:#5580b0;">(pre injekcije)</span></div>
+
+          <!-- VOD -->
+          <div class="va-group">
+            <div class="va-group-title">VOD</div>
+            <div class="va-row">
+              <span class="va-lbl">Vn</span>
+              <input class="w-vn" type="number" id="d-vod-vn" placeholder="0.1" step="0.05" min="0" max="1.2" title="Naturalni vid OD" />
+              <span class="va-lbl" style="margin-left:4px;">c/c</span>
+              <span class="va-sign">±</span>
+              <input class="w-sph" type="number" id="d-vod-sph" placeholder="DSph" step="0.25" title="Sfera OD" />
+              <span class="va-lbl">D</span>
+              <span class="va-sign">±</span>
+              <input class="w-cyl" type="number" id="d-vod-cyl" placeholder="DCyl" step="0.25" title="Cilindar OD" />
+              <span class="va-lbl">D ×</span>
+              <input class="w-ax" type="number" id="d-vod-ax" placeholder="Ax" step="1" min="0" max="180" title="Osa OD" />
+              <span class="va-lbl">° =</span>
+              <input class="w-bcva" type="number" id="d-vod-bcva" placeholder="BCVA" step="0.05" min="0" max="1.2" title="BCVA OD" />
+            </div>
+          </div>
+
+          <!-- VOS -->
+          <div class="va-group">
+            <div class="va-group-title">VOS</div>
+            <div class="va-row">
+              <span class="va-lbl">Vn</span>
+              <input class="w-vn" type="number" id="d-vos-vn" placeholder="0.1" step="0.05" min="0" max="1.2" title="Naturalni vid OS" />
+              <span class="va-lbl" style="margin-left:4px;">c/c</span>
+              <span class="va-sign">±</span>
+              <input class="w-sph" type="number" id="d-vos-sph" placeholder="DSph" step="0.25" title="Sfera OS" />
+              <span class="va-lbl">D</span>
+              <span class="va-sign">±</span>
+              <input class="w-cyl" type="number" id="d-vos-cyl" placeholder="DCyl" step="0.25" title="Cilindar OS" />
+              <span class="va-lbl">D ×</span>
+              <input class="w-ax" type="number" id="d-vos-ax" placeholder="Ax" step="1" min="0" max="180" title="Osa OS" />
+              <span class="va-lbl">° =</span>
+              <input class="w-bcva" type="number" id="d-vos-bcva" placeholder="BCVA" step="0.05" min="0" max="1.2" title="BCVA OS" />
+            </div>
+          </div>
+
+          <!-- IOP + CMT -->
           <div class="grid4" style="margin-bottom:8px;">
-            <div class="field"><label>VOD</label><input type="number" id="d-vod" placeholder="0.0" step="0.05" min="0" max="1.2" /></div>
-            <div class="field"><label>VOS</label><input type="number" id="d-vos" placeholder="0.0" step="0.05" min="0" max="1.2" /></div>
             <div class="field"><label>IOP OD <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-od" placeholder="—" step="1" min="0" max="60" /></div>
             <div class="field"><label>IOP OS <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-os" placeholder="—" step="1" min="0" max="60" /></div>
-          </div>
-          <div class="grid4" style="margin-bottom:8px;">
             <div class="field"><label>CMT OD <span class="clin-badge">μm</span></label><input type="number" id="d-cmt-od" placeholder="—" step="1" min="0" max="1000" /></div>
             <div class="field"><label>CMT OS <span class="clin-badge">μm</span></label><input type="number" id="d-cmt-os" placeholder="—" step="1" min="0" max="1000" /></div>
-            <div class="field" style="grid-column:span 2;"><label>OCT nalaz makule</label><input type="text" id="d-oct" placeholder="Npr. subfovealni fluid, druze..." /></div>
+          </div>
+          <div class="field" style="margin-bottom:4px;">
+            <label>OCT nalaz makule</label>
+            <input type="text" id="d-oct" placeholder="Npr. subfovealni fluid, druze, epiretinalna membrana..." />
           </div>
         </div>
         <div class="field" style="margin-bottom:10px;">
@@ -667,7 +718,7 @@ function renderDoses() {
         <div style="font-size:12px;color:#555;">${(d.drug||'').split(' ')[0]}<br><span style="color:#1a73e8;font-weight:500;">${d.doza?d.doza+' mg':''}</span></div>
         <div style="font-size:12px;color:#1a4f8a;">${d.lekar ? '<i class="ti ti-stethoscope" style="font-size:11px;"></i> '+d.lekar : '<span style="color:#ccc;">—</span>'}</div>
         <div style="font-size:12px;color:#555;">
-          ${(d.vod||d.vos) ? '<span style="color:#333;">VOD: <b>'+(d.vod||'—')+'</b> · VOS: <b>'+(d.vos||'—')+'</b></span><br>' : ''}
+          ${(d.vodVn||d.vodBcva||d.vosVn||d.vosBcva) ? '<span style="color:#333;font-size:11px;">VOD: <b>'+(d.vodVn||'—')+'</b>'+(d.vodBcva?' → BCVA <b>'+d.vodBcva+'</b>':'')+' &nbsp;|&nbsp; VOS: <b>'+(d.vosVn||'—')+'</b>'+(d.vosBcva?' → BCVA <b>'+d.vosBcva+'</b>':'')+'</span><br>' : ''}
           ${(d.cmtOd||d.cmtOs) ? '<span style="color:#555;">CMT OD: '+(d.cmtOd||'—')+' μm · OS: '+(d.cmtOs||'—')+' μm</span><br>' : ''}
           ${(d.iopOd||d.iopOs) ? '<span style="color:#555;">IOP OD: '+(d.iopOd||'—')+' · OS: '+(d.iopOs||'—')+' mmHg</span><br>' : ''}
           ${d.oct ? '<span style="color:#666;font-style:italic;">OCT: '+d.oct+'</span><br>' : ''}
@@ -688,7 +739,7 @@ function openAddDose() {
   document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj dozu';
   document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
   selectedDrug = '';
-  ['d-doza','d-kontrola','d-napomena','d-vod','d-vos','d-iop-od','d-iop-os','d-cmt-od','d-cmt-os','d-oct'].forEach(id=>document.getElementById(id).value='');
+  ['d-doza','d-kontrola','d-napomena','d-vod-vn','d-vod-sph','d-vod-cyl','d-vod-ax','d-vod-bcva','d-vos-vn','d-vos-sph','d-vos-cyl','d-vos-ax','d-vos-bcva','d-iop-od','d-iop-os','d-cmt-od','d-cmt-os','d-oct'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('d-completed').checked = false;
   setTodaySrb('d-datum');
   renderDrSelect('');
@@ -715,8 +766,16 @@ function openEditDose(id) {
   document.getElementById('d-kontrola').value = d.kontrola ? fmtDate(d.kontrola) : '';
   document.getElementById('d-completed').checked = String(d.completed).toLowerCase() === 'true';
   document.getElementById('d-napomena').value = d.napomena || '';
-  document.getElementById('d-vod').value = d.vod || '';
-  document.getElementById('d-vos').value = d.vos || '';
+  document.getElementById('d-vod-vn').value = d.vodVn || '';
+  document.getElementById('d-vod-sph').value = d.vodSph || '';
+  document.getElementById('d-vod-cyl').value = d.vodCyl || '';
+  document.getElementById('d-vod-ax').value = d.vodAx || '';
+  document.getElementById('d-vod-bcva').value = d.vodBcva || '';
+  document.getElementById('d-vos-vn').value = d.vosVn || '';
+  document.getElementById('d-vos-sph').value = d.vosSph || '';
+  document.getElementById('d-vos-cyl').value = d.vosCyl || '';
+  document.getElementById('d-vos-ax').value = d.vosAx || '';
+  document.getElementById('d-vos-bcva').value = d.vosBcva || '';
   document.getElementById('d-iop-od').value = d.iopOd || '';
   document.getElementById('d-iop-os').value = d.iopOs || '';
   document.getElementById('d-cmt-od').value = d.cmtOd || '';
@@ -752,8 +811,16 @@ async function saveDose() {
     kontrola,
     completed: document.getElementById('d-completed').checked,
     lekar: document.getElementById('d-lekar').value,
-    vod: document.getElementById('d-vod').value,
-    vos: document.getElementById('d-vos').value,
+    vodVn: document.getElementById('d-vod-vn').value,
+    vodSph: document.getElementById('d-vod-sph').value,
+    vodCyl: document.getElementById('d-vod-cyl').value,
+    vodAx: document.getElementById('d-vod-ax').value,
+    vodBcva: document.getElementById('d-vod-bcva').value,
+    vosVn: document.getElementById('d-vos-vn').value,
+    vosSph: document.getElementById('d-vos-sph').value,
+    vosCyl: document.getElementById('d-vos-cyl').value,
+    vosAx: document.getElementById('d-vos-ax').value,
+    vosBcva: document.getElementById('d-vos-bcva').value,
     iopOd: document.getElementById('d-iop-od').value,
     iopOs: document.getElementById('d-iop-os').value,
     cmtOd: document.getElementById('d-cmt-od').value,
@@ -862,7 +929,7 @@ function exportExcel() {
   XLSX.utils.book_append_sheet(wb, wsP, 'Pacijenti');
 
   // --- List 2: Doze (sve, sortirane po pacijentu i datumu) ---
-  const dHeader = ['Pacijent ID','Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Oko','Lek','Doza (mg)','Lekar','VOD','VOS','IOP OD (mmHg)','IOP OS (mmHg)','CMT OD (μm)','CMT OS (μm)','OCT nalaz','Kontrolni pregled','Kontrola obavljena','Napomena'];
+  const dHeader = ['Pacijent ID','Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Oko','Lek','Doza (mg)','Lekar','VOD Vn','VOD DSph','VOD DCyl','VOD Ax','VOD BCVA','VOS Vn','VOS DSph','VOS DCyl','VOS Ax','VOS BCVA','IOP OD (mmHg)','IOP OS (mmHg)','CMT OD (μm)','CMT OS (μm)','OCT nalaz','Kontrolni pregled','Kontrola obavljena','Napomena'];
   const dRows = [];
   patients.forEach(p => {
     const pd = doses
@@ -877,8 +944,16 @@ function exportExcel() {
         d.drug,
         d.doza ? Number(d.doza) : '',
         d.lekar || '',
-        d.vod ? Number(d.vod) : '',
-        d.vos ? Number(d.vos) : '',
+        d.vodVn ? Number(d.vodVn) : '',
+        d.vodSph ? Number(d.vodSph) : '',
+        d.vodCyl ? Number(d.vodCyl) : '',
+        d.vodAx ? Number(d.vodAx) : '',
+        d.vodBcva ? Number(d.vodBcva) : '',
+        d.vosVn ? Number(d.vosVn) : '',
+        d.vosSph ? Number(d.vosSph) : '',
+        d.vosCyl ? Number(d.vosCyl) : '',
+        d.vosAx ? Number(d.vosAx) : '',
+        d.vosBcva ? Number(d.vosBcva) : '',
         d.iopOd ? Number(d.iopOd) : '',
         d.iopOs ? Number(d.iopOs) : '',
         d.cmtOd ? Number(d.cmtOd) : '',
@@ -891,7 +966,7 @@ function exportExcel() {
     });
   });
   const wsD = XLSX.utils.aoa_to_sheet([dHeader, ...dRows]);
-  wsD['!cols'] = [8,12,16,10,7,13,6,18,9,20,7,7,12,12,12,12,30,15,10,30].map(w=>({wch:w}));
+  wsD['!cols'] = [8,12,16,10,7,13,6,18,9,20,7,7,7,5,7,7,7,7,5,7,12,12,12,12,30,15,10,30].map(w=>({wch:w}));
   dHeader.forEach((_,i) => {
     const cell = wsD[XLSX.utils.encode_cell({r:0,c:i})];
     if (cell) cell.s = {font:{bold:true}};
@@ -997,8 +1072,19 @@ function generateReport() {
       lines.push('  Oko:      ' + (d.oko || '—'));
       if (d.lekar) lines.push('  Lekar:    ' + d.lekar);
       // Klinička merenja
-      if (d.vod || d.vos)
-        lines.push('  VOD: ' + (d.vod||'—') + '  |  VOS: ' + (d.vos||'—'));
+      // Vizus
+      if (d.vodVn || d.vodBcva || d.vosSph) {
+        let vodStr = 'Vn ' + (d.vodVn||'—');
+        if (d.vodSph || d.vodCyl) vodStr += ' c/c ' + (d.vodSph>0?'+':''+(d.vodSph||'')) + 'D' + (d.vodCyl?' / '+(d.vodCyl>0?'+':''+(d.vodCyl||''))+'D':'') + (d.vodAx?' × '+d.vodAx+'°':'');
+        if (d.vodBcva) vodStr += ' = BCVA ' + d.vodBcva;
+        lines.push('  VOD: ' + vodStr);
+      }
+      if (d.vosVn || d.vosBcva || d.vosSph) {
+        let vosStr = 'Vn ' + (d.vosVn||'—');
+        if (d.vosSph || d.vosCyl) vosStr += ' c/c ' + (d.vosSph>0?'+':''+(d.vosSph||'')) + 'D' + (d.vosCyl?' / '+(d.vosCyl>0?'+':''+(d.vosCyl||''))+'D':'') + (d.vosAx?' × '+d.vosAx+'°':'');
+        if (d.vosBcva) vosStr += ' = BCVA ' + d.vosBcva;
+        lines.push('  VOS: ' + vosStr);
+      }
       if (d.iopOd || d.iopOs)
         lines.push('  IOP OD: ' + (d.iopOd||'—') + ' mmHg  |  IOP OS: ' + (d.iopOs||'—') + ' mmHg');
       if (d.cmtOd || d.cmtOs)

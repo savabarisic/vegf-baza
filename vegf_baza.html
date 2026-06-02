@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anti-VEGF Studija — Baza pacijenata</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid #e5e5e5;padding:0 2rem;display:flex;align-items:center;gap:16px;height:56px;position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:15px;font-weight:500;}
+.topbar-sub{font-size:13px;color:#888;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.container{max-width:900px;margin:0 auto;padding:2rem 1rem;}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #e5e5e5;margin-bottom:1.5rem;}
+.tab{padding:8px 16px;font-size:14px;color:#888;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.active{color:#1a1a1a;border-bottom:2px solid #1a1a1a;font-weight:500;}
+.section{display:none;}
+.section.active{display:block;}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.card-title{font-size:15px;font-weight:500;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:12px;color:#666;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+.field input,.field select{border:1px solid #e5e5e5;border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;color:#1a1a1a;outline:none;}
+.field input:focus,.field select:focus{border-color:#999;}
+.field textarea{resize:vertical;min-height:60px;padding:8px 10px;border:1px solid #e5e5e5;background:#fff;color:#1a1a1a;border-radius:8px;font-family:inherit;font-size:14px;outline:none;}
+.field textarea:focus{border-color:#999;}
+.btn{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #d5d5d5;background:transparent;color:#1a1a1a;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{background:#f5f5f3;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.btn-primary:hover{background:#333;border-color:#333;}
+.btn-danger{color:#c0392b;border-color:#f5c6c2;}
+.btn-danger:hover{background:#fdf0ef;}
+.btn-success{color:#1a7f5a;border-color:#b6e4d3;}
+.btn-success:hover{background:#edfaf4;}
+.btn-edit{color:#1a73e8;border-color:#c5d9f8;}
+.btn-edit:hover{background:#e8f0fe;}
+.patient-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.patient-row:last-child{border-bottom:none;}
+.patient-row:hover{background:#f9f9f7;margin:0 -1.25rem;padding:10px 1.25rem;border-radius:8px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#e8f0fe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#1a73e8;flex-shrink:0;}
+.patient-info{flex:1;min-width:0;}
+.patient-name{font-size:14px;font-weight:500;}
+.patient-meta{font-size:12px;color:#888;margin-top:1px;}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.badge-blue{background:#e8f0fe;color:#1a73e8;}
+.badge-green{background:#e6f4ea;color:#1a7f5a;}
+.badge-amber{background:#fef7e0;color:#b06000;}
+.dose-row{display:grid;grid-template-columns:110px 50px 90px 110px 1fr auto;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.dose-row:last-child{border-bottom:none;}
+.dose-header{display:grid;grid-template-columns:110px 50px 90px 110px 1fr auto;gap:8px;padding:6px 0;margin-bottom:2px;font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid #e5e5e5;}
+.dose-actions{display:flex;gap:4px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem;}
+.stat{background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:12px;}
+.stat-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;}
+.stat-value{font-size:22px;font-weight:500;}
+.empty-state{text-align:center;padding:2rem;color:#888;font-size:14px;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:flex-start;justify-content:center;z-index:100;padding:2rem 1rem;overflow-y:auto;}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:640px;max-width:100%;border:1px solid #e5e5e5;margin:auto;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;}
+.notice{font-size:12px;color:#666;background:#f5f5f3;border-radius:8px;padding:8px 12px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.notice-edit{background:#e8f0fe;color:#1a4f8a;border-radius:8px;padding:8px 12px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-size:12px;}
+.search-wrap{position:relative;margin-bottom:1rem;}
+.search-wrap input{width:100%;padding-left:34px;border:1px solid #e5e5e5;border-radius:8px;padding-top:8px;padding-bottom:8px;font-size:14px;outline:none;}
+.search-wrap input:focus{border-color:#999;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#aaa;pointer-events:none;}
+.drug-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.drug-btn{padding:10px;border-radius:8px;border:1px solid #e5e5e5;background:transparent;cursor:pointer;font-size:13px;color:#666;text-align:center;}
+.drug-btn.selected{border-color:#1a73e8;background:#e8f0fe;color:#1a73e8;font-weight:500;}
+.drug-btn:hover:not(.selected){background:#f5f5f3;}
+.divider{border:none;border-top:1px solid #f0f0f0;margin:1.25rem 0;}
+.flex-end{display:flex;justify-content:flex-end;gap:8px;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.section-subtitle{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:0.04em;font-weight:500;margin-bottom:10px;}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.alert-success{background:#e6f4ea;color:#1a7f5a;}
+.alert-danger{background:#fdf0ef;color:#c0392b;}
+.alert-info{background:#e8f0fe;color:#1a73e8;}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;}
+.checkbox-row input[type="checkbox"]{width:16px;height:16px;cursor:pointer;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #e5e5e5;border-top-color:#1a1a1a;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.date-combo{position:relative;display:flex;align-items:center;}
+.date-combo input[type="text"]{flex:1;padding-right:32px;}
+.date-combo .cal-btn{position:absolute;right:6px;background:none;border:none;cursor:pointer;color:#aaa;padding:0;font-size:16px;line-height:1;display:flex;align-items:center;}
+.date-combo .cal-btn:hover{color:#333;}
+.date-combo input[type="date"]{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:0;right:0;}
+.loading{text-align:center;padding:2rem;color:#888;font-size:14px;}
+.dr-manager{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:10px 12px;margin-top:6px;}
+.dr-manager-title{font-size:12px;font-weight:500;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.dr-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.dr-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:5px 10px;font-size:13px;}
+.dr-add-row{display:flex;gap:6px;}
+.dr-add-row input{flex:1;border:1px solid #c5d9f8;border-radius:6px;padding:6px 10px;font-size:13px;outline:none;background:#fff;}
+.dr-add-row input:focus{border-color:#1a73e8;}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;}
+.confirm-box{background:#fff;border-radius:12px;padding:1.5rem;width:380px;max-width:100%;border:1px solid #e5e5e5;box-shadow:0 8px 32px rgba(0,0,0,0.12);}
+.confirm-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 1rem;}
+.confirm-icon-danger{background:#fdf0ef;color:#c0392b;}
+.confirm-icon-warning{background:#fef7e0;color:#b06000;}
+.confirm-title{font-size:15px;font-weight:500;text-align:center;margin-bottom:6px;}
+.confirm-msg{font-size:13px;color:#666;text-align:center;line-height:1.5;margin-bottom:1.25rem;}
+.confirm-btns{display:flex;gap:8px;justify-content:center;}
+.pat-view{font-size:13px;}
+.pat-view .info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.75rem;}
+.pat-view .info-item span{color:#888;display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.pat-view .info-item strong{font-size:14px;}
+/* Inline edit for dose row */
+.dose-edit-form{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:12px;margin:4px 0 8px;grid-column:1/-1;}
+@media(max-width:600px){
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .dose-row,.dose-header{grid-template-columns:90px 45px 1fr auto;}
+  .dose-row > div:nth-child(3){display:none;}
+  .dose-row > div:nth-child(4){display:none;}
+  .dose-header > div:nth-child(3){display:none;}
+  .dose-header > div:nth-child(4){display:none;}
+  .topbar{padding:0 1rem;}
+  .container{padding:1rem 0.75rem;}
+  .pat-view .info-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <i class="ti ti-eye" style="font-size:20px;color:#1a73e8;"></i>
+  <div>
+    <div class="topbar-title">Anti-VEGF Studija</div>
+    <div class="topbar-sub">Baza pacijenata</div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn" onclick="loadData()" id="refreshBtn"><i class="ti ti-refresh"></i> Osveži</button>
+    <button class="btn btn-success" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="alertBox" style="display:none;"></div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('patients')"><i class="ti ti-users"></i> Pacijenti</button>
+    <button class="tab" onclick="switchTab('add')"><i class="ti ti-user-plus"></i> Novi pacijent</button>
+  </div>
+
+  <!-- LISTA -->
+  <div id="sec-patients" class="section active">
+    <div class="stats" id="statsBar"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Uključeni pacijenti</span>
+        <span id="patCount" style="font-size:13px;color:#888;"></span>
+      </div>
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon"></i>
+        <input type="text" placeholder="Pretraži po imenu, dijagnozi, ID-u..." oninput="renderPatients(this.value)" style="padding-left:34px;" />
+      </div>
+      <div id="patientList"><div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div></div>
+    </div>
+  </div>
+
+  <!-- DODAJ / EDITUJ PACIJENTA -->
+  <div id="sec-add" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="formTitle">Novi pacijent</span>
+        <button class="btn" id="cancelEditBtn" onclick="cancelEditPatient()" style="display:none;"><i class="ti ti-x"></i> Otkaži izmene</button>
+      </div>
+      <div class="notice" id="formNotice"><i class="ti ti-cloud"></i> Podaci se čuvaju u Google Sheets — vidljivi svim korisnicima u realnom vremenu.</div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="field"><label>Ime</label><input type="text" id="f-ime" placeholder="Npr. Marko" /></div>
+        <div class="field"><label>Prezime</label><input type="text" id="f-prezime" placeholder="Npr. Jovanović" /></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="field"><label>Datum rođenja</label>
+          <div class="date-combo">
+            <input type="text" id="f-dob" placeholder="DD.MM.YYYY." maxlength="11" />
+            <input type="date" id="f-dob-pick" onchange="pickToText('f-dob-pick','f-dob')" />
+            <button class="cal-btn" onclick="document.getElementById('f-dob-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+          </div>
+        </div>
+        <div class="field"><label>Pol</label>
+          <select id="f-pol"><option value="">—</option><option value="M">Muški</option><option value="Ž">Ženski</option></select>
+        </div>
+        <div class="field"><label>ID / Br. istorije</label><input type="text" id="f-id" placeholder="Npr. 2024-001" /></div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="field"><label>JMBG</label><input type="text" id="f-jmbg" placeholder="13 cifara" maxlength="13" /></div>
+        <div class="field"><label>Kontakt</label><input type="text" id="f-kontakt" placeholder="Npr. 064/123-4567" /></div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Dijagnoza</label>
+        <select id="f-dx">
+          <option value="">— Izaberi —</option>
+          <option value="nAMD">nAMD — neovaskularni AMD</option>
+          <option value="DME">DME — dijabetesni makularni edem</option>
+          <option value="BRVO">BRVO — okluzija grane retinalne vene</option>
+          <option value="CRVO">CRVO — okluzija centralne retinalne vene</option>
+          <option value="mCNV">mCNV — miopična horoidalna neovaskularizacija</option>
+          <option value="Ostalo">Ostalo</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Napomena</label>
+        <textarea id="f-napomena" placeholder="Anamneza, komorbiditeti, kontraindikacije..."></textarea>
+      </div>
+      <div class="flex-end">
+        <button class="btn" onclick="clearForm()"><i class="ti ti-x"></i> Poništi</button>
+        <button class="btn btn-primary" onclick="savePatient()" id="savePatBtn"><i class="ti ti-check"></i> Sačuvaj pacijenta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Detalji pacijenta -->
+<div id="overlay" style="display:none;" onclick="closeOverlay(event)">
+  <div class="overlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="avatar" id="m-avatar" style="width:44px;height:44px;font-size:15px;"></div>
+          <div>
+            <div style="font-size:16px;font-weight:500;" id="m-ime"></div>
+            <div style="font-size:13px;color:#888;" id="m-meta"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-edit" onclick="editPatient()"><i class="ti ti-edit"></i> Izmeni podatke</button>
+          <button class="btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+
+      <!-- Prikaz podataka pacijenta -->
+      <div id="patView" class="pat-view">
+        <div class="info-grid">
+          <div class="info-item"><span>Dijagnoza</span><strong id="m-dx"></strong></div>
+          <div class="info-item"><span>Datum rođenja</span><strong id="m-dob"></strong></div>
+          <div class="info-item"><span>Pol</span><strong id="m-pol"></strong></div>
+          <div class="info-item"><span>JMBG</span><strong id="m-jmbg"></strong></div>
+          <div class="info-item"><span>Kontakt</span><strong id="m-kontakt"></strong></div>
+          <div class="info-item"><span>ID / Br. istorije</span><strong id="m-pid"></strong></div>
+        </div>
+        <div style="font-size:13px;color:#888;" id="m-napomena"></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Doze -->
+      <div class="card-header">
+        <span class="card-title">Doze anti-VEGF</span>
+        <button class="btn btn-primary" onclick="openAddDose()"><i class="ti ti-plus"></i> Dodaj dozu</button>
+      </div>
+
+      <!-- Forma za novu dozu / edit doze -->
+      <div id="doseForm" style="display:none;background:#f9f9f7;border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div class="section-subtitle" id="doseFormTitle">Nova doza</div>
+        <div class="drug-selector" id="drugSelector">
+          <button class="drug-btn" onclick="selectDrug(this,'Lucentis (ranibizumab)')">Lucentis</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Eylea (aflibercept)')">Eylea</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Vabysmo (faricimab)')">Vabysmo</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Beovu (brolucizumab)')">Beovu</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Byooviz (ranibizumab BS)')">Byooviz</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Drugi')">Drugi</button>
+        </div>
+        <div class="grid3" style="margin-bottom:10px;">
+          <div class="field"><label>Datum</label>
+            <div class="date-combo">
+              <input type="text" id="d-datum" placeholder="DD.MM.YYYY." maxlength="11" />
+              <input type="date" id="d-datum-pick" onchange="pickToText('d-datum-pick','d-datum')" />
+              <button class="cal-btn" onclick="document.getElementById('d-datum-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+            </div>
+          </div>
+          <div class="field"><label>Oko</label>
+            <select id="d-oko"><option value="OD">OD (desno)</option><option value="OS">OS (levo)</option><option value="OU">OU (oba)</option></select>
+          </div>
+          <div class="field"><label>Doza (mg)</label><input type="number" id="d-doza" placeholder="0.5" step="0.1" min="0" /></div>
+        </div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div class="field"><label>Kontrolni pregled</label>
+            <div class="date-combo">
+              <input type="text" id="d-kontrola" placeholder="DD.MM.YYYY." maxlength="11" />
+              <input type="date" id="d-kontrola-pick" onchange="pickToText('d-kontrola-pick','d-kontrola')" />
+              <button class="cal-btn" onclick="document.getElementById('d-kontrola-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+            </div>
+          </div>
+          <div class="field" style="justify-content:flex-end;padding-top:4px;">
+            <label style="visibility:hidden;font-size:12px;">x</label>
+            <label class="checkbox-row"><input type="checkbox" id="d-completed" /> Kontrola obavljena</label>
+          </div>
+        </div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div class="field">
+            <label>Lekar</label>
+            <select id="d-lekar" style="width:100%;"></select>
+          </div>
+          <div class="field" style="justify-content:flex-end;padding-top:4px;">
+            <label style="visibility:hidden;font-size:12px;">x</label>
+            <button class="btn" style="font-size:12px;padding:5px 10px;" type="button" onclick="toggleDrManager()"><i class="ti ti-settings"></i> Uredi listu lekara</button>
+          </div>
+        </div>
+        <!-- Doctor manager -->
+        <div class="dr-manager" id="drManager" style="display:none;margin-bottom:10px;">
+          <div class="dr-manager-title"><i class="ti ti-stethoscope"></i> Lista lekara</div>
+          <div class="dr-list" id="drList"></div>
+          <div class="dr-add-row">
+            <input type="text" id="drNewName" placeholder="Ime i prezime lekara..." />
+            <button class="btn btn-primary" style="font-size:12px;" type="button" onclick="addDoctor()"><i class="ti ti-plus"></i> Dodaj</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Napomena</label>
+          <textarea id="d-napomena" placeholder="BCVA, OCT nalaz, IOP, reakcija..."></textarea>
+        </div>
+        <div class="flex-end">
+          <button class="btn" onclick="closeDoseForm()">Otkaži</button>
+          <button class="btn btn-primary" onclick="saveDose()" id="saveDoseBtn"><i class="ti ti-check"></i> Sačuvaj dozu</button>
+        </div>
+      </div>
+
+      <div id="doseList"></div>
+      <hr class="divider">
+      <div class="flex-end">
+        <button class="btn btn-danger" onclick="deletePatient()"><i class="ti ti-trash"></i> Obriši pacijenta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbxmH151E2N1Y2f3OcuGZ3Fu1Q4CBBWwjvhjx4CDD8Ilx5y7aypAL1g6Gu2My3abSEsFxg/exec';
+let patients = [], doses = [], currentPid = null, selectedDrug = '', editingDoseId = null, editingPatientId = null;
+
+/* ===== CUSTOM CONFIRM ===== */
+let _confirmResolve = null;
+function showConfirm(opts) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    const icon = document.getElementById('confirmIcon');
+    icon.className = 'confirm-icon ' + (opts.type === 'danger' ? 'confirm-icon-danger' : 'confirm-icon-warning');
+    icon.innerHTML = '<i class="ti ti-' + (opts.type === 'danger' ? 'trash' : 'alert-triangle') + '"></i>';
+    document.getElementById('confirmTitle').textContent = opts.title || 'Potvrda';
+    document.getElementById('confirmMsg').innerHTML = opts.msg || '';
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = opts.okLabel || 'Potvrdi';
+    okBtn.className = 'btn ' + (opts.type === 'danger' ? 'btn-danger' : 'btn-primary');
+    document.getElementById('confirmCancelBtn').textContent = opts.cancelLabel || 'Otkaži';
+    document.getElementById('confirmOverlay').style.display = 'block';
+  });
+}
+function confirmResolve(val) {
+  document.getElementById('confirmOverlay').style.display = 'none';
+  if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+}
+
+/* ===== DATE HELPERS ===== */
+function parseDate(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  // ISO sa timestamp-om: 2026-05-31T22:00:00.000Z — uzmi samo datum deo i koriguj za lokalno vreme
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    // Sheets čuva datum kao ponoć UTC, što može biti prethodni dan u +1/+2 zoni
+    // Uzimamo samo YYYY-MM-DD deo i parsujemo lokalno
+    const datePart = s.substring(0, 10);
+    const d = new Date(datePart + 'T12:00:00'); // podne lokalno — sigurno ispravan dan
+    return isNaN(d) ? null : d;
+  }
+  // YYYY-MM-DD čist ISO
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s + 'T12:00:00');
+  // DD.MM.YYYY ili DD.MM.YYYY.
+  const dot = s.replace(/\.+$/, '').split('.');
+  if (dot.length === 3 && dot[2].length === 4)
+    return new Date(dot[2] + '-' + dot[1].padStart(2,'0') + '-' + dot[0].padStart(2,'0') + 'T12:00:00');
+  // MM/DD/YYYY (Google Sheets fallback)
+  const slash = s.split('/');
+  if (slash.length === 3)
+    return new Date(slash[2] + '-' + slash[0].padStart(2,'0') + '-' + slash[1].padStart(2,'0') + 'T12:00:00');
+  return null;
+}
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = parseDate(v);
+  if (!d || isNaN(d)) return String(v);
+  return String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear() + '.';
+}
+function toISO(v) {
+  if (!v) return '';
+  const d = parseDate(v);
+  if (!d || isNaN(d)) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function pickToText(pickId, textId) {
+  const iso = document.getElementById(pickId).value;
+  if (!iso) return;
+  const p = iso.split('-');
+  document.getElementById(textId).value = p[2] + '.' + p[1] + '.' + p[0] + '.';
+}
+function setTodaySrb(id) {
+  const t = new Date();
+  document.getElementById(id).value = String(t.getDate()).padStart(2,'0') + '.' + String(t.getMonth()+1).padStart(2,'0') + '.' + t.getFullYear() + '.';
+}
+function calcAge(dob) {
+  if (!dob) return '—';
+  const d = parseDate(dob);
+  if (!d || isNaN(d)) return '—';
+  const now = new Date();
+  return now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+}
+
+/* ===== API ===== */
+async function api(params, body) {
+  try {
+    if (body) {
+      const r = await fetch(API, { method: 'POST', body: JSON.stringify(body) });
+      return await r.json();
+    } else {
+      const r = await fetch(API + '?action=' + params);
+      return await r.json();
+    }
+  } catch(e) { showAlert('Greška pri komunikaciji sa serverom.', 'danger'); return null; }
+}
+
+async function loadData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.innerHTML = '<div class="spinner"></div> Učitavam...'; btn.disabled = true;
+  document.getElementById('patientList').innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div>';
+  const data = await api('getAll');
+  btn.innerHTML = '<i class="ti ti-refresh"></i> Osveži'; btn.disabled = false;
+  if (!data) return;
+  const pRows = data.patients || [], dRows = data.doses || [];
+  const pH = pRows[0] || [], dH = dRows[0] || [];
+  patients = pRows.slice(1).map(r => {
+    const o={}; pH.forEach((h,i)=>o[h]=r[i]);
+    o.id = String(o.id||'').trim(); // uvek string
+    return o;
+  });
+  doses = dRows.slice(1).map(r => {
+    const o={}; dH.forEach((h,i)=>o[h]=r[i]);
+    o.id  = String(o.id||'').trim();
+    o.pid = String(o.pid||'').trim(); // mora da se poklapa sa patient.id
+    return o;
+  });
+  renderPatients();
+}
+
+/* ===== UI HELPERS ===== */
+function showAlert(msg, type) {
+  const a = document.getElementById('alertBox');
+  a.className = 'alert alert-' + type;
+  a.innerHTML = '<i class="ti ti-' + (type==='success'?'check':'alert-circle') + '"></i> ' + msg;
+  a.style.display = 'flex';
+  setTimeout(() => a.style.display = 'none', 3500);
+}
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['patients','add'][i] === tab));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('active');
+}
+function initials(ime, prez) { return ((ime||'?')[0] + (prez||'?')[0]).toUpperCase(); }
+function closeModal() { document.getElementById('overlay').style.display='none'; editingDoseId=null; }
+function closeOverlay(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+function closeDoseForm() { document.getElementById('doseForm').style.display='none'; editingDoseId=null; }
+
+/* ===== RENDER PATIENTS ===== */
+function renderPatients(filter) {
+  const total = patients.length, totalDoses = doses.length;
+  const avgDoses = total ? (totalDoses/total).toFixed(1) : 0;
+  const pending = doses.filter(d => d.kontrola && String(d.completed).toLowerCase()!=='true' && parseDate(d.kontrola) >= new Date()).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="stat-label">Pacijenti</div><div class="stat-value">${total}</div></div>
+    <div class="stat"><div class="stat-label">Ukupno doza</div><div class="stat-value">${totalDoses}</div></div>
+    <div class="stat"><div class="stat-label">Avg. doza/pac.</div><div class="stat-value">${avgDoses}</div></div>
+    <div class="stat"><div class="stat-label">Zakazane kontrole</div><div class="stat-value">${pending}</div></div>`;
+  let pts = patients;
+  if (filter) { const f=filter.toLowerCase(); pts=pts.filter(p=>(p.ime+' '+p.prezime).toLowerCase().includes(f)||(p.dx||'').toLowerCase().includes(f)||(p.pid||'').toLowerCase().includes(f)); }
+  document.getElementById('patCount').textContent = pts.length + ' pacijent' + (pts.length===1?'':pts.length<5?'a':'a');
+  const el = document.getElementById('patientList');
+  if (!pts.length) { el.innerHTML='<div class="empty-state"><i class="ti ti-user-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>Nema pacijenata.</div>'; return; }
+  el.innerHTML = pts.map(p => {
+    const pd = doses.filter(d => d.pid === p.id);
+    const lastDose = pd.length ? [...pd].sort((a,b)=>parseDate(b.datum)-parseDate(a.datum))[0].datum : null;
+    const overdue = pd.some(d => d.kontrola && String(d.completed).toLowerCase()!=='true' && parseDate(d.kontrola)<new Date());
+    return `<div class="patient-row" data-pid="${p.id}" onclick="openPatient(this.dataset.pid)">
+      <div class="avatar">${initials(p.ime,p.prezime)}</div>
+      <div class="patient-info">
+        <div class="patient-name">${p.ime} ${p.prezime} <span style="font-size:12px;color:#aaa;font-weight:400;">${p.pid?'· '+p.pid:''}</span></div>
+        <div class="patient-meta">${calcAge(p.dob)} god · ${p.pol||'—'} · ${p.dx||'—'}${lastDose?' · Zadnja inj: '+fmtDate(lastDose):''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <span class="badge badge-blue"><i class="ti ti-syringe" style="font-size:11px;"></i> ${pd.length}</span>
+        ${overdue?'<span class="badge badge-amber"><i class="ti ti-alert-triangle" style="font-size:11px;"></i> Kontrola</span>':''}
+      </div>
+      <i class="ti ti-chevron-right" style="color:#ccc;"></i>
+    </div>`;
+  }).join('');
+}
+
+/* ===== OPEN PATIENT MODAL ===== */
+function openPatient(id) {
+  currentPid = String(id);
+  const p = patients.find(x => x.id === String(id));
+  if (!p) return;
+  document.getElementById('m-avatar').textContent = initials(p.ime, p.prezime);
+  document.getElementById('m-ime').textContent = p.ime + ' ' + p.prezime;
+  document.getElementById('m-meta').textContent = calcAge(p.dob) + ' god · ' + (p.pol||'—') + (p.pid?' · '+p.pid:'');
+  document.getElementById('m-dx').textContent = p.dx||'—';
+  document.getElementById('m-dob').textContent = fmtDate(p.dob);
+  document.getElementById('m-pol').textContent = p.pol||'—';
+  document.getElementById('m-jmbg').textContent = p.jmbg||'—';
+  document.getElementById('m-kontakt').textContent = p.kontakt||'—';
+  document.getElementById('m-pid').textContent = p.pid||'—';
+  document.getElementById('m-napomena').textContent = p.napomena ? '📝 ' + p.napomena : '';
+  document.getElementById('doseForm').style.display = 'none';
+  editingDoseId = null;
+  renderDoses();
+  document.getElementById('overlay').style.display = 'block';
+  setTodaySrb('d-datum');
+}
+
+/* ===== EDIT PATIENT ===== */
+function editPatient() {
+  const p = patients.find(x => x.id === currentPid);
+  if (!p) return;
+  editingPatientId = currentPid;
+  // Populate form
+  document.getElementById('f-ime').value = p.ime||'';
+  document.getElementById('f-prezime').value = p.prezime||'';
+  document.getElementById('f-dob').value = fmtDate(p.dob) === '—' ? '' : fmtDate(p.dob);
+  document.getElementById('f-pol').value = p.pol||'';
+  document.getElementById('f-id').value = p.pid||'';
+  document.getElementById('f-jmbg').value = p.jmbg||'';
+  document.getElementById('f-kontakt').value = p.kontakt||'';
+  document.getElementById('f-dx').value = p.dx||'';
+  document.getElementById('f-napomena').value = p.napomena||'';
+  // Update form UI
+  document.getElementById('formTitle').textContent = 'Izmeni podatke pacijenta';
+  document.getElementById('savePatBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj izmene';
+  document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+  document.getElementById('formNotice').className = 'notice-edit';
+  document.getElementById('formNotice').innerHTML = '<i class="ti ti-edit"></i> Editujete podatke za: <strong>' + p.ime + ' ' + p.prezime + '</strong>';
+  closeModal();
+  switchTab('add');
+  window.scrollTo(0,0);
+}
+
+function cancelEditPatient() {
+  editingPatientId = null;
+  clearForm();
+  document.getElementById('formTitle').textContent = 'Novi pacijent';
+  document.getElementById('savePatBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj pacijenta';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('formNotice').className = 'notice';
+  document.getElementById('formNotice').innerHTML = '<i class="ti ti-cloud"></i> Podaci se čuvaju u Google Sheets — vidljivi svim korisnicima u realnom vremenu.';
+}
+
+/* ===== SAVE PATIENT (add or edit) ===== */
+async function savePatient() {
+  const ime = document.getElementById('f-ime').value.trim();
+  const prezime = document.getElementById('f-prezime').value.trim();
+  if (!ime||!prezime) { showAlert('Unesite ime i prezime.','danger'); return; }
+  const jmbg = document.getElementById('f-jmbg').value.trim();
+  if (jmbg && !/^\d{13}$/.test(jmbg)) { showAlert('JMBG mora imati tačno 13 cifara.','danger'); return; }
+  const btn = document.getElementById('savePatBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Čuvam...';
+
+  const pData = {
+    ime, prezime,
+    dob: toISO(document.getElementById('f-dob').value.trim()),
+    pol: document.getElementById('f-pol').value,
+    pid: document.getElementById('f-id').value.trim(),
+    jmbg, kontakt: document.getElementById('f-kontakt').value.trim(),
+    dx: document.getElementById('f-dx').value,
+    napomena: document.getElementById('f-napomena').value.trim()
+  };
+
+  if (editingPatientId) {
+    // UPDATE: delete old row, insert new with same id
+    const oldP = patients.find(x => x.id === editingPatientId);
+    const ok = await showConfirm({
+      type: 'warning',
+      title: 'Sačuvaj izmene',
+      msg: 'Sačuvati izmene podataka za pacijenta <strong>' + ime + ' ' + prezime + '</strong>?',
+      okLabel: 'Da, sačuvaj',
+      cancelLabel: 'Otkaži'
+    });
+    if (!ok) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene'; return; }
+    const res1 = await api(null, { action: 'deletePatient', id: editingPatientId, keepDoses: true });
+    if (!res1 || !res1.ok) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene'; showAlert('Greška pri čuvanju.','danger'); return; }
+    const newP = { action:'addPatient', id: editingPatientId, ...pData };
+    const res2 = await api(null, newP);
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene';
+    if (res2 && res2.ok) {
+      const idx = patients.findIndex(x => x.id === editingPatientId);
+      if (idx !== -1) patients[idx] = { id: editingPatientId, ...pData };
+      cancelEditPatient();
+      showAlert('Podaci pacijenta ' + ime + ' ' + prezime + ' ažurirani.','success');
+      switchTab('patients'); renderPatients();
+    }
+  } else {
+    // ADD NEW
+    const newP = { action:'addPatient', id: Date.now().toString(), ...pData };
+    const res = await api(null, newP);
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj pacijenta';
+    if (res && res.ok) {
+      patients.push({ id: newP.id, ...pData });
+      clearForm(); showAlert('Pacijent ' + ime + ' ' + prezime + ' uspešno dodat.','success');
+      switchTab('patients'); renderPatients();
+    }
+  }
+}
+
+function clearForm() {
+  ['f-ime','f-prezime','f-id','f-jmbg','f-kontakt','f-napomena','f-dob'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-pol').value='';
+  document.getElementById('f-dx').value='';
+}
+
+/* ===== RENDER DOSES ===== */
+function renderDoses() {
+  const pd = doses.filter(d => d.pid === currentPid).sort((a,b)=>parseDate(a.datum)-parseDate(b.datum));
+  const el = document.getElementById('doseList');
+  if (!pd.length) { el.innerHTML='<div class="empty-state" style="padding:1rem;"><i class="ti ti-syringe" style="font-size:24px;display:block;margin-bottom:6px;"></i>Još nema unesenih doza.</div>'; return; }
+  el.innerHTML = `<div class="dose-header"><div>Br. / Datum</div><div>Oko</div><div>Lek / mg</div><div>Lekar</div><div>Napomena / Kontrola</div><div></div></div>` +
+    pd.map((d,i) => {
+      const completed = String(d.completed).toLowerCase()==='true';
+      const today = new Date(); today.setHours(0,0,0,0);
+      const kontrolaDate = parseDate(d.kontrola);
+      if (kontrolaDate) kontrolaDate.setHours(0,0,0,0);
+      const overdue = d.kontrola && !completed && kontrolaDate && kontrolaDate < today;
+      const ctrl = d.kontrola ? `<span style="font-size:11px;color:${completed?'#1a7f5a':overdue?'#c0392b':'#888'};">
+        <i class="ti ti-calendar"></i> ${fmtDate(d.kontrola)}${completed?' ✓':overdue?' ⚠':''}</span>` : '';
+      const ordinal = i + 1;
+      // filtriramo timestamp vrednosti iz napomene
+      const napomena = (d.napomena||'').trim();
+      const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
+      return `<div class="dose-row" id="drow-${d.id}">
+        <div><span style="font-size:11px;font-weight:600;color:#1a73e8;background:#e8f0fe;border-radius:4px;padding:1px 5px;margin-right:4px;">${ordinal}.</span>${fmtDate(d.datum)}</div>
+        <div><span class="badge ${d.oko==='OD'?'badge-blue':d.oko==='OS'?'badge-green':'badge-amber'}">${d.oko||'—'}</span></div>
+        <div style="font-size:12px;color:#555;">${(d.drug||'').split(' ')[0]}<br><span style="color:#1a73e8;font-weight:500;">${d.doza?d.doza+' mg':''}</span></div>
+        <div style="font-size:12px;color:#1a4f8a;">${d.lekar ? '<i class="ti ti-stethoscope" style="font-size:11px;"></i> '+d.lekar : '<span style="color:#ccc;">—</span>'}</div>
+        <div style="font-size:12px;color:#555;">${napClean ? napClean+'<br>' : ''}${ctrl}</div>
+        <div class="dose-actions">
+          <button class="btn btn-edit" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="openEditDose(this.dataset.did)"><i class="ti ti-edit"></i></button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="deleteDose(this.dataset.did)"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+/* ===== ADD DOSE ===== */
+function openAddDose() {
+  editingDoseId = null;
+  document.getElementById('doseFormTitle').textContent = 'Nova doza';
+  document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj dozu';
+  document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
+  selectedDrug = '';
+  ['d-doza','d-kontrola','d-napomena'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('d-completed').checked = false;
+  setTodaySrb('d-datum');
+  renderDrSelect('');
+  document.getElementById('doseForm').style.display = 'block';
+  document.getElementById('doseForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ===== EDIT DOSE ===== */
+function openEditDose(id) {
+  id = String(id);
+  const d = doses.find(x => x.id === id);
+  if (!d) return;
+  editingDoseId = id;
+  document.getElementById('doseFormTitle').textContent = 'Izmeni dozu';
+  document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj izmene';
+  // Set drug
+  selectedDrug = d.drug || '';
+  document.querySelectorAll('.drug-btn').forEach(b => {
+    b.classList.toggle('selected', b.textContent.trim() === (d.drug||'').split(' ')[0]);
+  });
+  document.getElementById('d-datum').value = fmtDate(d.datum) === '—' ? '' : fmtDate(d.datum);
+  document.getElementById('d-oko').value = d.oko || 'OD';
+  document.getElementById('d-doza').value = d.doza || '';
+  document.getElementById('d-kontrola').value = d.kontrola ? fmtDate(d.kontrola) : '';
+  document.getElementById('d-completed').checked = String(d.completed).toLowerCase() === 'true';
+  document.getElementById('d-napomena').value = d.napomena || '';
+  renderDrSelect(d.lekar || '');
+  document.getElementById('doseForm').style.display = 'block';
+  document.getElementById('doseForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function selectDrug(btn, name) {
+  selectedDrug = name;
+  document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+/* ===== SAVE DOSE (add or edit) ===== */
+async function saveDose() {
+  const datumRaw = document.getElementById('d-datum').value.trim();
+  if (!datumRaw) { showAlert('Unesite datum doze.','danger'); return; }
+  if (!selectedDrug) { showAlert('Izaberite lek.','danger'); return; }
+  const datum = toISO(datumRaw);
+  const kontrolaRaw = document.getElementById('d-kontrola').value.trim();
+  const kontrola = kontrolaRaw ? toISO(kontrolaRaw) : '';
+  const btn = document.getElementById('saveDoseBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Čuvam...';
+
+  const doseData = {
+    pid: currentPid, datum,
+    oko: document.getElementById('d-oko').value,
+    drug: selectedDrug,
+    doza: document.getElementById('d-doza').value,
+    kontrola,
+    completed: document.getElementById('d-completed').checked,
+    lekar: document.getElementById('d-lekar').value,
+    napomena: document.getElementById('d-napomena').value
+  };
+
+  if (editingDoseId) {
+    // UPDATE: delete + re-add with same id
+    const d = doses.find(x => x.id === editingDoseId);
+    const oldInfo = d ? fmtDate(d.datum) + ' · ' + (d.drug||'').split(' ')[0] + ' · ' + (d.oko||'') : '';
+    const okEdit = await showConfirm({
+      type: 'warning',
+      title: 'Sačuvaj izmene doze',
+      msg: 'Sačuvati izmene za dozu:<br><strong>' + oldInfo + '</strong>?',
+      okLabel: 'Da, sačuvaj',
+      cancelLabel: 'Otkaži'
+    });
+    if (!okEdit) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene'; return; }
+    const res1 = await api(null, { action:'deleteDose', id: editingDoseId });
+    if (!res1 || !res1.ok) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene'; showAlert('Greška pri čuvanju.','danger'); return; }
+    const res2 = await api(null, { action:'addDose', id: editingDoseId, ...doseData });
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene';
+    if (res2 && res2.ok) {
+      const idx = doses.findIndex(x => x.id === editingDoseId);
+      if (idx !== -1) doses[idx] = { id: editingDoseId, ...doseData };
+      closeDoseForm(); renderDoses(); renderPatients();
+      showAlert('Doza ažurirana.','success');
+    }
+  } else {
+    // ADD NEW
+    const newId = Date.now().toString();
+    const res = await api(null, { action:'addDose', id: newId, ...doseData });
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj dozu';
+    if (res && res.ok) {
+      doses.push({ id: newId, ...doseData });
+      closeDoseForm(); renderDoses(); renderPatients();
+      showAlert('Doza sačuvana.','success');
+    }
+  }
+}
+
+/* ===== DELETE ===== */
+async function deletePatient() {
+  const p = patients.find(x => x.id === currentPid);
+  const name = p ? p.ime + ' ' + p.prezime : 'pacijenta';
+  const nd = doses.filter(d => d.pid === currentPid).length;
+  const ok = await showConfirm({
+    type: 'danger',
+    title: 'Obriši pacijenta',
+    msg: 'Da li ste sigurni da želite da obrišete <strong>' + name + '</strong>?<br><span style="color:#c0392b;">Biće obrisano i <strong>' + nd + ' doz' + (nd===1?'a':nd<5?'e':'a') + '</strong>. Ova akcija je nepovratna.</span>',
+    okLabel: 'Da, obriši',
+    cancelLabel: 'Otkaži'
+  });
+  if (!ok) return;
+  const res = await api(null, { action:'deletePatient', id: currentPid });
+  if (res && res.ok) {
+    patients = patients.filter(p=>p.id!==currentPid);
+    doses = doses.filter(d=>d.pid!==currentPid);
+    closeModal(); renderPatients(); showAlert('Pacijent obrisan.','success');
+  }
+}
+
+async function deleteDose(id) {
+  id = String(id);
+  const d = doses.find(x => x.id === id);
+  const info = d ? fmtDate(d.datum) + ' · ' + (d.drug||'').split(' ')[0] + ' · ' + (d.oko||'') : '';
+  const ok = await showConfirm({
+    type: 'danger',
+    title: 'Obriši dozu',
+    msg: 'Obrisati dozu:<br><strong>' + info + '</strong>?<br><span style="color:#c0392b;">Ova akcija je nepovratna.</span>',
+    okLabel: 'Da, obriši',
+    cancelLabel: 'Otkaži'
+  });
+  if (!ok) return;
+  const res = await api(null, { action:'deleteDose', id });
+  if (res && res.ok) {
+    doses = doses.filter(d=>d.id!==id);
+    renderDoses(); renderPatients(); showAlert('Doza obrisana.','success');
+  }
+}
+
+/* ===== EXPORT EXCEL ===== */
+function exportExcel() {
+  if (!patients.length) { showAlert('Nema podataka za export.','danger'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // --- List 1: Pacijenti ---
+  const pHeader = ['ID','Ime','Prezime','Datum rođenja','Starost','Pol','JMBG','Kontakt','Dijagnoza','Br. istorije','Napomena','Broj doza'];
+  const pRows = patients.map(p => [
+    p.id, p.ime, p.prezime,
+    fmtDate(p.dob), calcAge(p.dob), p.pol,
+    p.jmbg, p.kontakt, p.dx, p.pid, p.napomena,
+    doses.filter(d => d.pid === p.id).length
+  ]);
+  const wsP = XLSX.utils.aoa_to_sheet([pHeader, ...pRows]);
+  // Column widths
+  wsP['!cols'] = [8,12,16,14,7,5,16,16,10,12,30,10].map(w=>({wch:w}));
+  // Header style
+  pHeader.forEach((_,i) => {
+    const cell = wsP[XLSX.utils.encode_cell({r:0,c:i})];
+    if (cell) cell.s = {font:{bold:true},fill:{fgColor:{rgb:'1A73E8'}},fontColor:{rgb:'FFFFFF'}};
+  });
+  XLSX.utils.book_append_sheet(wb, wsP, 'Pacijenti');
+
+  // --- List 2: Doze (sve, sortirane po pacijentu i datumu) ---
+  const dHeader = ['Pacijent ID','Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Oko','Lek','Doza (mg)','Lekar','Kontrolni pregled','Kontrola obavljena','Napomena'];
+  const dRows = [];
+  patients.forEach(p => {
+    const pd = doses
+      .filter(d => d.pid === p.id)
+      .sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+    pd.forEach((d, i) => {
+      dRows.push([
+        p.id, p.ime, p.prezime, p.dx,
+        i + 1,
+        fmtDate(d.datum),
+        d.oko,
+        d.drug,
+        d.doza ? Number(d.doza) : '',
+        d.lekar || '',
+        d.kontrola ? fmtDate(d.kontrola) : '',
+        String(d.completed).toLowerCase() === 'true' ? 'Da' : 'Ne',
+        d.napomena || ''
+      ]);
+    });
+  });
+  const wsD = XLSX.utils.aoa_to_sheet([dHeader, ...dRows]);
+  wsD['!cols'] = [8,12,16,10,7,13,6,18,9,20,15,10,30].map(w=>({wch:w}));
+  dHeader.forEach((_,i) => {
+    const cell = wsD[XLSX.utils.encode_cell({r:0,c:i})];
+    if (cell) cell.s = {font:{bold:true}};
+  });
+  XLSX.utils.book_append_sheet(wb, wsD, 'Doze');
+
+  // --- List 3: Zakazane kontrole (neobavljene) ---
+  const kHeader = ['Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Lek','Oko','Lekar','Datum kontrole','Status'];
+  const kRows = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  patients.forEach(p => {
+    const pd = doses
+      .filter(d => d.pid === p.id)
+      .sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+    pd.forEach((d, i) => {
+      if (!d.kontrola || String(d.completed).toLowerCase() === 'true') return;
+      const kd = parseDate(d.kontrola);
+      if (!kd) return;
+      kd.setHours(0,0,0,0);
+      const status = kd < today ? 'PREKORAČENO' : 'Zakazano';
+      kRows.push([
+        p.ime, p.prezime, p.dx,
+        i + 1,
+        fmtDate(d.datum), d.drug, d.oko,
+        d.lekar || '',
+        fmtDate(d.kontrola),
+        status
+      ]);
+    });
+  });
+  if (kRows.length) {
+    kRows.sort((a,b) => parseDate(a[8]) - parseDate(b[8]));
+    const wsK = XLSX.utils.aoa_to_sheet([kHeader, ...kRows]);
+    wsK['!cols'] = [12,16,10,7,13,18,6,20,15,12].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb, wsK, 'Kontrole');
+  }
+
+  const fname = 'VEGF_Studija_' + new Date().toISOString().split('T')[0] + '.xlsx';
+  XLSX.writeFile(wb, fname);
+  showAlert('Excel fajl exportovan (' + patients.length + ' pacijenata, ' + doses.length + ' doza).', 'success');
+}
+
+/* ===== DOCTOR MANAGEMENT ===== */
+const DR_KEY = 'vegf_lekari';
+function getDoctors() {
+  try { return JSON.parse(localStorage.getItem(DR_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveDoctors(list) {
+  localStorage.setItem(DR_KEY, JSON.stringify(list));
+}
+function renderDrSelect(selected) {
+  const sel = document.getElementById('d-lekar');
+  const docs = getDoctors();
+  sel.innerHTML = '<option value="">— Izaberi lekara —</option>' +
+    docs.map(d => `<option value="${d}" ${d === selected ? 'selected' : ''}>${d}</option>`).join('');
+}
+function renderDrList() {
+  const docs = getDoctors();
+  const el = document.getElementById('drList');
+  if (!docs.length) { el.innerHTML = '<div style="font-size:12px;color:#888;padding:4px 0;">Još nema lekara. Dodajte prvog.</div>'; return; }
+  el.innerHTML = docs.map((d,i) => `
+    <div class="dr-item">
+      <span><i class="ti ti-user-circle" style="font-size:13px;color:#1a73e8;vertical-align:-2px;margin-right:4px;"></i>${d}</span>
+      <button class="btn btn-danger" style="padding:2px 8px;font-size:11px;" onclick="removeDoctor(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+function toggleDrManager() {
+  const el = document.getElementById('drManager');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  if (open) renderDrList();
+}
+function addDoctor() {
+  const inp = document.getElementById('drNewName');
+  const name = inp.value.trim();
+  if (!name) { showAlert('Unesite ime lekara.','danger'); return; }
+  const docs = getDoctors();
+  if (docs.includes(name)) { showAlert('Lekar već postoji u listi.','danger'); return; }
+  docs.push(name);
+  saveDoctors(docs);
+  inp.value = '';
+  renderDrList();
+  renderDrSelect(name); // auto-selektuj novog
+  showAlert('Lekar dodat.','success');
+}
+function removeDoctor(idx) {
+  const docs = getDoctors();
+  const name = docs[idx];
+  docs.splice(idx, 1);
+  saveDoctors(docs);
+  renderDrList();
+  renderDrSelect('');
+  showAlert(name + ' uklonjen iz liste.','success');
+}
+
+loadData();
+</script>
+<!-- CONFIRM MODAL -->
+<div id="confirmOverlay" style="display:none;">
+  <div class="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-icon" id="confirmIcon"></div>
+      <div class="confirm-title" id="confirmTitle"></div>
+      <div class="confirm-msg" id="confirmMsg"></div>
+      <div class="confirm-btns">
+        <button class="btn" onclick="confirmResolve(false)" id="confirmCancelBtn">Otkaži</button>
+        <button class="btn" onclick="confirmResolve(true)" id="confirmOkBtn">Potvrdi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

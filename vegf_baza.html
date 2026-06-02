@@ -99,13 +99,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .clin-badge{display:inline-block;font-size:10px;background:#1a73e8;color:#fff;border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:1px;text-transform:none;letter-spacing:0;}
 .va-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
 .va-row input{border:1px solid #c5d9f8;border-radius:6px;padding:6px 7px;font-size:14px;background:#fff;outline:none;min-width:0;}
+.va-row input[type=number]::-webkit-inner-spin-button,
+.va-row input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.va-row input[type=number]{-moz-appearance:textfield;}
 .va-row input:focus{border-color:#1a73e8;}
 .va-row .va-lbl{font-size:12px;color:#1a4f8a;font-weight:500;white-space:nowrap;}
 .va-row .va-sign{font-size:14px;color:#1a4f8a;font-weight:600;padding:0 1px;}
 .va-row .w-vn{width:58px;}
 .va-row .w-sph{width:66px;}
 .va-row .w-cyl{width:66px;}
-.va-row .w-ax{width:62px;}
+.va-row .w-ax{width:70px;}
 .va-row .w-bcva{width:62px;}
 .va-group{background:#fff;border:1px solid #c5d9f8;border-radius:8px;padding:8px 10px;margin-bottom:8px;}
 .va-group-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}

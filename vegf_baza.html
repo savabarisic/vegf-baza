@@ -93,6 +93,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .date-combo .cal-btn:hover{color:#333;}
 .date-combo input[type="date"]{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:0;right:0;}
 .loading{text-align:center;padding:2rem;color:#888;font-size:14px;}
+.clin-section{background:#edf4ff;border:1px solid #c5d9f8;border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+.clin-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.clin-badge{display:inline-block;font-size:10px;background:#1a73e8;color:#fff;border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:1px;}
 .report-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-start;justify-content:center;z-index:150;padding:2rem 1rem;overflow-y:auto;}
 .report-modal{background:#fff;border-radius:12px;padding:1.5rem;width:660px;max-width:100%;border:1px solid #e5e5e5;margin:auto;}
 .report-text{font-family:'Menlo','Consolas',monospace;font-size:12px;line-height:1.8;background:#f9f9f7;border:1px solid #e5e5e5;border-radius:8px;padding:1rem;white-space:pre-wrap;color:#1a1a1a;min-height:200px;max-height:60vh;overflow-y:auto;user-select:all;}
@@ -317,9 +321,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
             <button class="btn btn-primary" style="font-size:12px;" type="button" onclick="addDoctor()"><i class="ti ti-plus"></i> Dodaj</button>
           </div>
         </div>
+        <!-- Klinička merenja pre injekcije -->
+        <div class="clin-section">
+          <div class="clin-title"><i class="ti ti-eye"></i> Klinička merenja <span style="font-size:10px;font-weight:400;color:#5580b0;">(pre injekcije)</span></div>
+          <div class="grid4" style="margin-bottom:8px;">
+            <div class="field"><label>VOD</label><input type="number" id="d-vod" placeholder="0.0" step="0.05" min="0" max="1.2" /></div>
+            <div class="field"><label>VOS</label><input type="number" id="d-vos" placeholder="0.0" step="0.05" min="0" max="1.2" /></div>
+            <div class="field"><label>IOP OD <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-od" placeholder="—" step="1" min="0" max="60" /></div>
+            <div class="field"><label>IOP OS <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-os" placeholder="—" step="1" min="0" max="60" /></div>
+          </div>
+          <div class="grid4" style="margin-bottom:8px;">
+            <div class="field"><label>CMT OD <span class="clin-badge">μm</span></label><input type="number" id="d-cmt-od" placeholder="—" step="1" min="0" max="1000" /></div>
+            <div class="field"><label>CMT OS <span class="clin-badge">μm</span></label><input type="number" id="d-cmt-os" placeholder="—" step="1" min="0" max="1000" /></div>
+            <div class="field" style="grid-column:span 2;"><label>OCT nalaz makule</label><input type="text" id="d-oct" placeholder="Npr. subfovealni fluid, druze..." /></div>
+          </div>
+        </div>
         <div class="field" style="margin-bottom:10px;">
           <label>Napomena</label>
-          <textarea id="d-napomena" placeholder="BCVA, OCT nalaz, IOP, reakcija..."></textarea>
+          <textarea id="d-napomena" placeholder="Ostale napomene..."></textarea>
         </div>
         <div class="flex-end">
           <button class="btn" onclick="closeDoseForm()">Otkaži</button>
@@ -647,7 +666,13 @@ function renderDoses() {
         <div><span class="badge ${d.oko==='OD'?'badge-blue':d.oko==='OS'?'badge-green':'badge-amber'}">${d.oko||'—'}</span></div>
         <div style="font-size:12px;color:#555;">${(d.drug||'').split(' ')[0]}<br><span style="color:#1a73e8;font-weight:500;">${d.doza?d.doza+' mg':''}</span></div>
         <div style="font-size:12px;color:#1a4f8a;">${d.lekar ? '<i class="ti ti-stethoscope" style="font-size:11px;"></i> '+d.lekar : '<span style="color:#ccc;">—</span>'}</div>
-        <div style="font-size:12px;color:#555;">${napClean ? napClean+'<br>' : ''}${ctrl}</div>
+        <div style="font-size:12px;color:#555;">
+          ${(d.vod||d.vos) ? '<span style="color:#333;">VOD: <b>'+(d.vod||'—')+'</b> · VOS: <b>'+(d.vos||'—')+'</b></span><br>' : ''}
+          ${(d.cmtOd||d.cmtOs) ? '<span style="color:#555;">CMT OD: '+(d.cmtOd||'—')+' μm · OS: '+(d.cmtOs||'—')+' μm</span><br>' : ''}
+          ${(d.iopOd||d.iopOs) ? '<span style="color:#555;">IOP OD: '+(d.iopOd||'—')+' · OS: '+(d.iopOs||'—')+' mmHg</span><br>' : ''}
+          ${d.oct ? '<span style="color:#666;font-style:italic;">OCT: '+d.oct+'</span><br>' : ''}
+          ${napClean ? napClean+'<br>' : ''}${ctrl}
+        </div>
         <div class="dose-actions">
           <button class="btn btn-edit" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="openEditDose(this.dataset.did)"><i class="ti ti-edit"></i></button>
           <button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="deleteDose(this.dataset.did)"><i class="ti ti-trash"></i></button>
@@ -663,7 +688,7 @@ function openAddDose() {
   document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj dozu';
   document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
   selectedDrug = '';
-  ['d-doza','d-kontrola','d-napomena'].forEach(id=>document.getElementById(id).value='');
+  ['d-doza','d-kontrola','d-napomena','d-vod','d-vos','d-iop-od','d-iop-os','d-cmt-od','d-cmt-os','d-oct'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('d-completed').checked = false;
   setTodaySrb('d-datum');
   renderDrSelect('');
@@ -690,6 +715,13 @@ function openEditDose(id) {
   document.getElementById('d-kontrola').value = d.kontrola ? fmtDate(d.kontrola) : '';
   document.getElementById('d-completed').checked = String(d.completed).toLowerCase() === 'true';
   document.getElementById('d-napomena').value = d.napomena || '';
+  document.getElementById('d-vod').value = d.vod || '';
+  document.getElementById('d-vos').value = d.vos || '';
+  document.getElementById('d-iop-od').value = d.iopOd || '';
+  document.getElementById('d-iop-os').value = d.iopOs || '';
+  document.getElementById('d-cmt-od').value = d.cmtOd || '';
+  document.getElementById('d-cmt-os').value = d.cmtOs || '';
+  document.getElementById('d-oct').value = d.oct || '';
   renderDrSelect(d.lekar || '');
   document.getElementById('doseForm').style.display = 'block';
   document.getElementById('doseForm').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -720,6 +752,13 @@ async function saveDose() {
     kontrola,
     completed: document.getElementById('d-completed').checked,
     lekar: document.getElementById('d-lekar').value,
+    vod: document.getElementById('d-vod').value,
+    vos: document.getElementById('d-vos').value,
+    iopOd: document.getElementById('d-iop-od').value,
+    iopOs: document.getElementById('d-iop-os').value,
+    cmtOd: document.getElementById('d-cmt-od').value,
+    cmtOs: document.getElementById('d-cmt-os').value,
+    oct: document.getElementById('d-oct').value,
     napomena: document.getElementById('d-napomena').value
   };
 
@@ -823,7 +862,7 @@ function exportExcel() {
   XLSX.utils.book_append_sheet(wb, wsP, 'Pacijenti');
 
   // --- List 2: Doze (sve, sortirane po pacijentu i datumu) ---
-  const dHeader = ['Pacijent ID','Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Oko','Lek','Doza (mg)','Lekar','Kontrolni pregled','Kontrola obavljena','Napomena'];
+  const dHeader = ['Pacijent ID','Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Oko','Lek','Doza (mg)','Lekar','VOD','VOS','IOP OD (mmHg)','IOP OS (mmHg)','CMT OD (μm)','CMT OS (μm)','OCT nalaz','Kontrolni pregled','Kontrola obavljena','Napomena'];
   const dRows = [];
   patients.forEach(p => {
     const pd = doses
@@ -845,7 +884,7 @@ function exportExcel() {
     });
   });
   const wsD = XLSX.utils.aoa_to_sheet([dHeader, ...dRows]);
-  wsD['!cols'] = [8,12,16,10,7,13,6,18,9,20,15,10,30].map(w=>({wch:w}));
+  wsD['!cols'] = [8,12,16,10,7,13,6,18,9,20,7,7,12,12,12,12,30,15,10,30].map(w=>({wch:w}));
   dHeader.forEach((_,i) => {
     const cell = wsD[XLSX.utils.encode_cell({r:0,c:i})];
     if (cell) cell.s = {font:{bold:true}};
@@ -947,9 +986,18 @@ function generateReport() {
       const completed = String(d.completed).toLowerCase() === 'true';
 
       lines.push('Doza ' + (i+1) + ': ' + fmtDate(d.datum));
-      lines.push('  Lek:    ' + (d.drug || '—') + (d.doza ? ', ' + d.doza + ' mg' : ''));
-      lines.push('  Oko:    ' + (d.oko || '—'));
-      if (d.lekar) lines.push('  Lekar:  ' + d.lekar);
+      lines.push('  Lek:      ' + (d.drug || '—') + (d.doza ? ', ' + d.doza + ' mg' : ''));
+      lines.push('  Oko:      ' + (d.oko || '—'));
+      if (d.lekar) lines.push('  Lekar:    ' + d.lekar);
+      // Klinička merenja
+      if (d.vod || d.vos)
+        lines.push('  VOD: ' + (d.vod||'—') + '  |  VOS: ' + (d.vos||'—'));
+      if (d.iopOd || d.iopOs)
+        lines.push('  IOP OD: ' + (d.iopOd||'—') + ' mmHg  |  IOP OS: ' + (d.iopOs||'—') + ' mmHg');
+      if (d.cmtOd || d.cmtOs)
+        lines.push('  CMT OD: ' + (d.cmtOd||'—') + ' μm  |  CMT OS: ' + (d.cmtOs||'—') + ' μm');
+      if (d.oct)
+        lines.push('  OCT makule: ' + d.oct);
       if (d.kontrola) {
         const kd = parseDate(d.kontrola);
         const kd0 = new Date(kd); kd0.setHours(0,0,0,0);

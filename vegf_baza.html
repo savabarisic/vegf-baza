@@ -877,6 +877,13 @@ function exportExcel() {
         d.drug,
         d.doza ? Number(d.doza) : '',
         d.lekar || '',
+        d.vod ? Number(d.vod) : '',
+        d.vos ? Number(d.vos) : '',
+        d.iopOd ? Number(d.iopOd) : '',
+        d.iopOs ? Number(d.iopOs) : '',
+        d.cmtOd ? Number(d.cmtOd) : '',
+        d.cmtOs ? Number(d.cmtOs) : '',
+        d.oct || '',
         d.kontrola ? fmtDate(d.kontrola) : '',
         String(d.completed).toLowerCase() === 'true' ? 'Da' : 'Ne',
         d.napomena || ''

@@ -1031,80 +1031,144 @@ function generateReport() {
     .filter(d => d.kontrola && String(d.completed).toLowerCase() !== 'true')
     .sort((a,b) => parseDate(a.kontrola) - parseDate(b.kontrola))[0];
 
+  // Helper: formatira refrakcionu korekciju
+  function fmtRefr(sph, cyl, ax) {
+    if (!sph && !cyl) return '';
+    let s = '';
+    if (sph) s += (Number(sph) > 0 ? '+' : '') + sph + ' D sph';
+    if (cyl) s += (s ? ', ' : '') + (Number(cyl) > 0 ? '+' : '') + cyl + ' D cyl';
+    if (ax && cyl) s += ' × ' + ax + '°';
+    return s;
+  }
+
+  // Helper: rečenica o vizusu za jedno oko
+  function fmtVizus(vn, sph, cyl, ax, bcva) {
+    if (!vn && !bcva) return null;
+    let s = '';
+    if (vn) s += 'Vn = ' + vn;
+    const refr = fmtRefr(sph, cyl, ax);
+    if (refr) s += (s ? ', korekcija: ' : 'Korekcija: ') + refr;
+    if (bcva) s += (s ? '; BCVA = ' : 'BCVA = ') + bcva;
+    return s;
+  }
+
   let lines = [];
 
-  lines.push('ANTI-VEGF TERAPIJA — PREGLED LEČENJA');
-  lines.push('Datum izveštaja: ' + todayStr);
-  lines.push('═'.repeat(50));
+  lines.push('NALAZ I MIŠLJENJE');
+  lines.push('Datum pregleda: ' + todayStr);
+  lines.push('═'.repeat(56));
   lines.push('');
 
-  // Dijagnoza i status
+  // Dijagnoza
   lines.push('DIJAGNOZA: ' + (p.dx || '—'));
-  if (p.napomena) lines.push('Napomena: ' + p.napomena);
+  if (p.napomena) {
+    lines.push('');
+    lines.push('Anamneza / napomena: ' + p.napomena);
+  }
   lines.push('');
 
-  // Sažetak terapije
-  lines.push('SAŽETAK TERAPIJE:');
-  lines.push('Ukupan broj doza: ' + pd.length);
+  // Uvodni sažetak
   if (pd.length > 0) {
-    lines.push('Prva doza: ' + fmtDate(pd[0].datum) +
-      (pd[0].drug ? ' (' + pd[0].drug.split(' ')[0] + ')' : ''));
-    lines.push('Poslednja doza: ' + fmtDate(lastDose.datum) +
-      (lastDose.drug ? ' (' + lastDose.drug.split(' ')[0] + ')' : ''));
+    const firstDrug = pd[0].drug ? pd[0].drug.split(' ')[0] : '';
+    const lastDrug = lastDose.drug ? lastDose.drug.split(' ')[0] : '';
+    const drugsUsed = [...new Set(pd.map(d => d.drug ? d.drug.split(' ')[0] : '').filter(Boolean))];
+
+    let uvod = 'Pacijent se nalazi na intravitrealno primenjenoj anti-VEGF terapiji';
+    if (drugsUsed.length === 1) uvod += ' preparatom ' + drugsUsed[0];
+    else if (drugsUsed.length > 1) uvod += ' (korišćeni preparati: ' + drugsUsed.join(', ') + ')';
+    uvod += '. Do danas je primljeno ukupno ' + pd.length + ' injekcij' +
+      (pd.length === 1 ? 'a' : pd.length < 5 ? 'e' : 'a') + '.';
+    uvod += ' Prva injekcija data je ' + fmtDate(pd[0].datum) +
+      ', a poslednja ' + fmtDate(lastDose.datum) + '.';
+    lines.push(uvod);
+
+    if (nextCtrl) {
+      const kd = parseDate(nextCtrl.kontrola);
+      const kd0 = new Date(kd); kd0.setHours(0,0,0,0);
+      const t0 = new Date(); t0.setHours(0,0,0,0);
+      if (kd0 < t0) {
+        lines.push('Napomena: kontrolni pregled zakazan za ' + fmtDate(nextCtrl.kontrola) + ' nije evidentiran kao obavljen.');
+      } else {
+        lines.push('Sledeći kontrolni pregled zakazan je za ' + fmtDate(nextCtrl.kontrola) + '.');
+      }
+    }
+    lines.push('');
   }
-  if (nextCtrl) {
-    const kd = parseDate(nextCtrl.kontrola);
-    const kd0 = new Date(kd); kd0.setHours(0,0,0,0);
-    const t0 = new Date(); t0.setHours(0,0,0,0);
-    const status = kd0 < t0 ? ' [PREKORAČENO]' : '';
-    lines.push('Sledeća kontrola: ' + fmtDate(nextCtrl.kontrola) + status);
-  }
-  lines.push('');
 
   // Hronološki pregled doza
   if (pd.length > 0) {
-    lines.push('HRONOLOŠKI PREGLED DOZA:');
-    lines.push('─'.repeat(50));
+    lines.push('HRONOLOŠKI PREGLED PRIMLJENIH INJEKCIJA:');
+    lines.push('─'.repeat(56));
+    lines.push('');
+
     pd.forEach((d, i) => {
       const napomena = (d.napomena||'').trim();
       const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
       const completed = String(d.completed).toLowerCase() === 'true';
+      const drug = d.drug || '—';
+      const oko = d.oko === 'OD' ? 'desno oko (OD)' : d.oko === 'OS' ? 'levo oko (OS)' : 'oba oka (OU)';
 
-      lines.push('Doza ' + (i+1) + ': ' + fmtDate(d.datum));
-      lines.push('  Lek:      ' + (d.drug || '—') + (d.doza ? ', ' + d.doza + ' mg' : ''));
-      lines.push('  Oko:      ' + (d.oko || '—'));
-      if (d.lekar) lines.push('  Lekar:    ' + d.lekar);
-      // Klinička merenja
-      // Vizus
-      if (d.vodVn || d.vodBcva || d.vosSph) {
-        let vodStr = 'Vn ' + (d.vodVn||'—');
-        if (d.vodSph || d.vodCyl) vodStr += ' c/c ' + (d.vodSph>0?'+':''+(d.vodSph||'')) + 'D' + (d.vodCyl?' / '+(d.vodCyl>0?'+':''+(d.vodCyl||''))+'D':'') + (d.vodAx?' × '+d.vodAx+'°':'');
-        if (d.vodBcva) vodStr += ' = BCVA ' + d.vodBcva;
-        lines.push('  VOD: ' + vodStr);
+      lines.push('Injekcija ' + (i+1) + ' — ' + fmtDate(d.datum));
+
+      // Lek i oko
+      let lekLine = 'Primenjen ' + drug;
+      if (d.doza) lekLine += ', doza ' + d.doza + ' mg';
+      lekLine += ', ' + oko;
+      if (d.lekar) lekLine += '. Lekar: ' + d.lekar + '.';
+      lines.push(lekLine);
+
+      // Vidna oštrina
+      const vodStr = fmtVizus(d.vodVn, d.vodSph, d.vodCyl, d.vodAx, d.vodBcva);
+      const vosStr = fmtVizus(d.vosVn, d.vosSph, d.vosCyl, d.vosAx, d.vosBcva);
+      if (vodStr || vosStr) {
+        lines.push('Vidna oštrina pre injekcije:');
+        if (vodStr) lines.push('  VOD: ' + vodStr);
+        if (vosStr) lines.push('  VOS: ' + vosStr);
       }
-      if (d.vosVn || d.vosBcva || d.vosSph) {
-        let vosStr = 'Vn ' + (d.vosVn||'—');
-        if (d.vosSph || d.vosCyl) vosStr += ' c/c ' + (d.vosSph>0?'+':''+(d.vosSph||'')) + 'D' + (d.vosCyl?' / '+(d.vosCyl>0?'+':''+(d.vosCyl||''))+'D':'') + (d.vosAx?' × '+d.vosAx+'°':'');
-        if (d.vosBcva) vosStr += ' = BCVA ' + d.vosBcva;
-        lines.push('  VOS: ' + vosStr);
+
+      // IOP
+      if (d.iopOd || d.iopOs) {
+        let iopLine = 'Intraokularni pritisak: ';
+        if (d.iopOd && d.iopOs) iopLine += 'OD ' + d.iopOd + ' mmHg, OS ' + d.iopOs + ' mmHg.';
+        else if (d.iopOd) iopLine += 'OD ' + d.iopOd + ' mmHg.';
+        else iopLine += 'OS ' + d.iopOs + ' mmHg.';
+        lines.push(iopLine);
       }
-      if (d.iopOd || d.iopOs)
-        lines.push('  IOP OD: ' + (d.iopOd||'—') + ' mmHg  |  IOP OS: ' + (d.iopOs||'—') + ' mmHg');
-      if (d.cmtOd || d.cmtOs)
-        lines.push('  CMT OD: ' + (d.cmtOd||'—') + ' µm  |  CMT OS: ' + (d.cmtOs||'—') + ' µm');
-      if (d.oct)
-        lines.push('  OCT makule: ' + d.oct);
+
+      // CMT
+      if (d.cmtOd || d.cmtOs) {
+        let cmtLine = 'Centralna debljina makule (OCT): ';
+        if (d.cmtOd && d.cmtOs) cmtLine += 'OD ' + d.cmtOd + ' µm, OS ' + d.cmtOs + ' µm.';
+        else if (d.cmtOd) cmtLine += 'OD ' + d.cmtOd + ' µm.';
+        else cmtLine += 'OS ' + d.cmtOs + ' µm.';
+        lines.push(cmtLine);
+      }
+
+      // OCT nalaz
+      if (d.oct) lines.push('OCT nalaz makule: ' + d.oct + '.');
+
+      // Napomena
+      if (napClean) lines.push('Napomena: ' + napClean);
+
+      // Kontrola
       if (d.kontrola) {
         const kd = parseDate(d.kontrola);
         const kd0 = new Date(kd); kd0.setHours(0,0,0,0);
         const t0 = new Date(); t0.setHours(0,0,0,0);
-        const kStatus = completed ? ' [obavljeno]' : kd0 < t0 ? ' [PREKORAČENO]' : ' [zakazano]';
-        lines.push('  Kontrola: ' + fmtDate(d.kontrola) + kStatus);
+        if (completed) {
+          lines.push('Kontrolni pregled od ' + fmtDate(d.kontrola) + ' obavljen.');
+        } else if (kd0 < t0) {
+          lines.push('Kontrolni pregled zakazan za ' + fmtDate(d.kontrola) + ' — nije evidentiran kao obavljen.');
+        } else {
+          lines.push('Kontrolni pregled zakazan za ' + fmtDate(d.kontrola) + '.');
+        }
       }
-      if (napClean) lines.push('  Napomena: ' + napClean);
+
       if (i < pd.length - 1) lines.push('');
     });
-    lines.push('─'.repeat(50));
+
+    lines.push('');
+    lines.push('─'.repeat(56));
   }
 
   lines.push('');
@@ -1113,7 +1177,7 @@ function generateReport() {
   const text = lines.join('\n');
   document.getElementById('reportText').textContent = text;
   document.getElementById('reportSubtitle').textContent =
-    p.dx + ' · ' + pd.length + ' doz' + (pd.length===1?'a':pd.length<5?'e':'a');
+    p.dx + ' · ' + pd.length + ' injekcij' + (pd.length===1?'a':pd.length<5?'e':'a');
   document.getElementById('reportOverlay').style.display = 'block';
   document.getElementById('copySuccess').style.display = 'none';
 }

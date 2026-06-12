@@ -410,7 +410,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxmH151E2N1Y2f3OcuGZ3Fu1Q4CBBWwjvhjx4CDD8Ilx5y7aypAL1g6Gu2My3abSEsFxg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzUcXdXLwh8o4cpi_Kv8bmJg8V_7dJqBpNXkAjgTYWVjJtlIswi5Q6qVhonVcheIINOCA/exec';
 let patients = [], doses = [], currentPid = null, selectedDrug = '', editingDoseId = null, editingPatientId = null;
 
 /* ===== CUSTOM CONFIRM ===== */
@@ -522,6 +522,7 @@ async function loadData() {
     o.pid = String(o.pid||'').trim(); // mora da se poklapa sa patient.id
     return o;
   });
+  await loadDoctors();
   renderPatients();
 }
 
@@ -714,7 +715,7 @@ function renderDoses() {
       const ordinal = i + 1;
       // filtriramo timestamp vrednosti iz napomene
       const napomena = (d.napomena||'').trim();
-      const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
+      const napClean = (!napomena || /^\d{4}-\d{2}-\d{2}T/.test(napomena) || /^\d{4}-\d{2}-\d{2}$/.test(napomena)) ? '' : napomena;
       return `<div class="dose-row" id="drow-${d.id}">
         <div><span style="font-size:11px;font-weight:600;color:#1a73e8;background:#e8f0fe;border-radius:4px;padding:1px 5px;margin-right:4px;">${ordinal}.</span>${fmtDate(d.datum)}</div>
         <div><span class="badge ${d.oko==='OD'?'badge-blue':d.oko==='OS'?'badge-green':'badge-amber'}">${d.oko||'—'}</span></div>
@@ -1103,7 +1104,7 @@ function generateReport() {
 
     pd.forEach((d, i) => {
       const napomena = (d.napomena||'').trim();
-      const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
+      const napClean = (!napomena || /^\d{4}-\d{2}-\d{2}T/.test(napomena) || /^\d{4}-\d{2}-\d{2}$/.test(napomena)) ? '' : napomena;
       const completed = String(d.completed).toLowerCase() === 'true';
       const drug = d.drug || '—';
       const oko = d.oko === 'OD' ? 'desno oko (OD)' : d.oko === 'OS' ? 'levo oko (OS)' : 'oba oka (OU)';
@@ -1196,57 +1197,76 @@ function closeReportOutside(e) {
     document.getElementById('reportOverlay').style.display = 'none';
 }
 
-/* ===== DOCTOR MANAGEMENT ===== */
-const DR_KEY = 'vegf_lekari';
-function getDoctors() {
-  try { return JSON.parse(localStorage.getItem(DR_KEY) || '[]'); } catch(e) { return []; }
+/* ===== DOCTOR MANAGEMENT — Google Sheets ===== */
+let doctorsList = [];
+
+async function loadDoctors() {
+  const data = await api('getDoctors');
+  if (data && data.doctors) {
+    doctorsList = data.doctors.filter(d => d && String(d).trim());
+  }
 }
-function saveDoctors(list) {
-  localStorage.setItem(DR_KEY, JSON.stringify(list));
-}
+
 function renderDrSelect(selected) {
   const sel = document.getElementById('d-lekar');
-  const docs = getDoctors();
   sel.innerHTML = '<option value="">— Izaberi lekara —</option>' +
-    docs.map(d => `<option value="${d}" ${d === selected ? 'selected' : ''}>${d}</option>`).join('');
+    doctorsList.map(d => `<option value="${d}" ${d === selected ? 'selected' : ''}>${d}</option>`).join('');
 }
+
 function renderDrList() {
-  const docs = getDoctors();
   const el = document.getElementById('drList');
-  if (!docs.length) { el.innerHTML = '<div style="font-size:12px;color:#888;padding:4px 0;">Još nema lekara. Dodajte prvog.</div>'; return; }
-  el.innerHTML = docs.map((d,i) => `
+  if (!doctorsList.length) {
+    el.innerHTML = '<div style="font-size:12px;color:#888;padding:4px 0;">Nema lekara u listi.</div>';
+    return;
+  }
+  el.innerHTML = doctorsList.map((d, i) => `
     <div class="dr-item">
       <span><i class="ti ti-user-circle" style="font-size:13px;color:#1a73e8;vertical-align:-2px;margin-right:4px;"></i>${d}</span>
-      <button class="btn btn-danger" style="padding:2px 8px;font-size:11px;" onclick="removeDoctor(${i})"><i class="ti ti-x"></i></button>
+      <button class="btn btn-danger" style="padding:2px 8px;font-size:11px;" data-idx="${i}" onclick="removeDoctor(this.dataset.idx)"><i class="ti ti-x"></i></button>
     </div>`).join('');
 }
+
 function toggleDrManager() {
   const el = document.getElementById('drManager');
   const open = el.style.display === 'none';
   el.style.display = open ? 'block' : 'none';
   if (open) renderDrList();
 }
-function addDoctor() {
+
+async function addDoctor() {
   const inp = document.getElementById('drNewName');
   const name = inp.value.trim();
-  if (!name) { showAlert('Unesite ime lekara.','danger'); return; }
-  const docs = getDoctors();
-  if (docs.includes(name)) { showAlert('Lekar već postoji u listi.','danger'); return; }
-  docs.push(name);
-  saveDoctors(docs);
-  inp.value = '';
-  renderDrList();
-  renderDrSelect(name); // auto-selektuj novog
-  showAlert('Lekar dodat.','success');
+  if (!name) { showAlert('Unesite ime lekara.', 'danger'); return; }
+  if (doctorsList.includes(name)) { showAlert('Lekar već postoji u listi.', 'danger'); return; }
+  const res = await api(null, { action: 'addDoctor', name });
+  if (res && res.ok) {
+    doctorsList.push(name);
+    inp.value = '';
+    renderDrList();
+    renderDrSelect(name);
+    showAlert('Lekar ' + name + ' dodat.', 'success');
+  }
 }
-function removeDoctor(idx) {
-  const docs = getDoctors();
-  const name = docs[idx];
-  docs.splice(idx, 1);
-  saveDoctors(docs);
-  renderDrList();
-  renderDrSelect('');
-  showAlert(name + ' uklonjen iz liste.','success');
+
+async function removeDoctor(idx) {
+  idx = Number(idx);
+  const name = doctorsList[idx];
+  if (!name) return;
+  const ok = await showConfirm({
+    type: 'danger',
+    title: 'Ukloni lekara',
+    msg: 'Ukloniti <strong>' + name + '</strong> iz liste?',
+    okLabel: 'Da, ukloni',
+    cancelLabel: 'Otkaži'
+  });
+  if (!ok) return;
+  const res = await api(null, { action: 'removeDoctor', name });
+  if (res && res.ok) {
+    doctorsList.splice(idx, 1);
+    renderDrList();
+    renderDrSelect('');
+    showAlert(name + ' uklonjen iz liste.', 'success');
+  }
 }
 
 loadData();

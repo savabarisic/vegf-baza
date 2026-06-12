@@ -137,6 +137,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pat-view .info-item strong{font-size:14px;}
 /* Inline edit for dose row */
 .dose-edit-form{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:12px;margin:4px 0 8px;grid-column:1/-1;}
+.dose-filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.filter-btn{padding:4px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #e5e5e5;background:transparent;color:#666;}
+.filter-btn.active{background:#1a73e8;color:#fff;border-color:#1a73e8;font-weight:500;}
+.filter-btn:hover:not(.active){background:#f0f4ff;border-color:#c5d9f8;color:#1a4f8a;}
+.filter-sep{width:1px;height:20px;background:#e5e5e5;margin:0 2px;}
+.filter-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.global-search-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-start;justify-content:center;z-index:150;padding:2rem 1rem;overflow-y:auto;}
+.global-search-modal{background:#fff;border-radius:12px;padding:1.5rem;width:780px;max-width:100%;border:1px solid #e5e5e5;margin:auto;}
+.gs-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end;}
+.gs-result-row{display:grid;grid-template-columns:140px 100px 80px 100px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:start;cursor:pointer;}
+.gs-result-row:hover{background:#f9f9f7;border-radius:6px;margin:0 -4px;padding:8px 4px;}
+.gs-result-row:last-child{border-bottom:none;}
+.gs-header{display:grid;grid-template-columns:140px 100px 80px 100px 1fr;gap:8px;padding:6px 0;font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e5e5e5;margin-bottom:4px;}
+.gs-empty{text-align:center;padding:2rem;color:#888;font-size:14px;}
+.gs-count{font-size:12px;color:#888;margin-bottom:8px;}
 @media(max-width:600px){
   .grid2,.grid3{grid-template-columns:1fr;}
   .dose-row,.dose-header{grid-template-columns:90px 45px 1fr auto;}
@@ -169,6 +184,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="tabs">
     <button class="tab active" onclick="switchTab('patients')"><i class="ti ti-users"></i> Pacijenti</button>
     <button class="tab" onclick="switchTab('add')"><i class="ti ti-user-plus"></i> Novi pacijent</button>
+    <button class="tab" onclick="openGlobalSearch()"><i class="ti ti-search"></i> Napredna pretraga</button>
   </div>
 
   <!-- LISTA -->
@@ -278,6 +294,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="card-header">
         <span class="card-title">Doze anti-VEGF</span>
         <button class="btn btn-primary" onclick="openAddDose()"><i class="ti ti-plus"></i> Dodaj dozu</button>
+      </div>
+      <!-- Filter doze -->
+      <div class="dose-filters" id="doseFilters">
+        <span class="filter-label">Oko:</span>
+        <button class="filter-btn active" onclick="setDoseFilter('oko','sve',this)">Sve</button>
+        <button class="filter-btn" onclick="setDoseFilter('oko','OD',this)">OD</button>
+        <button class="filter-btn" onclick="setDoseFilter('oko','OS',this)">OS</button>
+        <button class="filter-btn" onclick="setDoseFilter('oko','OU',this)">OU</button>
+        <div class="filter-sep"></div>
+        <span class="filter-label">Lek:</span>
+        <select id="filterDrug" onchange="renderDoses()" style="font-size:12px;padding:3px 8px;border:1px solid #e5e5e5;border-radius:20px;outline:none;color:#666;">
+          <option value="">Svi</option>
+        </select>
       </div>
 
       <!-- Forma za novu dozu / edit doze -->
@@ -412,6 +441,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbzUcXdXLwh8o4cpi_Kv8bmJg8V_7dJqBpNXkAjgTYWVjJtlIswi5Q6qVhonVcheIINOCA/exec';
 let patients = [], doses = [], currentPid = null, selectedDrug = '', editingDoseId = null, editingPatientId = null;
+let doseFilter = { oko: 'sve', drug: '' };
 
 /* ===== CUSTOM CONFIRM ===== */
 let _confirmResolve = null;
@@ -500,6 +530,98 @@ async function api(params, body) {
       return await r.json();
     }
   } catch(e) { showAlert('Greška pri komunikaciji sa serverom.', 'danger'); return null; }
+}
+
+/* ===== DOSE FILTERS ===== */
+function setDoseFilter(key, val, btn) {
+  doseFilter[key] = val;
+  if (btn) {
+    btn.closest('.dose-filters').querySelectorAll('.filter-btn[onclick*="setDoseFilter(\'oko\'"]')
+      .forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderDoses();
+}
+
+function populateFilterDrug() {
+  const drugs = [...new Set(doses.filter(d => d.pid === currentPid).map(d => (d.drug||'').split(' ')[0]).filter(Boolean))];
+  const sel = document.getElementById('filterDrug');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Svi</option>' + drugs.map(d => `<option value="${d}" ${d===cur?'selected':''}>${d}</option>`).join('');
+}
+
+/* ===== GLOBAL SEARCH ===== */
+function openGlobalSearch() {
+  // Populate drug filter
+  const drugs = [...new Set(doses.map(d => (d.drug||'').split(' ')[0]).filter(Boolean))];
+  const sel = document.getElementById('gs-drug');
+  sel.innerHTML = '<option value="">Svi</option>' + drugs.map(d => `<option value="${d}">${d}</option>`).join('');
+  document.getElementById('globalSearchOverlay').style.display = 'block';
+  runGlobalSearch();
+}
+
+function closeGSOutside(e) {
+  if (e.target === document.getElementById('globalSearchOverlay'))
+    document.getElementById('globalSearchOverlay').style.display = 'none';
+}
+
+function resetGlobalSearch() {
+  ['gs-patient','gs-od','gs-do'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('gs-oko').value = '';
+  document.getElementById('gs-drug').value = '';
+  runGlobalSearch();
+}
+
+function runGlobalSearch() {
+  const patFilter = document.getElementById('gs-patient').value.trim().toLowerCase();
+  const okoFilter = document.getElementById('gs-oko').value;
+  const drugFilter = document.getElementById('gs-drug').value;
+  const odRaw = document.getElementById('gs-od').value.trim();
+  const doRaw = document.getElementById('gs-do').value.trim();
+  const odDate = odRaw ? parseDate(odRaw) : null;
+  const doDate = doRaw ? parseDate(doRaw) : null;
+
+  let results = [];
+  doses.forEach(d => {
+    const p = patients.find(x => x.id === d.pid);
+    if (!p) return;
+    const patName = (p.ime + ' ' + p.prezime).toLowerCase();
+    const patId = (p.pid||'').toLowerCase();
+    if (patFilter && !patName.includes(patFilter) && !patId.includes(patFilter)) return;
+    if (okoFilter && d.oko !== okoFilter) return;
+    if (drugFilter && (d.drug||'').split(' ')[0] !== drugFilter) return;
+    const dDate = parseDate(d.datum);
+    if (odDate && dDate && dDate < odDate) return;
+    if (doDate && dDate && dDate > doDate) return;
+    results.push({ d, p });
+  });
+
+  results.sort((a,b) => parseDate(a.d.datum) - parseDate(b.d.datum));
+
+  document.getElementById('gsCount').textContent = results.length + ' rezultat' + (results.length===1?'':results.length<5?'a':'a');
+
+  const el = document.getElementById('gsResults');
+  if (!results.length) {
+    el.innerHTML = '<div class="gs-empty"><i class="ti ti-search-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>Nema rezultata za zadatе filtere.</div>';
+    return;
+  }
+
+  el.innerHTML = results.map(({d, p}) => {
+    const napomena = (d.napomena||'').trim();
+    const napClean = /^\d{4}-\d{2}-\d{2}T/.test(napomena) ? '' : napomena;
+    const vodStr = d.vodVn || d.vodBcva ? 'VOD ' + (d.vodVn||'—') + (d.vodBcva?' →'+d.vodBcva:'') : '';
+    const vosStr = d.vosVn || d.vosBcva ? 'VOS ' + (d.vosVn||'—') + (d.vosBcva?' →'+d.vosBcva:'') : '';
+    const cmtStr = (d.cmtOd||d.cmtOs) ? 'CMT ' + (d.cmtOd||'—') + '/' + (d.cmtOs||'—') + 'µm' : '';
+    const iopStr = (d.iopOd||d.iopOs) ? 'IOP ' + (d.iopOd||'—') + '/' + (d.iopOs||'—') + 'mmHg' : '';
+    const clinBits = [vodStr, vosStr, cmtStr, iopStr, d.oct, napClean].filter(Boolean);
+    return `<div class="gs-result-row" onclick="document.getElementById('globalSearchOverlay').style.display='none';openPatient('${p.id}')">
+      <div><span style="font-weight:500;">${p.ime} ${p.prezime}</span><br><span style="font-size:11px;color:#888;">${p.dx||''} · ${p.pid||''}</span></div>
+      <div>${fmtDate(d.datum)}</div>
+      <div><span class="badge ${d.oko==='OD'?'badge-blue':d.oko==='OS'?'badge-green':'badge-amber'}">${d.oko||'—'}</span></div>
+      <div style="font-size:12px;">${(d.drug||'').split(' ')[0]}<br><span style="color:#1a73e8;">${d.doza?d.doza+' mg':''}</span></div>
+      <div style="font-size:11px;color:#666;">${clinBits.slice(0,3).join(' · ')}</div>
+    </div>`;
+  }).join('');
 }
 
 async function loadData() {
@@ -595,6 +717,11 @@ function openPatient(id) {
   document.getElementById('m-napomena').textContent = p.napomena ? '📝 ' + p.napomena : '';
   document.getElementById('doseForm').style.display = 'none';
   editingDoseId = null;
+  doseFilter = { oko: 'sve', drug: '' };
+  // Reset filter buttons
+  document.querySelectorAll('.dose-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  const allBtn = document.querySelector('.dose-filters .filter-btn');
+  if (allBtn) allBtn.classList.add('active');
   renderDoses();
   document.getElementById('overlay').style.display = 'block';
   setTodaySrb('d-datum');
@@ -700,7 +827,12 @@ function clearForm() {
 
 /* ===== RENDER DOSES ===== */
 function renderDoses() {
-  const pd = doses.filter(d => d.pid === currentPid).sort((a,b)=>parseDate(a.datum)-parseDate(b.datum));
+  populateFilterDrug();
+  const drugFilterVal = document.getElementById('filterDrug') ? document.getElementById('filterDrug').value : '';
+  let pd = doses.filter(d => d.pid === currentPid);
+  if (doseFilter.oko !== 'sve') pd = pd.filter(d => d.oko === doseFilter.oko);
+  if (drugFilterVal) pd = pd.filter(d => (d.drug||'').split(' ')[0] === drugFilterVal);
+  pd = pd.sort((a,b)=>parseDate(a.datum)-parseDate(b.datum));
   const el = document.getElementById('doseList');
   if (!pd.length) { el.innerHTML='<div class="empty-state" style="padding:1rem;"><i class="ti ti-syringe" style="font-size:24px;display:block;margin-bottom:6px;"></i>Još nema unesenih doza.</div>'; return; }
   el.innerHTML = `<div class="dose-header"><div>Br. / Datum</div><div>Oko</div><div>Lek / mg</div><div>Lekar</div><div>Napomena / Kontrola</div><div></div></div>` +
@@ -1271,6 +1403,64 @@ async function removeDoctor(idx) {
 
 loadData();
 </script>
+<!-- GLOBAL SEARCH MODAL -->
+<div id="globalSearchOverlay" style="display:none;" onclick="closeGSOutside(event)">
+  <div class="global-search-overlay">
+    <div class="global-search-modal" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div>
+          <div style="font-size:15px;font-weight:500;"><i class="ti ti-search" style="color:#1a73e8;margin-right:6px;"></i>Napredna pretraga doza</div>
+        </div>
+        <button class="btn" onclick="document.getElementById('globalSearchOverlay').style.display='none'"><i class="ti ti-x"></i></button>
+      </div>
+      <!-- Filteri -->
+      <div class="gs-filters">
+        <div class="field" style="min-width:130px;">
+          <label>Pacijent</label>
+          <input type="text" id="gs-patient" placeholder="Ime ili ID..." oninput="runGlobalSearch()" style="padding:6px 10px;font-size:13px;" />
+        </div>
+        <div class="field">
+          <label>Oko</label>
+          <select id="gs-oko" onchange="runGlobalSearch()" style="padding:6px 10px;font-size:13px;">
+            <option value="">Svi</option>
+            <option value="OD">OD (desno)</option>
+            <option value="OS">OS (levo)</option>
+            <option value="OU">OU (oba)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Lek</label>
+          <select id="gs-drug" onchange="runGlobalSearch()" style="padding:6px 10px;font-size:13px;">
+            <option value="">Svi</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Od datuma</label>
+          <div class="date-combo">
+            <input type="text" id="gs-od" placeholder="DD.MM.YYYY." maxlength="11" oninput="runGlobalSearch()" style="width:110px;" />
+            <input type="date" id="gs-od-pick" onchange="pickToText('gs-od-pick','gs-od');runGlobalSearch();" />
+            <button class="cal-btn" onclick="document.getElementById('gs-od-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Do datuma</label>
+          <div class="date-combo">
+            <input type="text" id="gs-do" placeholder="DD.MM.YYYY." maxlength="11" oninput="runGlobalSearch()" style="width:110px;" />
+            <input type="date" id="gs-do-pick" onchange="pickToText('gs-do-pick','gs-do');runGlobalSearch();" />
+            <button class="cal-btn" onclick="document.getElementById('gs-do-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+          </div>
+        </div>
+        <button class="btn" onclick="resetGlobalSearch()" style="align-self:flex-end;font-size:12px;"><i class="ti ti-x"></i> Reset</button>
+      </div>
+      <div class="gs-count" id="gsCount"></div>
+      <div class="gs-header">
+        <div>Pacijent</div><div>Datum</div><div>Oko</div><div>Lek / mg</div><div>Klinički podaci</div>
+      </div>
+      <div id="gsResults" style="max-height:50vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- REPORT MODAL -->
 <div id="reportOverlay" style="display:none;" onclick="closeReportOutside(event)">
   <div class="report-overlay">

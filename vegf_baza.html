@@ -978,37 +978,6 @@ function exportExcel() {
   });
   XLSX.utils.book_append_sheet(wb, wsD, 'Doze');
 
-  // --- List 3: Zakazane kontrole (neobavljene) ---
-  const kHeader = ['Ime','Prezime','Dijagnoza','Br. doze','Datum doze','Lek','Oko','Lekar','Datum kontrole','Status'];
-  const kRows = [];
-  const today = new Date(); today.setHours(0,0,0,0);
-  patients.forEach(p => {
-    const pd = doses
-      .filter(d => d.pid === p.id)
-      .sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
-    pd.forEach((d, i) => {
-      if (!d.kontrola || String(d.completed).toLowerCase() === 'true') return;
-      const kd = parseDate(d.kontrola);
-      if (!kd) return;
-      kd.setHours(0,0,0,0);
-      const status = kd < today ? 'PREKORAČENO' : 'Zakazano';
-      kRows.push([
-        p.ime, p.prezime, p.dx,
-        i + 1,
-        fmtDate(d.datum), d.drug, d.oko,
-        d.lekar || '',
-        fmtDate(d.kontrola),
-        status
-      ]);
-    });
-  });
-  if (kRows.length) {
-    kRows.sort((a,b) => parseDate(a[8]) - parseDate(b[8]));
-    const wsK = XLSX.utils.aoa_to_sheet([kHeader, ...kRows]);
-    wsK['!cols'] = [12,16,10,7,13,18,6,20,15,12].map(w=>({wch:w}));
-    XLSX.utils.book_append_sheet(wb, wsK, 'Kontrole');
-  }
-
   const fname = 'VEGF_Studija_' + new Date().toISOString().split('T')[0] + '.xlsx';
   XLSX.writeFile(wb, fname);
   showAlert('Excel fajl exportovan (' + patients.length + ' pacijenata, ' + doses.length + ' doza).', 'success');

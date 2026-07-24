@@ -137,6 +137,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pat-view .info-item strong{font-size:14px;}
 /* Inline edit for dose row */
 .dose-edit-form{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:12px;margin:4px 0 8px;grid-column:1/-1;}
+.login-overlay{position:fixed;inset:0;background:#f5f5f3;display:flex;align-items:center;justify-content:center;z-index:999;}
+.login-box{background:#fff;border-radius:16px;padding:2rem;width:360px;max-width:90vw;border:1px solid #e5e5e5;box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.login-title{font-size:18px;font-weight:500;}
+.login-sub{font-size:13px;color:#888;margin-top:2px;}
+.login-field{margin-bottom:12px;}
+.login-field label{font-size:12px;color:#666;font-weight:500;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;}
+.login-field input{width:100%;border:1px solid #e5e5e5;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;}
+.login-field input:focus{border-color:#1a73e8;}
+.login-btn{width:100%;padding:10px;border-radius:8px;background:#1a1a1a;color:#fff;border:none;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;}
+.login-btn:hover{background:#333;}
+.login-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.login-error{background:#fdf0ef;color:#c0392b;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:12px;display:none;}
+.user-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:#666;background:#f5f5f3;border-radius:20px;padding:4px 10px;}
+.log-row{display:grid;grid-template-columns:140px 100px 80px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:start;}
+.log-row:last-child{border-bottom:none;}
+.log-header{display:grid;grid-template-columns:140px 100px 80px 1fr;gap:8px;padding:6px 0;font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #e5e5e5;margin-bottom:4px;}
+.log-badge{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.log-add{background:#e6f4ea;color:#1a7f5a;}
+.log-edit{background:#e8f0fe;color:#1a73e8;}
+.log-delete{background:#fdf0ef;color:#c0392b;}
+.log-login{background:#fef7e0;color:#b06000;}
 @media(max-width:600px){
   .grid2,.grid3{grid-template-columns:1fr;}
   .dose-row,.dose-header{grid-template-columns:90px 45px 1fr auto;}
@@ -152,6 +174,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <i class="ti ti-eye" style="font-size:28px;color:#1a73e8;"></i>
+      <div>
+        <div class="login-title">Anti-VEGF Studija</div>
+        <div class="login-sub">Baza pacijenata</div>
+      </div>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-field">
+      <label>Korisničko ime</label>
+      <input type="text" id="loginUser" placeholder="Unesite korisničko ime" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label>Lozinka</label>
+      <input type="password" id="loginPass" placeholder="Unesite lozinku" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password" />
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Prijavi se</button>
+  </div>
+</div>
+
 <div class="topbar">
   <i class="ti ti-eye" style="font-size:20px;color:#1a73e8;"></i>
   <div>
@@ -161,6 +206,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="topbar-right">
     <button class="btn" onclick="loadData()" id="refreshBtn"><i class="ti ti-refresh"></i> Osveži</button>
     <button class="btn btn-success" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>
+    <div class="user-chip" id="userChip" style="display:none;"><i class="ti ti-user"></i><span id="userChipName"></span></div>
+    <button class="btn btn-danger" id="logoutBtn" style="display:none;" onclick="doLogout()"><i class="ti ti-logout"></i> Odjavi se</button>
   </div>
 </div>
 
@@ -169,6 +216,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="tabs">
     <button class="tab active" onclick="switchTab('patients')"><i class="ti ti-users"></i> Pacijenti</button>
     <button class="tab" onclick="switchTab('add')"><i class="ti ti-user-plus"></i> Novi pacijent</button>
+    <button class="tab" onclick="switchTab('log')"><i class="ti ti-history"></i> Log</button>
   </div>
 
   <!-- LISTA -->
@@ -236,6 +284,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="btn" onclick="clearForm()"><i class="ti ti-x"></i> Poništi</button>
         <button class="btn btn-primary" onclick="savePatient()" id="savePatBtn"><i class="ti ti-check"></i> Sačuvaj pacijenta</button>
       </div>
+    </div>
+  </div>
+  <!-- LOG -->
+  <div id="sec-log" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Dnevnik aktivnosti</span>
+        <button class="btn" onclick="loadLog()" id="logRefreshBtn"><i class="ti ti-refresh"></i> Osveži</button>
+      </div>
+      <div id="logContent"><div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam log...</div></div>
     </div>
   </div>
 </div>
@@ -503,7 +561,114 @@ async function api(params, body) {
   } catch(e) { showAlert('Greška pri komunikaciji sa serverom.', 'danger'); return null; }
 }
 
+/* ===== AUTH ===== */
+let currentUser = null;
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (!username || !password) {
+    showLoginError('Unesite korisničko ime i lozinku.');
+    return;
+  }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Proveravam...';
+  const res = await apiLogin(username, password);
+  btn.disabled = false; btn.textContent = 'Prijavi se';
+  if (res && res.ok) {
+    currentUser = res.username;
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('userChip').style.display = 'flex';
+    document.getElementById('userChipName').textContent = currentUser;
+    document.getElementById('logoutBtn').style.display = 'inline-flex';
+    sessionStorage.setItem('vegf_user', currentUser);
+    writeLog('Prijavljen', 'Korisnik ' + currentUser + ' se prijavio');
+    loadData();
+  } else {
+    showLoginError('Pogrešno korisničko ime ili lozinka.');
+    document.getElementById('loginPass').value = '';
+  }
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  writeLog('Odjavljen', 'Korisnik ' + currentUser + ' se odjavio');
+  currentUser = null;
+  sessionStorage.removeItem('vegf_user');
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('userChip').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  patients = []; doses = [];
+  document.getElementById('patientList').innerHTML = '';
+  document.getElementById('statsBar').innerHTML = '';
+}
+
+async function apiLogin(username, password) {
+  try {
+    const r = await fetch(API + '?action=login&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
+    return await r.json();
+  } catch(e) { return null; }
+}
+
+async function writeLog(action, details) {
+  try {
+    await fetch(API, { method: 'POST', body: JSON.stringify({
+      action: 'writeLog',
+      username: currentUser || '—',
+      logAction: action,
+      details: details,
+      timestamp: new Date().toISOString()
+    })});
+  } catch(e) {}
+}
+
+async function loadLog() {
+  const el = document.getElementById('logContent');
+  el.innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam...</div>';
+  try {
+    const r = await fetch(API + '?action=getLog');
+    const data = await r.json();
+    const rows = (data.log || []).reverse(); // najnoviji prvi
+    if (!rows.length) { el.innerHTML = '<div class="empty-state">Nema zabeleženih aktivnosti.</div>'; return; }
+    el.innerHTML = '<div class="log-header"><div>Vreme</div><div>Korisnik</div><div>Akcija</div><div>Detalji</div></div>' +
+      rows.map(row => {
+        const action = String(row[1]||'');
+        const badgeClass = action.includes('Dodat') || action.includes('Prijavl') ? 'log-add' :
+                           action.includes('Izmen') ? 'log-edit' :
+                           action.includes('Obrisan') ? 'log-delete' : 'log-login';
+        const ts = row[0] ? fmtDate(row[0]) + ' ' + (String(row[0]).includes('T') ? String(row[0]).substring(11,16) : '') : '—';
+        return `<div class="log-row">
+          <div style="font-size:12px;color:#666;">${ts}</div>
+          <div style="font-size:12px;font-weight:500;">${row[2]||'—'}</div>
+          <div><span class="log-badge ${badgeClass}">${action}</span></div>
+          <div style="font-size:12px;color:#555;">${row[3]||''}</div>
+        </div>`;
+      }).join('');
+  } catch(e) { el.innerHTML = '<div class="empty-state">Greška pri učitavanju loga.</div>'; }
+}
+
+// Check session on load
+(function checkSession() {
+  const saved = sessionStorage.getItem('vegf_user');
+  if (saved) {
+    currentUser = saved;
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('userChip').style.display = 'flex';
+    document.getElementById('userChipName').textContent = currentUser;
+    document.getElementById('logoutBtn').style.display = 'inline-flex';
+  }
+})();
+
 async function loadData() {
+  if (!currentUser) return;
   const btn = document.getElementById('refreshBtn');
   btn.innerHTML = '<div class="spinner"></div> Učitavam...'; btn.disabled = true;
   document.getElementById('patientList').innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div>';
@@ -536,9 +701,10 @@ function showAlert(msg, type) {
   setTimeout(() => a.style.display = 'none', 3500);
 }
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['patients','add'][i] === tab));
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['patients','add','log'][i] === tab));
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + tab).classList.add('active');
+  if (tab === 'log') loadLog();
 }
 function initials(ime, prez) { return ((ime||'?')[0] + (prez||'?')[0]).toUpperCase(); }
 function closeModal() { document.getElementById('overlay').style.display='none'; editingDoseId=null; }
@@ -676,6 +842,7 @@ async function savePatient() {
     if (res2 && res2.ok) {
       const idx = patients.findIndex(x => x.id === editingPatientId);
       if (idx !== -1) patients[idx] = { id: editingPatientId, ...pData };
+      writeLog('Izmena pacijenta', ime + ' ' + prezime + ' (' + (pData.dx||'') + ')');
       cancelEditPatient();
       showAlert('Podaci pacijenta ' + ime + ' ' + prezime + ' ažurirani.','success');
       switchTab('patients'); renderPatients();
@@ -687,6 +854,7 @@ async function savePatient() {
     btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj pacijenta';
     if (res && res.ok) {
       patients.push({ id: newP.id, ...pData });
+      writeLog('Dodat pacijent', ime + ' ' + prezime + ' (' + (pData.dx||'') + ')');
       clearForm(); showAlert('Pacijent ' + ime + ' ' + prezime + ' uspešno dodat.','success');
       switchTab('patients'); renderPatients();
     }
@@ -853,6 +1021,8 @@ async function saveDose() {
     if (res2 && res2.ok) {
       const idx = doses.findIndex(x => x.id === editingDoseId);
       if (idx !== -1) doses[idx] = { id: editingDoseId, ...doseData };
+      const p1 = patients.find(x=>x.id===currentPid);
+      writeLog('Izmena doze', (p1?p1.ime+' '+p1.prezime:'') + ' — ' + (doseData.drug||'').split(' ')[0] + ' ' + (doseData.oko||'') + ' ' + fmtDate(doseData.datum));
       closeDoseForm(); renderDoses(); renderPatients();
       showAlert('Doza ažurirana.','success');
     }
@@ -863,6 +1033,8 @@ async function saveDose() {
     btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj dozu';
     if (res && res.ok) {
       doses.push({ id: newId, ...doseData });
+      const p0 = patients.find(x=>x.id===currentPid);
+      writeLog('Dodata doza', (p0?p0.ime+' '+p0.prezime:'') + ' — ' + (doseData.drug||'').split(' ')[0] + ' ' + (doseData.oko||'') + ' ' + fmtDate(doseData.datum));
       closeDoseForm(); renderDoses(); renderPatients();
       showAlert('Doza sačuvana.','success');
     }
@@ -884,6 +1056,8 @@ async function deletePatient() {
   if (!ok) return;
   const res = await api(null, { action:'deletePatient', id: currentPid });
   if (res && res.ok) {
+    const delP = patients.find(x=>x.id===currentPid);
+    writeLog('Obrisan pacijent', delP ? delP.ime+' '+delP.prezime : currentPid);
     patients = patients.filter(p=>p.id!==currentPid);
     doses = doses.filter(d=>d.pid!==currentPid);
     closeModal(); renderPatients(); showAlert('Pacijent obrisan.','success');
@@ -904,6 +1078,9 @@ async function deleteDose(id) {
   if (!ok) return;
   const res = await api(null, { action:'deleteDose', id });
   if (res && res.ok) {
+    const delD = doses.find(x=>x.id===id);
+    const delDP = patients.find(x=>x.id===(delD&&delD.pid));
+    writeLog('Obrisana doza', (delDP?delDP.ime+' '+delDP.prezime:'') + (delD?' — '+(delD.drug||'').split(' ')[0]+' '+(delD.oko||'')+' '+fmtDate(delD.datum):''));
     doses = doses.filter(d=>d.id!==id);
     renderDoses(); renderPatients(); showAlert('Doza obrisana.','success');
   }
@@ -1239,7 +1416,7 @@ async function removeDoctor(idx) {
   }
 }
 
-loadData();
+if (currentUser) loadData();
 </script>
 <!-- REPORT MODAL -->
 <div id="reportOverlay" style="display:none;" onclick="closeReportOutside(event)">

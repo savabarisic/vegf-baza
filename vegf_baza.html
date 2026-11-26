@@ -259,6 +259,47 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
 .pr-note{font-size:11px;margin-top:10px;}
 .pr-sign{display:flex;justify-content:space-between;margin-top:36px;font-size:12px;}
 .pr-foot{font-size:10px;margin-top:18px;color:#444;}
+#rfzoOverlay{display:none;position:fixed;inset:0;background:rgba(13,61,110,0.35);z-index:160;overflow-y:auto;padding:2rem 1rem;}
+.rf-box{background:#fff;border-radius:14px;padding:1.5rem;width:900px;max-width:100%;margin:auto;box-shadow:var(--shadow-lg);}
+.rf-item{border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+.rf-item.rf-bad{border-color:#f5c6c2;background:#fff8f7;}
+.rf-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rf-head label{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;cursor:pointer;}
+.rf-head input[type=checkbox]{width:20px;height:20px;}
+.rf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px;}
+.rf-grid .field{min-width:0;}.rf-grid input,.rf-grid select{width:100%;min-width:0;box-sizing:border-box;}
+.rf-snip{font-size:11px;color:var(--text-3);margin-top:8px;font-family:monospace;word-break:break-word;}
+.sch-info{font-size:13px;color:var(--text-2);margin:6px 0 10px;}
+.sch-info b{color:var(--blue-dark);}
+.op-sub{font-size:12px;color:var(--text-3);}
+.dob-badge{font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--text-2);}
+
+.field{min-width:0;}
+.field > input,.field > select,.field > textarea{width:100%;max-width:100%;box-sizing:border-box;}
+.ind-box{background:#f9f9f7;padding:12px;border-radius:8px;border:1px dashed #ccc;margin-bottom:12px;}
+.ind-box .section-subtitle{margin-bottom:8px;}
+.rfzo-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px;}
+.plan-box{background:var(--blue-pale);border:1px solid #c5d9f8;border-radius:10px;padding:12px 14px;}
+.plan-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.plan-grid span{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:2px;}
+.plan-grid strong{font-size:14px;}
+.rfzo-steps{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+.rfzo-step{font-size:12px;padding:4px 10px;border-radius:20px;background:#fff;border:1px solid var(--border);color:var(--text-3);}
+.rfzo-step.done{background:var(--green-bg);border-color:#b6e4d3;color:var(--green);font-weight:600;}
+.rfzo-step.cur{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700;}
+.rfzo-step.bad{background:var(--red-bg);border-color:#f5c6c2;color:var(--red);font-weight:700;}
+.term-row{display:grid;grid-template-columns:120px 50px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;}
+.term-row.past{opacity:.6;}
+.term-row .t-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.term-row .t-act .btn{padding:5px 9px;font-size:12px;}
+.pat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.pf{font-size:12px;padding:6px 11px;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text-2);font-weight:600;}
+.pf b{margin-left:4px;}
+.pf.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.pf.urgent:not(.active){border-color:#f2c48d;color:var(--amber);}
+#termOverlay{display:none;position:fixed;inset:0;background:rgba(13,61,110,0.35);z-index:155;overflow-y:auto;padding:2rem 1rem;}
+.sch-load{display:flex;gap:10px;align-items:flex-start;background:var(--green-bg);border:1px solid #b6e4d3;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;}
+.sch-load input{width:20px;height:20px;margin-top:1px;}
 #undoToast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0d3d6e;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:500;gap:12px;align-items:center;font-size:14px;}
 @media print{
   body{background:#fff !important;}
@@ -277,7 +318,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   .topbar .lbl{display:none;}
   .topbar .btn{width:42px;height:42px;padding:0;justify-content:center;font-size:19px;}
   .container{padding:12px 12px calc(84px + env(safe-area-inset-bottom));}
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(13,61,110,0.08);}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;background:#fff;border-top:1px solid var(--border);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(13,61,110,0.08);}
   .tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 7px;font-size:11px;border-bottom:none;border-top:3px solid transparent;margin:0;}
   .tab i{font-size:22px;}
   .tab.active{border-bottom:none;border-top:3px solid var(--blue);}
@@ -307,6 +348,11 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   .log-row > div:nth-child(2){order:3;grid-column:1/-1;}.log-row > div:nth-child(4){order:4;grid-column:1/-1;}
   .pat-view .info-grid{grid-template-columns:1fr 1fr;}
   .login-box{padding:1.75rem 1.25rem;}
+  .rf-grid,.rfzo-fields,.plan-grid{grid-template-columns:1fr 1fr;}
+  .term-row{grid-template-columns:90px 44px minmax(0,1fr);}
+  .term-row .t-act{grid-column:1/-1;justify-content:flex-start;}
+  #rfzoOverlay,#schOverlay{padding:0 !important;}
+  .rf-box{border-radius:0;min-height:100%;}
 }
 </style>
 </head>
@@ -380,6 +426,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
         <button class="btn btn-primary" onclick="document.getElementById('rfzoPdfInput').click()"><i class="ti ti-file-upload"></i> Uvezi RFZO odobrenja</button>
         <input type="file" id="rfzoPdfInput" accept=".pdf" style="display:none;" onchange="handleRfzoPdfUpload(this)" />
       </div>
+      <div class="pat-filters" id="patFilters"></div>
       <div id="patientList"><div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div></div>
     </div>
   </div>
@@ -410,8 +457,9 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
         </div>
         <div class="field"><label>JMBG</label><input type="text" id="f-jmbg" placeholder="13 cifara" maxlength="13" inputmode="numeric" autocomplete="off" /></div>
       </div>
-      <div class="grid2" style="margin-bottom:12px;">
+      <div class="grid3" style="margin-bottom:12px;">
         <div class="field"><label>Kontakt</label><input type="text" id="f-kontakt" inputmode="tel" placeholder="Npr. 064/123-4567" /></div>
+        <div class="field"><label>LBO (broj osiguranika)</label><input type="text" id="f-lbo" placeholder="11 cifara" maxlength="11" inputmode="numeric" autocomplete="off" /></div>
         <div class="field"><label>Dijagnoza (Dg)</label>
           <select id="f-dx">
             <option value="">— Izaberi —</option>
@@ -425,48 +473,32 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
         </div>
       </div>
 
-      <!-- Grupa, Lek i Oko -->
-      <div class="grid3" style="margin-bottom:12px;background:#f9f9f7;padding:12px;border-radius:8px;border:1px dashed #ccc;">
-        <div class="field">
-          <label>Grupa pacijenta</label>
-          <select id="f-grupa" onchange="toggleRfzoStatus()">
-            <option value="Podela">Podela</option>
-            <option value="RFZO">RFZO</option>
-          </select>
+      <!-- Indikacija terapije -->
+      <div class="ind-box">
+        <div class="section-subtitle">Indikacija anti-VEGF terapije</div>
+        <div class="grid3" style="margin-bottom:10px;">
+          <div class="field"><label>Grupa pacijenta</label>
+            <select id="f-grupa" onchange="toggleRfzoStatus()"><option value="Podela">Podela</option><option value="RFZO">RFZO</option></select></div>
+          <div class="field"><label>Izabrani lek</label>
+            <select id="f-lek"><option value="">— Izaberi —</option><option value="Eylea (aflibercept)">Eylea</option><option value="Vabysmo (faricimab)">Vabysmo</option><option value="Lucentis (ranibizumab)">Lucentis</option><option value="Beovu (brolucizumab)">Beovu</option><option value="Byooviz (ranibizumab BS)">Byooviz</option></select></div>
+          <div class="field"><label>Izabrano oko</label>
+            <select id="f-oko"><option value="">— Izaberi —</option><option value="OD">OD (desno)</option><option value="OS">OS (levo)</option><option value="OU">OU (oba)</option></select></div>
         </div>
-        <div class="field">
-          <label>Izabrani lek (plan)</label>
-          <select id="f-lek">
-            <option value="">— Izaberi —</option>
-            <option value="Lucentis (ranibizumab)">Lucentis</option>
-            <option value="Eylea (aflibercept)">Eylea</option>
-            <option value="Vabysmo (faricimab)">Vabysmo</option>
-            <option value="Beovu (brolucizumab)">Beovu</option>
-            <option value="Byooviz (ranibizumab BS)">Byooviz</option>
-          </select>
+        <div class="grid2">
+          <div class="field"><label>Indikovao lekar</label><select id="f-indLekar"></select></div>
+          <div class="field"><label>Datum indikacije (prvi pregled)</label><input type="text" id="f-indDatum" placeholder="DD.MM.YYYY." maxlength="11" /></div>
         </div>
-        <div class="field">
-          <label>Izabrano oko</label>
-          <select id="f-oko">
-            <option value="">— Izaberi —</option>
-            <option value="OD">OD (desno)</option>
-            <option value="OS">OS (levo)</option>
-            <option value="OU">OU (oba)</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="grid2" id="rfzoStatusFields" style="margin-bottom:12px;display:none;">
-        <div class="field">
-          <label>Status odobrenja RFZO</label>
-          <select id="f-rfzo-status">
-            <option value="Cekanje">Čeka se odobrenje (FA / PDF)</option>
-            <option value="Odobreno">Odobreno — može se zakazati</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Datum isteka odobrenja</label>
-          <input type="text" id="f-rfzo-vazi" placeholder="YYYY-MM-DD ili DD.MM.YYYY." />
+        <div class="rfzo-fields" id="rfzoStatusFields" style="display:none;">
+          <div class="field"><label>Faza RFZO</label>
+            <select id="f-rfzo-status">
+              <option value="CekaFA">1. Čeka FA</option>
+              <option value="Cekanje">2. Poslato u RFZO — čeka odgovor</option>
+              <option value="Odobreno">3. Odobreno — može se zakazati</option>
+              <option value="Odbijeno">Odbijeno</option>
+            </select></div>
+          <div class="field"><label>FA urađena</label><input type="text" id="f-fa" placeholder="DD.MM.YYYY." maxlength="11" /></div>
+          <div class="field"><label>Poslato u RFZO</label><input type="text" id="f-poslato" placeholder="DD.MM.YYYY." maxlength="11" /></div>
+          <div class="field"><label>Odobrenje važi do</label><input type="text" id="f-rfzo-vazi" placeholder="DD.MM.YYYY." maxlength="11" /></div>
         </div>
       </div>
 
@@ -576,27 +608,20 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
           <div class="info-item"><span>Pol</span><strong id="m-pol"></strong></div>
           <div class="info-item"><span>JMBG</span><strong id="m-jmbg"></strong></div>
           <div class="info-item"><span>Kontakt</span><strong id="m-kontakt"></strong></div>
+          <div class="info-item"><span>LBO</span><strong id="m-lbo"></strong></div>
           <div class="info-item"><span>Poslednja br. istorije</span><strong id="m-pid"></strong></div>
         </div>
         <div style="font-size:13px;color:#888;margin-bottom:10px;" id="m-napomena"></div>
         
-        <!-- Prikaz grupe i plana -->
-        <div style="background:var(--blue-pale);border:1px solid #c5d9f8;border-radius:8px;padding:12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;">
-          <div>
-            <span style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:2px;">Grupa pacijenta</span>
-            <strong id="m-grupa" style="font-size:15px;"></strong>
+        <!-- Indikacija i RFZO -->
+        <div class="plan-box">
+          <div class="plan-grid">
+            <div><span>Grupa</span><strong id="m-grupa"></strong></div>
+            <div><span>Indikovana terapija</span><strong id="m-plan"></strong></div>
+            <div><span>Indikovao</span><strong id="m-ind"></strong></div>
+            <div><span>Sledeći termin</span><strong id="m-next"></strong></div>
           </div>
-          <div>
-            <span style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:2px;">Planirana Th</span>
-            <strong id="m-plan" style="font-size:15px;"></strong>
-          </div>
-          <div id="rfzoVaziBox" style="display:none;">
-            <span style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;display:block;margin-bottom:2px;">RFZO važi do</span>
-            <strong id="m-rfzo-vazi" style="font-size:15px;"></strong>
-          </div>
-          <div id="rfzoApproveBox" style="display:none;">
-            <button class="btn btn-success" onclick="approveRfzo()"><i class="ti ti-check"></i> Odobreno od RFZO</button>
-          </div>
+          <div id="m-rfzo"></div>
         </div>
       </div>
 
@@ -604,15 +629,16 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
       
       <!-- Zakazivanje -->
       <div class="card-header" style="margin-bottom:10px;padding-bottom:5px;border-bottom:none;">
-        <span class="card-title">Zakazivanje doza</span>
+        <span class="card-title">Termini za davanje leka</span>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-        <button class="btn btn-primary" onclick="openSchedule(currentPid)" id="btnSchedule1"><i class="ti ti-calendar-plus"></i> Zakaži dozu</button>
-        <button class="btn" onclick="scheduleNextTwoDoses()" id="btnSchedule23" style="color:var(--blue);border-color:#c5d9f8;"><i class="ti ti-calendar-plus"></i> Auto-zakaži 2. i 3. dozu (+4 nedelje)</button>
+        <button class="btn btn-primary" onclick="openSchedule(currentPid)" id="btnSchedule1"><i class="ti ti-calendar-plus"></i> Zakaži novu dozu</button>
+        <button class="btn" onclick="scheduleNextTwoDoses()" id="btnSchedule23" style="color:var(--blue);border-color:#c5d9f8;"><i class="ti ti-calendar-plus"></i> Zakaži udarne doze (2. i 3.)</button>
       </div>
       <div id="rfzoWarning" class="msg-warn" style="display:none;">
-        <i class="ti ti-alert-triangle"></i> Pacijent je u RFZO grupi, ali terapija još nije odobrena. Zakazivanje nije moguće dok se ne unese odobrenje.
+        <i class="ti ti-alert-triangle"></i> <span id="rfzoWarningText">Pacijent je u RFZO grupi, ali terapija još nije odobrena. Zakazivanje nije moguće dok se ne unese odobrenje.</span>
       </div>
+      <div id="termList"></div>
 
       <hr class="divider">
       <div class="card-header"><span class="card-title">Primljene doze anti-VEGF</span></div>
@@ -762,14 +788,14 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
     <div class="field" style="margin-bottom:12px;">
       <label>Pacijent</label>
       <div class="sch-chosen" id="schChosen" style="display:none;"></div>
-      <input type="text" id="schSearch" placeholder="Traži po imenu ili ID-u..." style="margin-top:6px;" oninput="schSearchPatient()" />
+      <input type="text" id="schSearch" placeholder="Traži po imenu, JMBG-u ili LBO..." style="margin-top:6px;" oninput="schSearchPatient()" />
       <div class="sch-results" id="schResults"></div>
     </div>
     <div class="field" style="margin-bottom:12px;">
       <label>Datum</label>
       <div class="date-combo">
-        <input type="text" id="schDatum" placeholder="DD.MM.YYYY." maxlength="11" />
-        <input type="date" id="schDatumPick" onchange="pickToText('schDatumPick','schDatum')" />
+        <input type="text" id="schDatum" placeholder="DD.MM.YYYY." maxlength="11" oninput="schCheck()" />
+        <input type="date" id="schDatumPick" onchange="pickToText('schDatumPick','schDatum');schCheck();" />
         <button class="cal-btn" onclick="document.getElementById('schDatumPick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
       </div>
     </div>
@@ -778,7 +804,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
       <div class="sch-eyes">
         <button class="sch-eye" data-eye="OD" onclick="schSelectEye(this)">OD<small>desno</small></button>
         <button class="sch-eye" data-eye="OS" onclick="schSelectEye(this)">OS<small>levo</small></button>
-        <button class="sch-eye" data-eye="OU" onclick="schSelectEye(this)">OU<small>oba</small></button>
+        <button class="sch-eye" data-eye="OU" onclick="schSelectEye(this)">OU<small>oba — 2 termina</small></button>
       </div>
     </div>
     <div class="field" style="margin-bottom:12px;">
@@ -791,10 +817,65 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
         <button class="sch-drug-btn" onclick="schSelectDrug(this,'Byooviz (ranibizumab BS)')">Byooviz</button>
       </div>
     </div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="field"><label>Lekar</label><select id="schLekar"></select></div>
+      <div class="field"><label>Broj istorije (može i na dan primene)</label><input type="text" id="schBrIst" placeholder="npr. 12345/2026" /></div>
+    </div>
+    <div class="sch-info" id="schDoseNo"></div>
+    <div class="sch-load" id="schLoadBox" style="display:none;"><input type="checkbox" id="schLoad" checked onchange="schCheck()"><div><b>Odmah zakaži i 2. i 3. dozu</b> (udarna faza, razmak 4 nedelje)<div id="schLoadDates" class="op-sub"></div></div></div>
+    <div id="schWarn" style="display:none;"></div>
     <div id="schError" style="display:none;"></div>
     <div class="flex-end">
       <button class="btn" onclick="closeSchedule()">Otkaži</button>
-      <button class="btn btn-primary" onclick="saveSchedule()"><i class="ti ti-check"></i> Zakaži</button>
+      <button class="btn btn-primary" id="schSaveBtn" onclick="saveSchedule()"><i class="ti ti-check"></i> Zakaži</button>
+    </div>
+  </div>
+</div>
+
+<!-- Izmena / pomeranje termina -->
+<div id="termOverlay">
+  <div style="background:#fff;border-radius:14px;padding:1.5rem;width:560px;max-width:100%;margin:auto;box-shadow:var(--shadow-lg);">
+    <div class="modal-header">
+      <span class="card-title"><i class="ti ti-calendar-repeat"></i> Izmena termina</span>
+      <button class="btn" onclick="closeTermEdit()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="teHead" class="sch-chosen" style="margin-bottom:12px;"></div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="field"><label>Novi datum</label>
+        <div class="date-combo">
+          <input type="text" id="teDatum" placeholder="DD.MM.YYYY." maxlength="11" oninput="teCheck()" />
+          <input type="date" id="teDatumPick" onchange="pickToText('teDatumPick','teDatum');teCheck();" />
+          <button class="cal-btn" onclick="document.getElementById('teDatumPick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+        </div></div>
+      <div class="field"><label>Lek</label><select id="teDrug" onchange="teCheck()"><option value="Eylea (aflibercept)">Eylea</option><option value="Vabysmo (faricimab)">Vabysmo</option><option value="Lucentis (ranibizumab)">Lucentis</option><option value="Beovu (brolucizumab)">Beovu</option><option value="Byooviz (ranibizumab BS)">Byooviz</option></select></div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="field"><label>Lekar</label><select id="teLekar"></select></div>
+      <div class="field"><label>Broj istorije</label><input type="text" id="teBrIst" /></div>
+    </div>
+    <div class="field" style="margin-bottom:12px;"><label>Napomena / razlog promene</label><input type="text" id="teNap" placeholder="npr. pacijent bolestan, pomereno na zahtev..." /></div>
+    <label class="sch-load" id="teShiftBox" style="display:none;"><input type="checkbox" id="teShift" checked onchange="teCheck()"><div><b>Pomeri i sledeće termine ovog oka</b> za isti broj dana<div id="teShiftInfo" class="op-sub"></div></div></label>
+    <div id="teWarn" style="display:none;"></div>
+    <div id="teErr" style="display:none;"></div>
+    <div class="flex-end">
+      <button class="btn" onclick="closeTermEdit()">Otkaži</button>
+      <button class="btn btn-primary" id="teSave" onclick="saveTermEdit()"><i class="ti ti-check"></i> Sačuvaj izmene</button>
+    </div>
+  </div>
+</div>
+
+<!-- RFZO: pregled predloga iz PDF-a -->
+<div id="rfzoOverlay">
+  <div class="rf-box">
+    <div class="modal-header">
+      <span class="card-title"><i class="ti ti-file-certificate"></i> RFZO odobrenja iz PDF-a — proverite pre upisa</span>
+      <button class="btn" onclick="closeRfzo()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="msg-info" id="rfzoIntro"></div>
+    <div id="rfzoList"></div>
+    <div class="flex-end" style="margin-top:12px;">
+      <button class="btn" onclick="closeRfzo()">Otkaži</button>
+      <button class="btn btn-success" id="rfzoApproveBtn" onclick="approveRfzoSelected()"><i class="ti ti-check"></i> Upiši odobrenje za označene</button>
     </div>
   </div>
 </div>
@@ -963,12 +1044,35 @@ function showUndoToast(msg, onUndo, duration) {
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function initials(ime, prez) { return ((ime||'?')[0] + (prez||'?')[0]).toUpperCase(); }
 function todayISO(){ const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0'); }
+function drugShort(d){ return String(d || '').split(' ')[0]; }
+function eyeName(o){ return o === 'OD' ? 'desno oko' : o === 'OS' ? 'levo oko' : o === 'OU' ? 'oba oka' : (o || ''); }
+// godina rođenja iz datuma rođenja, a ako ga nema — iz JMBG-a (cifre 5–7)
+function birthYear(p){
+  if (!p) return null;
+  const d = parseDate(p.dob); if (d && !isNaN(d)) return d.getFullYear();
+  const j = String(p.jmbg || '').replace(/\D/g, '');
+  if (j.length === 13) { const y = Number(j.substring(4, 7)); return y >= 900 ? 1000 + y : 2000 + y; }
+  return null;
+}
+function daysBetween(a, b){ return Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 86400000); }
+// doze jednog oka (OU se računa u oba oka)
+function eyeDoses(pid, oko){ return getDosesForPid(pid).filter(d => d.oko === oko || d.oko === 'OU' || (oko === 'OU' && (d.oko === 'OD' || d.oko === 'OS'))); }
+// redni broj zakazane doze: date doze tog oka pre datuma + još nedate zakazane doze tog oka pre datuma + 1
+function plannedDoseNo(pid, oko, iso, exceptId){
+  // ako doze pacijenta još nisu učitane, koristi se sažetak sa servera (broj doza po oku)
+  const sm = dosesSummary[String(pid)];
+  const given = dosesByPid[String(pid)] ? eyeDoses(pid, oko).filter(d => toISO(d.datum) <= iso).length
+              : (sm && sm.eyes && sm.eyes[oko] ? sm.eyes[oko].n : 0);
+  const pend = program.filter(t => t.pid === String(pid) && t.id !== exceptId && t.status === 'zakazano' && t.oko === oko && toISO(t.datum) < iso).length;
+  return given + pend + 1;
+}
 function brIstMatch(p, f){ const s = dosesSummary[p.id]; return s && s.lastBrIst ? String(s.lastBrIst).toLowerCase().includes(f) : false; }
 function lastBrIst(p) { const s = dosesSummary[p.id]; return s && s.lastBrIst ? s.lastBrIst : ''; }
 
 // ---------- DATE ----------
 function parseDate(v) {
   if (!v) return null;
+  if (v instanceof Date) return isNaN(v) ? null : new Date(v.getFullYear(), v.getMonth(), v.getDate(), 12);
   const s = String(v).trim();
   if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
     if (/(Z|[+-]\d{2}:?\d{2})$/.test(s)) { const z = new Date(s); if (!isNaN(z)) return new Date(z.getFullYear(), z.getMonth(), z.getDate(), 12); }
@@ -1090,7 +1194,7 @@ function showLoginError(msg) {
 function clearSession() {
   currentUser = null; authToken = null; role = 'user';
   try { sessionStorage.removeItem('vegf_user'); sessionStorage.removeItem('vegf_token'); sessionStorage.removeItem('vegf_role'); } catch(e) {}
-  ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay','rfzoOverlay','userModal'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
   document.getElementById('loginOverlay').style.display = 'flex';
   document.getElementById('userChip').style.display = 'none';
   document.getElementById('logoutBtn').style.display = 'none';
@@ -1202,6 +1306,9 @@ async function loadData(silent) {
   if (currentPid && document.getElementById('overlay').style.display === 'block') {
     await ensureDosesForPid(currentPid, true);
     renderDoses();
+    const cp = patients.find(x => x.id === currentPid);
+    if (cp) { document.getElementById('m-rfzo').innerHTML = rfzoStepsHtml(cp); }
+    renderTerms();
   }
   const q = document.getElementById('patSearch');
   renderPatients(q ? q.value : '');
@@ -1243,7 +1350,7 @@ async function saveVersioned(action, id, version, fields, label){
 
 // ---------- AUTO REFRESH ----------
 function isBusy(){
-  const open = ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay','loginOverlay','userModal'].some(id => {
+  const open = ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay','loginOverlay','userModal','rfzoOverlay'].some(id => {
     const e = document.getElementById(id); return e && e.style.display && e.style.display !== 'none';
   });
   return open || !!editingPatientId || !!editingDoseId;
@@ -1268,48 +1375,79 @@ function switchTab(tab) {
   if (tab === 'log') loadLog();
   if (tab === 'program') renderProgram();
   if (tab === 'users') loadUsers();
+  if (tab === 'add' && !editingPatientId) { const cur = document.getElementById('f-indLekar').value; fillIndLekar(cur); if (!document.getElementById('f-indDatum').value) setTodaySrb('f-indDatum'); }
 }
 function closeModal() { document.getElementById('overlay').style.display='none'; editingDoseId=null; currentPid=null; }
 function closeOverlay(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
 function closeDoseForm() { document.getElementById('doseForm').style.display='none'; editingDoseId=null; }
 
-// ---------- RFZO PDF UPLOAD ----------
+// ---------- RFZO PDF: server samo predlaže, lekar potvrđuje ----------
+let rfzoCands = [];
 async function handleRfzoPdfUpload(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
-  if (file.type !== 'application/pdf') { showAlert('Molimo izaberite PDF fajl.', 'danger'); return; }
-  
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const base64Data = e.target.result.split(',')[1];
-    const btn = document.querySelector('button[onclick*="rfzoPdfInput"]');
-    const origHtml = btn.innerHTML;
-    btn.innerHTML = '<div class="spinner" style="border-top-color:#fff;"></div> Obrađujem PDF...';
-    btn.disabled = true;
-    
-    try {
-      const res = await apiWrite({ action: 'processRfzoPdf', fileData: base64Data, fileName: file.name });
-      if (res && res.ok) {
-        if (res.approvedList && res.approvedList.length > 0) {
-          showAlert('Uspešno odobreno ' + res.approvedList.length + ' pacijenata: ' + res.approvedList.join(', '), 'success');
-          await loadData();
-        } else {
-          showAlert('Nijedan pacijent iz PDF-a nije pronađen (ili su već odobreni).', 'warn');
-        }
-      } else {
-        showAlert((res && res.reason) || 'Greška pri obradi PDF-a.', 'danger');
-      }
-    } catch(err) {
-      showAlert('Nema veze sa serverom.', 'danger');
-    } finally {
-      btn.innerHTML = origHtml;
-      btn.disabled = false;
-      input.value = '';
-    }
-  };
-  reader.readAsDataURL(file);
+  if (file.type !== 'application/pdf') { showAlert('Izaberite PDF fajl.', 'danger'); input.value = ''; return; }
+  const btn = document.querySelector('button[onclick*="rfzoPdfInput"]');
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<div class="spinner"></div> Čitam PDF (do 1 min)...'; btn.disabled = true;
+  try {
+    const base64Data = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
+    const res = await apiWrite({ action: 'processRfzoPdf', fileData: base64Data, fileName: file.name }, false);
+    if (!res || !res.ok) { showAlert((res && res.reason) || 'Greška pri obradi PDF-a.', 'danger'); return; }
+    rfzoCands = (res.candidates || []).map(c => Object.assign({ checked: c.decision !== 'odbijeno' && c.decision !== 'nije pročitano' }, c));
+    document.getElementById('rfzoIntro').innerHTML = rfzoCands.length
+      ? 'Sednica Komisije: <b>' + fmtDate(res.sessionDate) + '</b> Pacijenata iz PDF-a pronađenih u bazi: <b>' + rfzoCands.length + '</b>. ' +
+        'Uporedite svaki red sa PDF-om, ispravite datum isteka ako treba i označite koga upisujete. <b>Ništa nije upisano dok ne kliknete dugme dole.</b> ' +
+        'Pacijenti koji nisu pronađeni (drugačije napisano ime, nema LBO u kartonu) odobravaju se ručno u kartonu.'
+      : 'Nijedan pacijent iz PDF-a nije pronađen u bazi. Proverite da li su imena ista kao u PDF-u ili upišite LBO u karton, pa pokušajte ponovo — ili odobrite ručno u kartonu.';
+    renderRfzo();
+    document.getElementById('rfzoOverlay').style.display = 'block';
+  } catch(err) { showAlert('Nema veze sa serverom.', 'danger'); }
+  finally { btn.innerHTML = origHtml; btn.disabled = false; input.value = ''; }
 }
-
+function renderRfzo() {
+  const drugs = ['Eylea (aflibercept)','Vabysmo (faricimab)','Lucentis (ranibizumab)','Beovu (brolucizumab)','Byooviz (ranibizumab BS)'];
+  document.getElementById('rfzoList').innerHTML = rfzoCands.map((c, i) => {
+    const bad = c.decision === 'odbijeno', unk = c.decision === 'nije pročitano';
+    return `<div class="rf-item ${bad ? 'rf-bad' : ''}">
+      <div class="rf-head">
+        <label><input type="checkbox" ${c.checked ? 'checked' : ''} onchange="rfzoCands[${i}].checked=this.checked"> ${esc(c.name)}</label>
+        <span class="badge ${bad ? 'badge-red' : unk ? 'badge-amber' : 'badge-green'}">${esc(c.decision)}</span>
+        <span class="badge badge-blue">pronađen po: ${esc(c.matchedBy)}</span>
+        ${c.grupa !== 'RFZO' ? '<span class="badge badge-amber">u kartonu nije RFZO</span>' : ''}
+        ${c.statusTh === 'Odobreno' ? '<span class="badge badge-green">već odobren' + (c.currentVaziDo ? ' do ' + fmtDate(c.currentVaziDo) : '') + '</span>' : ''}
+      </div>
+      ${bad ? '<div class="msg-err">Komisija nije odobrila terapiju — ne upisujte odobrenje.</div>' : ''}
+      <div class="rf-grid">
+        <div class="field"><label>Lek</label><select onchange="rfzoCands[${i}].lek=this.value"><option value="">— ne menjaj —</option>${drugs.map(d => `<option value="${esc(d)}" ${d === c.lek ? 'selected' : ''}>${esc(drugShort(d))}</option>`).join('')}</select></div>
+        <div class="field"><label>Oko</label><select onchange="rfzoCands[${i}].oko=this.value"><option value="">— ne menjaj —</option>${['OD','OS','OU'].map(o => `<option ${o === c.oko ? 'selected' : ''}>${o}</option>`).join('')}</select></div>
+        <div class="field"><label>Trajanje (meseci)</label><input type="text" value="${c.months || ''}" disabled></div>
+        <div class="field"><label>Važi do</label><input type="date" value="${esc(c.vaziDo || '')}" onchange="rfzoCands[${i}].vaziDo=this.value"></div>
+      </div>
+      ${c.mg ? '<div class="op-sub" style="margin-top:6px;">Doza u PDF-u: ' + esc(c.mg) + ' mg</div>' : ''}
+      <div class="rf-snip">Pročitano iz PDF-a: „${esc(c.snippet)}…“</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rfzoApproveBtn').style.display = rfzoCands.length ? '' : 'none';
+}
+function closeRfzo(){ document.getElementById('rfzoOverlay').style.display = 'none'; }
+async function approveRfzoSelected() {
+  const sel = rfzoCands.filter(c => c.checked);
+  if (!sel.length) { showAlert('Nije označen nijedan pacijent.', 'danger'); return; }
+  const rejected = sel.filter(c => c.decision === 'odbijeno');
+  const noDate = sel.filter(c => !c.vaziDo);
+  const ok = await showConfirm({ type: rejected.length ? 'danger' : 'warning', title: 'Upis RFZO odobrenja',
+    msg: 'Upisati odobrenje za <b>' + sel.length + '</b> pacijenata?<br><br>' + sel.map(c => esc(c.name) + (c.vaziDo ? ' — do ' + fmtDate(c.vaziDo) : ' — <b>bez datuma isteka</b>')).join('<br>') +
+      (rejected.length ? '<br><br><b>Pažnja: ' + rejected.length + ' od njih ima odluku „odbijeno“.</b>' : '') +
+      (noDate.length ? '<br><br>Za pacijente bez datuma isteka aplikacija neće upozoravati na istek roka.' : ''),
+    okLabel: 'Upiši odobrenje' });
+  if (!ok) return;
+  try {
+    const r = await apiWrite({ action:'approveRfzo', items: sel.map(c => ({ pid:c.pid, vaziDo:c.vaziDo || '', lek:c.lek || '', oko:c.oko || '', izvor:'PDF Komisije' })) }, false);
+    if (r && r.ok) { closeRfzo(); showAlert('Odobrenje upisano: ' + (r.approved || []).join(', '), 'success'); await loadData(true); }
+    else showAlert((r && r.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
 // ---------- RENDER PATIENTS ----------
 function renderPatients(filter) {
   const total = patients.length;
@@ -1320,7 +1458,12 @@ function renderPatients(filter) {
     '<div class="stat"><div class="stat-label">Ukupno doza</div><div class="stat-value">'+totalDoses+'</div></div>' +
     '<div class="stat"><div class="stat-label">Avg. doza/pac.</div><div class="stat-value">'+avgDoses+'</div></div>' +
     '<div class="stat"><div class="stat-label">Zakazane kontrole</div><div class="stat-value">'+pending+'</div></div>';
-  let pts = patients;
+  let pts = patients.slice().sort((a,b) => (a.prezime + ' ' + a.ime).localeCompare(b.prezime + ' ' + b.ime, 'sr'));
+  const phases = {}; pts.forEach(p => { phases[p.id] = patientPhase(p); });
+  const cnt = k => pts.filter(p => !k || phases[p.id].key === k).length;
+  document.getElementById('patFilters').innerHTML = PHASE_FILTERS.filter(f => !f.key || cnt(f.key)).map(f =>
+    `<button class="pf ${phaseFilter === f.key ? 'active' : ''} ${f.urgent ? 'urgent' : ''}" data-k="${f.key}" onclick="setPhaseFilter(this.dataset.k)">${f.label}<b>${cnt(f.key)}</b></button>`).join('');
+  if (phaseFilter) pts = pts.filter(p => phases[p.id].key === phaseFilter);
   if (filter) {
     const f = filter.toLowerCase();
     const fd = filter.replace(/\D/g,'');
@@ -1328,6 +1471,7 @@ function renderPatients(filter) {
       (p.ime + ' ' + p.prezime).toLowerCase().includes(f) ||
       (p.dx || '').toLowerCase().includes(f) ||
       String(p.jmbg||'').includes(f) ||
+      (fd && String(p.lbo||'').includes(fd)) ||
       (fd && String(p.kontakt||'').replace(/\D/g,'').includes(fd)) ||
       brIstMatch(p, f)
     );
@@ -1337,7 +1481,7 @@ function renderPatients(filter) {
   if (!pts.length) { el.innerHTML='<div class="empty-state"><i class="ti ti-user-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>Nema pacijenata.</div>'; return; }
   el.innerHTML = pts.map(p => {
     const s = dosesSummary[p.id] || {count:0, lastDatum:'', lastBrIst:'', hasOverdue:false};
-    const isRfzoWait = p.grupa === 'RFZO' && p.statusTh === 'Cekanje';
+    const ph = phases[p.id];
     return `<div class="patient-row" data-pid="${p.id}" onclick="openPatient(this.dataset.pid)">
       <div class="avatar">${initials(p.ime,p.prezime)}</div>
       <div class="patient-info">
@@ -1346,7 +1490,7 @@ function renderPatients(filter) {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
         ${p.grupa ? `<span class="badge ${p.grupa==='RFZO'?'badge-blue':'badge-amber'}">${esc(p.grupa)}</span>` : ''}
-        ${isRfzoWait ? '<span class="badge badge-red"><i class="ti ti-clock"></i> Čeka RFZO</span>' : ''}
+        <span class="badge ${ph.cls}">${esc(ph.label)}</span>
         <span class="badge badge-blue"><i class="ti ti-syringe" style="font-size:11px;"></i> ${s.count||0}</span>
         ${s.hasOverdue?'<span class="badge badge-amber"><i class="ti ti-alert-triangle" style="font-size:11px;"></i> Kontrola</span>':''}
       </div>
@@ -1368,34 +1512,23 @@ async function openPatient(id) {
   document.getElementById('m-pol').textContent = p.pol||'—';
   document.getElementById('m-jmbg').textContent = p.jmbg||'—';
   document.getElementById('m-kontakt').textContent = p.kontakt||'—';
+  document.getElementById('m-lbo').textContent = p.lbo||'—';
   document.getElementById('m-pid').textContent = lastBrIst(p)||'—';
   document.getElementById('m-napomena').textContent = p.napomena ? '📝 ' + p.napomena : '';
   
-  // Grupa i plan
+  // Indikacija, RFZO faze, zakazivanje
   document.getElementById('m-grupa').textContent = p.grupa || '—';
-  document.getElementById('m-plan').textContent = (p.izabraniLek ? String(p.izabraniLek).split(' ')[0] : '—') + ' ' + (p.izabranoOko || '');
-  
-  // RFZO Rok
-  const hasVaziDo = p.rfzoVaziDo && p.rfzoVaziDo.trim();
-  document.getElementById('rfzoVaziBox').style.display = hasVaziDo ? 'block' : 'none';
-  if (hasVaziDo) {
-    const isExpired = toISO(p.rfzoVaziDo) < todayISO();
-    document.getElementById('m-rfzo-vazi').innerHTML = fmtDate(p.rfzoVaziDo) + (isExpired ? ' <span class="badge badge-red">Isteklo</span>' : '');
-  }
-
-  // RFZO Status
-  const isRfzoWait = p.grupa === 'RFZO' && p.statusTh === 'Cekanje';
-  document.getElementById('rfzoApproveBox').style.display = isRfzoWait ? 'block' : 'none';
-  document.getElementById('rfzoWarning').style.display = isRfzoWait ? 'block' : 'none';
-  
-  // Onemogući zakazivanje ako čeka RFZO
-  const canSchedule = !isRfzoWait;
-  document.getElementById('btnSchedule1').disabled = !canSchedule;
-  document.getElementById('btnSchedule23').disabled = !canSchedule;
-  document.getElementById('btnSchedule1').style.opacity = canSchedule ? '1' : '0.5';
-  document.getElementById('btnSchedule23').style.opacity = canSchedule ? '1' : '0.5';
-  document.getElementById('btnSchedule1').style.pointerEvents = canSchedule ? 'auto' : 'none';
-  document.getElementById('btnSchedule23').style.pointerEvents = canSchedule ? 'auto' : 'none';
+  document.getElementById('m-plan').textContent = (p.izabraniLek ? drugShort(p.izabraniLek) : '—') + ' ' + (p.izabranoOko || '');
+  document.getElementById('m-ind').textContent = (p.indikovaoLekar || '—') + (p.datumIndikacije ? ' · ' + fmtDate(p.datumIndikacije) : '');
+  document.getElementById('m-rfzo').innerHTML = rfzoStepsHtml(p);
+  const blocked = p.grupa === 'RFZO' && p.statusTh !== 'Odobreno';
+  document.getElementById('rfzoWarningText').textContent = !blocked ? '' :
+    p.statusTh === 'CekaFA' ? 'Pacijent čeka FA. Posle FA dokumentacija ide u RFZO — zakazivanje je moguće tek kad RFZO odobri terapiju.'
+    : p.statusTh === 'Odbijeno' ? 'RFZO je odbio terapiju — zakazivanje nije moguće.'
+    : 'Dokumentacija je u RFZO. Zakazivanje je moguće kad stigne odobrenje (PDF Komisije ili dugme „RFZO odobrio“).';
+  document.getElementById('rfzoWarning').style.display = blocked ? 'block' : 'none';
+  ['btnSchedule1','btnSchedule23'].forEach(id => { const b = document.getElementById(id); b.disabled = blocked; b.style.opacity = blocked ? '0.5' : '1'; b.style.pointerEvents = blocked ? 'none' : 'auto'; });
+  renderTerms();
 
   document.getElementById('doseForm').style.display = 'none';
   editingDoseId = null;
@@ -1404,24 +1537,6 @@ async function openPatient(id) {
   document.getElementById('doseList').innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam doze...</div>';
   await ensureDosesForPid(currentPid);
   renderDoses();
-}
-
-async function approveRfzo() {
-  if (!currentPid) return;
-  const p = patients.find(x => x.id === currentPid);
-  if (!p) return;
-  const ok = await showConfirm({ type: 'warning', title: 'Odobrenje RFZO',
-    msg: 'Označiti da je RFZO odobrio terapiju za <strong>' + esc(p.ime + ' ' + p.prezime) + '</strong>?<br><br>Nakon ovoga će zakazivanje doza biti omogućeno.',
-    okLabel: 'Da, odobreno' });
-  if (!ok) return;
-  try {
-    const res = await saveVersioned('updatePatient', p.id, String(p.updatedAt || p.createdAt || ''), { statusTh: 'Odobreno' }, p.ime + ' ' + p.prezime);
-    if (res && res.ok) {
-      showAlert('Status promenjen u Odobreno.', 'success');
-      await loadData(true);
-      openPatient(currentPid);
-    } else showAlert((res && res.reason) || 'Greška.', 'danger');
-  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
 }
 
 // ---------- EDIT PATIENT ----------
@@ -1436,12 +1551,17 @@ function editPatient() {
   document.getElementById('f-pol').value = p.pol||'';
   document.getElementById('f-jmbg').value = p.jmbg||'';
   document.getElementById('f-kontakt').value = p.kontakt||'';
+  document.getElementById('f-lbo').value = p.lbo||'';
   document.getElementById('f-dx').value = p.dx||'';
   document.getElementById('f-grupa').value = p.grupa||'Podela';
   document.getElementById('f-lek').value = p.izabraniLek||'';
   document.getElementById('f-oko').value = p.izabranoOko||'';
   document.getElementById('f-rfzo-status').value = p.statusTh||'Cekanje';
-  document.getElementById('f-rfzo-vazi').value = p.rfzoVaziDo||'';
+  document.getElementById('f-rfzo-vazi').value = p.rfzoVaziDo ? fmtDate(p.rfzoVaziDo) : '';
+  document.getElementById('f-fa').value = p.faDatum ? fmtDate(p.faDatum) : '';
+  document.getElementById('f-poslato').value = p.rfzoPoslato ? fmtDate(p.rfzoPoslato) : '';
+  fillIndLekar(p.indikovaoLekar || '');
+  document.getElementById('f-indDatum').value = p.datumIndikacije ? fmtDate(p.datumIndikacije) : '';
   toggleRfzoStatus();
   document.getElementById('f-napomena').value = p.napomena||'';
   
@@ -1467,14 +1587,25 @@ function toggleRfzoStatus() {
   const g = document.getElementById('f-grupa').value;
   document.getElementById('rfzoStatusFields').style.display = g === 'RFZO' ? 'grid' : 'none';
 }
+function fillIndLekar(cur) {
+  const sel = document.getElementById('f-indLekar'); if (!sel) return;
+  sel.innerHTML = '<option value="">—</option>' + doctorsList.map(d => `<option value="${esc(d)}" ${d === cur ? 'selected' : ''}>${esc(d)}</option>`).join('') +
+    (cur && !doctorsList.includes(cur) ? `<option selected>${esc(cur)}</option>` : '');
+}
 
 // ---------- SAVE PATIENT ----------
 async function savePatient() {
   const ime = document.getElementById('f-ime').value.trim();
   const prezime = document.getElementById('f-prezime').value.trim();
   if (!ime||!prezime) { showAlert('Unesite ime i prezime.','danger'); return; }
+  for (const [id, lbl] of [['f-dob','Datum rođenja'],['f-indDatum','Datum indikacije'],['f-fa','Datum FA'],['f-poslato','Datum slanja u RFZO'],['f-rfzo-vazi','Rok odobrenja']]) {
+    const v = document.getElementById(id).value.trim();
+    if (v && !toISO(v)) { showAlert(lbl + ': datum nije u obliku DD.MM.YYYY.', 'danger'); return; }
+  }
   const jmbg = document.getElementById('f-jmbg').value.trim();
   if (jmbg && !/^\d{13}$/.test(jmbg)) { showAlert('JMBG mora imati tačno 13 cifara.','danger'); return; }
+  const lbo = document.getElementById('f-lbo').value.trim();
+  if (lbo && !/^\d{11}$/.test(lbo)) { showAlert('LBO mora imati tačno 11 cifara.','danger'); return; }
   const btn = document.getElementById('savePatBtn');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Čuvam...';
   
@@ -1482,13 +1613,17 @@ async function savePatient() {
     ime, prezime,
     dob: toISO(document.getElementById('f-dob').value.trim()),
     pol: document.getElementById('f-pol').value,
-    jmbg, kontakt: document.getElementById('f-kontakt').value.trim(),
+    jmbg, lbo, kontakt: document.getElementById('f-kontakt').value.trim(),
     dx: document.getElementById('f-dx').value,
     grupa: document.getElementById('f-grupa').value,
     izabraniLek: document.getElementById('f-lek').value,
     izabranoOko: document.getElementById('f-oko').value,
     statusTh: document.getElementById('f-grupa').value === 'RFZO' ? document.getElementById('f-rfzo-status').value : '',
     rfzoVaziDo: document.getElementById('f-grupa').value === 'RFZO' ? toISO(document.getElementById('f-rfzo-vazi').value.trim()) : '',
+    faDatum: document.getElementById('f-grupa').value === 'RFZO' ? toISO(document.getElementById('f-fa').value.trim()) : '',
+    rfzoPoslato: document.getElementById('f-grupa').value === 'RFZO' ? toISO(document.getElementById('f-poslato').value.trim()) : '',
+    indikovaoLekar: document.getElementById('f-indLekar').value,
+    datumIndikacije: toISO(document.getElementById('f-indDatum').value.trim()),
     napomena: document.getElementById('f-napomena').value.trim()
   };
 
@@ -1520,12 +1655,15 @@ async function savePatient() {
   }
 }
 function clearForm() {
-  ['f-ime','f-prezime','f-jmbg','f-kontakt','f-napomena','f-dob','f-rfzo-vazi'].forEach(id=>document.getElementById(id).value='');
+  ['f-ime','f-prezime','f-jmbg','f-lbo','f-kontakt','f-napomena','f-dob','f-rfzo-vazi','f-fa','f-poslato'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-pol').value='';
   document.getElementById('f-dx').value='';
   document.getElementById('f-grupa').value='Podela';
   document.getElementById('f-lek').value='';
   document.getElementById('f-oko').value='';
+  document.getElementById('f-rfzo-status').value='CekaFA';
+  fillIndLekar(currentUser && doctorsList.includes(currentUser) ? currentUser : '');
+  setTodaySrb('f-indDatum');
   toggleRfzoStatus();
 }
 
@@ -1535,21 +1673,15 @@ function updateDoseNo(){
   const iso = toISO(document.getElementById('d-datum').value.trim());
   const oko = document.getElementById('d-oko').value;
   if (!iso || !currentPid) { el.textContent = '—'; return; }
-  if (editingDoseId) {
-    const d = getDosesForPid(currentPid).find(x => x.id === editingDoseId);
-    if (d && d.redniBroj) { el.textContent = d.redniBroj + '. doza ' + d.oko; return; }
-  }
-  const arr = getDosesForPid(currentPid).filter(x => x.oko === oko && toISO(x.datum) <= iso);
-  el.textContent = (arr.length + 1) + '. doza ' + oko;
+  const others = getDosesForPid(currentPid).filter(x => x.id !== editingDoseId && toISO(x.datum) <= iso);
+  const cnt = e => others.filter(x => x.oko === e || x.oko === 'OU').length + 1;
+  el.textContent = oko === 'OU' ? 'OD ' + cnt('OD') + '. / OS ' + cnt('OS') + '. doza' : cnt(oko) + '. doza ' + oko;
 }
 function cardDoseNoText(d) {
-  if (d.redniBroj && String(d.redniBroj).trim()) return Number(d.redniBroj) + '. ' + d.oko;
-  const arr = getDosesForPid(String(d.pid || ''))
-    .filter(x => x.oko === d.oko).sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
-  const idx = arr.findIndex(x => x.id === d.id);
-  return idx !== -1 ? (idx + 1) + '. ' + d.oko : '? ' + d.oko;
+  const rb = String(d.redniBroj || '').trim();
+  if (rb) return /^\d+$/.test(rb) ? rb + '. ' + d.oko : rb;
+  return '— ' + (d.oko || '');
 }
-
 // ---------- RENDER DOSES ----------
 function getBaseline(pid, oko) {
   if (oko !== 'OD' && oko !== 'OS') return null;
@@ -1816,7 +1948,7 @@ function renderDrSelect(current) {
 function renderDrManager() {
   const el = document.getElementById('drList'); if (!el) return;
   el.innerHTML = doctorsList.map(d =>
-    `<div class="dr-item"><span>${esc(d)}</span><button class="btn btn-danger" style="padding:2px 6px;font-size:11px;" onclick="removeDoctor('${esc(d).replace(/'/g,"\\'")}')"><i class="ti ti-x"></i></button></div>`
+    `<div class="dr-item"><span>${esc(d)}</span><button class="btn btn-danger" style="padding:2px 6px;font-size:11px;" data-name="${esc(d)}" onclick="removeDoctor(this.dataset.name)"><i class="ti ti-x"></i></button></div>`
   ).join('') || '<div style="font-size:12px;color:#888;">Nema lekara u listi.</div>';
 }
 function toggleDrManager() {
@@ -1851,152 +1983,409 @@ async function loadDoctors() {
   return doctorsList;
 }
 
+// ---------- TOK RADA: faze pacijenta ----------
+const RFZO_LABEL = { CekaFA:'Čeka FA', Cekanje:'Poslato u RFZO', Odobreno:'RFZO odobrio', Odbijeno:'RFZO odbio' };
+function nextTerm(pid){
+  const t = todayISO();
+  return program.filter(x => x.pid === String(pid) && x.status === 'zakazano' && toISO(x.datum) >= t)
+    .sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum)))[0] || null;
+}
+// u kojoj je fazi pacijent — za filtere i oznake na listi
+function patientPhase(p){
+  const nt = nextTerm(p.id);
+  if (p.grupa === 'RFZO' && p.statusTh === 'CekaFA') return { key:'fa', label:'Čeka FA', cls:'badge-amber' };
+  if (p.grupa === 'RFZO' && (p.statusTh === 'Cekanje' || !p.statusTh)) return { key:'rfzo', label:'Čeka RFZO', cls:'badge-red' };
+  if (p.grupa === 'RFZO' && p.statusTh === 'Odbijeno') return { key:'odbijen', label:'RFZO odbio', cls:'badge-red' };
+  if (nt) return { key:'termin', label:'Sledeći: ' + fmtDate(nt.datum).slice(0,6) + ' ' + nt.oko, cls:'badge-green' };
+  const s = dosesSummary[p.id];
+  if (!s || !s.count) return { key:'prva', label:'Zakazati 1. dozu', cls:'badge-amber' };
+  return { key:'bez', label:'Nema sledećeg termina', cls:'badge-amber' };
+}
+const PHASE_FILTERS = [
+  { key:'', label:'Svi' }, { key:'prva', label:'Zakazati 1. dozu', urgent:true }, { key:'bez', label:'Bez sledećeg termina', urgent:true },
+  { key:'termin', label:'Imaju termin' }, { key:'fa', label:'Čeka FA' }, { key:'rfzo', label:'Čeka RFZO' }, { key:'odbijen', label:'RFZO odbio' }
+];
+let phaseFilter = '';
+try { phaseFilter = sessionStorage.getItem('vegf_pf') || ''; } catch(e) {}
+function setPhaseFilter(k){ phaseFilter = k; try { sessionStorage.setItem('vegf_pf', k); } catch(e) {} renderPatients(document.getElementById('patSearch').value); }
+function rfzoStepsHtml(p){
+  if (p.grupa !== 'RFZO') return '';
+  const st = p.statusTh || 'Cekanje';
+  const order = ['CekaFA','Cekanje','Odobreno'];
+  const idx = st === 'Odbijeno' ? 2 : order.indexOf(st);
+  const step = (i, txt, date) => `<span class="rfzo-step ${st === 'Odbijeno' && i === 2 ? 'bad' : i < idx ? 'done' : i === idx ? 'cur' : ''}">${txt}${date ? ' · ' + fmtDate(date) : ''}</span>`;
+  const exp = p.rfzoVaziDo && toISO(p.rfzoVaziDo) < todayISO();
+  const soon = p.rfzoVaziDo && !exp && daysBetween(todayISO(), toISO(p.rfzoVaziDo)) <= 30;
+  let btn = '';
+  if (st === 'CekaFA') btn = `<button class="btn" onclick="rfzoStep('Cekanje')"><i class="ti ti-send"></i> FA urađena, dokumentacija poslata</button>`;
+  else if (st === 'Cekanje') btn = `<button class="btn btn-success" onclick="rfzoStep('Odobreno')"><i class="ti ti-check"></i> RFZO odobrio</button> <button class="btn" onclick="rfzoStep('Odbijeno')">Odbijeno</button>`;
+  else if (st === 'Odbijeno') btn = `<button class="btn" onclick="rfzoStep('Cekanje')"><i class="ti ti-send"></i> Ponovo poslato</button>`;
+  else if (exp || soon) btn = `<button class="btn" onclick="rfzoStep('Cekanje')"><i class="ti ti-send"></i> Poslat zahtev za produženje</button>`;
+  return `<div class="rfzo-steps">${step(0,'FA',p.faDatum)}<i class="ti ti-chevron-right" style="color:#aaa;"></i>${step(1,'Poslato RFZO',p.rfzoPoslato)}<i class="ti ti-chevron-right" style="color:#aaa;"></i>${step(2, st === 'Odbijeno' ? 'Odbijeno' : 'Odobreno', '')}
+    ${p.rfzoVaziDo ? `<span class="badge ${exp ? 'badge-red' : soon ? 'badge-amber' : 'badge-green'}">važi do ${fmtDate(p.rfzoVaziDo)}${exp ? ' — isteklo' : soon ? ' — uskoro ističe' : ''}</span>` : ''}
+    <span style="flex:1"></span>${btn}</div>`;
+}
+// sledeći korak RFZO iz kartona (sa datumom)
+async function rfzoStep(next){
+  const p = patients.find(x => x.id === currentPid); if (!p) return;
+  const today = fmtDate(todayISO());
+  const q = {
+    Cekanje: { title:'Dokumentacija poslata u RFZO', field:'Datum slanja', key:'rfzoPoslato', def: today, extra: p.statusTh === 'CekaFA' ? { faDatum: toISO(p.faDatum) || todayISO() } : {} },
+    Odobreno: { title:'RFZO odobrio terapiju', field:'Odobrenje važi do (iz rešenja)', key:'rfzoVaziDo', def:'' },
+    Odbijeno: { title:'RFZO odbio terapiju', field:'', key:'', def:'' }
+  }[next];
+  const ok = await showConfirm({ type:'warning', title:q.title,
+    msg: '<b>' + esc(p.ime + ' ' + p.prezime) + '</b>' + (q.field ? '<div class="field" style="margin-top:12px;text-align:left;"><label>' + q.field + '</label><input type="text" id="rfzoStepDate" placeholder="DD.MM.YYYY." value="' + q.def + '"></div>' : '') +
+      (next === 'Odobreno' ? '<div class="op-sub" style="margin-top:6px;text-align:left;">Ako rok nije poznat, ostavite prazno.</div>' : ''),
+    okLabel:'Sačuvaj' });
+  if (!ok) return;
+  const f = Object.assign({ statusTh: next }, q.extra || {});
+  if (q.key) { const v = toISO((document.getElementById('rfzoStepDate') || {}).value || ''); if (v) f[q.key] = v; }
+  const res = await saveVersioned('updatePatient', p.id, String(p.updatedAt || p.createdAt || ''), f, p.ime + ' ' + p.prezime);
+  if (res && res.ok) { Object.assign(p, f, { updatedAt: res.updatedAt }); showAlert('Sačuvano: ' + RFZO_LABEL[next] + '.', 'success'); await loadData(true); openPatient(p.id); }
+  else if (res && !res.cancelled) showAlert((res && res.reason) || 'Greška.', 'danger');
+}
+// lista termina u kartonu
+function renderTerms(){
+  const el = document.getElementById('termList'); if (!el || !currentPid) return;
+  const t0 = todayISO();
+  const list = program.filter(x => x.pid === currentPid).sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum)) || String(a.oko).localeCompare(String(b.oko)));
+  const p = patients.find(x => x.id === currentPid);
+  const nt = nextTerm(currentPid);
+  document.getElementById('m-next').innerHTML = nt ? fmtDate(nt.datum) + ' · ' + esc(nt.oko) : '<span style="color:var(--amber);">nije zakazan</span>';
+  if (!list.length) { el.innerHTML = '<div class="empty-state" style="padding:12px;">Nema zakazanih termina.</div>'; return; }
+  const future = list.filter(x => toISO(x.datum) >= t0 || x.status === 'zakazano');
+  const past = list.filter(x => !(toISO(x.datum) >= t0 || x.status === 'zakazano'));
+  const row = x => {
+    const st = x.status, iso = toISO(x.datum), isPast = iso < t0 && st !== 'zakazano';
+    const overdue = st === 'zakazano' && iso < t0;
+    const badge = st === 'dato' ? '<span class="badge badge-green">dato</span>' : st === 'otkazano' ? '<span class="badge badge-amber">otkazano</span>'
+                : overdue ? '<span class="badge badge-red">propušteno — pomerite</span>' : iso === t0 ? '<span class="badge badge-blue">danas</span>' : '';
+    const no = st === 'zakazano' ? plannedDoseNo(x.pid, x.oko, iso, x.id) + '. doza · ' : '';
+    const acts = st === 'dato' ? '' : `
+      <button class="btn" data-id="${esc(x.id)}" onclick="openTermEdit(this.dataset.id)"><i class="ti ti-calendar-repeat"></i> Pomeri / izmeni</button>
+      <button class="btn" data-id="${esc(x.id)}" onclick="cancelTerm(this.dataset.id)">${st === 'otkazano' ? 'Vrati' : 'Otkaži'}</button>
+      <button class="btn btn-danger" data-id="${esc(x.id)}" onclick="deleteTerm(this.dataset.id)"><i class="ti ti-trash"></i></button>`;
+    return `<div class="term-row ${isPast ? 'past' : ''}">
+      <div><b>${fmtDate(x.datum)}</b><div class="op-sub">${['ned','pon','uto','sre','čet','pet','sub'][new Date(iso + 'T12:00').getDay()]}</div></div>
+      <div><span class="eye-tag eye-${esc(x.oko)}">${esc(x.oko)}</span></div>
+      <div>${no}${esc(drugShort(x.drug))}${x.lekar ? ' · ' + esc(x.lekar) : ''}${x.brIst ? ' · ist. ' + esc(x.brIst) : ''} ${badge}${x.napomena ? '<div class="op-sub">' + esc(x.napomena) + '</div>' : ''}</div>
+      <div class="t-act">${acts}</div>
+    </div>`;
+  };
+  el.innerHTML = future.map(row).join('') + (past.length ? '<details style="margin-top:6px;"><summary class="op-sub" style="cursor:pointer;padding:6px 0;">Raniji termini (' + past.length + ')</summary>' + past.map(row).join('') + '</details>' : '');
+}
+// ---------- IZMENA / POMERANJE TERMINA ----------
+let teId = '';
+function openTermEdit(id){
+  const t = program.find(x => x.id === id); if (!t) return;
+  const p = patients.find(x => x.id === t.pid);
+  teId = id;
+  document.getElementById('teHead').innerHTML = `<span class="eye-tag eye-${esc(t.oko)}">${esc(t.oko)}</span><div><b>${esc(p ? p.ime + ' ' + p.prezime : '')}</b><div class="op-sub">sada: ${fmtDate(t.datum)} · ${esc(drugShort(t.drug))}</div></div>`;
+  document.getElementById('teDatum').value = fmtDate(t.datum);
+  document.getElementById('teDatumPick').value = '';
+  document.getElementById('teDrug').value = t.drug || '';
+  document.getElementById('teLekar').innerHTML = ['<option value="">—</option>'].concat(doctorsList.map(d => `<option value="${esc(d)}" ${d === t.lekar ? 'selected' : ''}>${esc(d)}</option>`)).join('') +
+    (t.lekar && !doctorsList.includes(t.lekar) ? `<option selected>${esc(t.lekar)}</option>` : '');
+  document.getElementById('teBrIst').value = t.brIst || '';
+  document.getElementById('teNap').value = '';
+  document.getElementById('teErr').style.display = 'none';
+  document.getElementById('termOverlay').style.display = 'block';
+  ensureDosesForPid(t.pid).then(teCheck);
+  teCheck();
+}
+function closeTermEdit(){ document.getElementById('termOverlay').style.display = 'none'; teId = ''; }
+function teLater(t){ return program.filter(x => x.pid === t.pid && x.id !== t.id && x.oko === t.oko && x.status === 'zakazano' && toISO(x.datum) > toISO(t.datum)).sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum))); }
+function teCheck(){
+  const t = program.find(x => x.id === teId); if (!t) return [];
+  const p = patients.find(x => x.id === t.pid);
+  const iso = toISO(document.getElementById('teDatum').value);
+  const later = teLater(t), shift = iso ? daysBetween(toISO(t.datum), iso) : 0;
+  const box = document.getElementById('teShiftBox');
+  box.style.display = later.length && shift ? 'flex' : 'none';
+  document.getElementById('teShiftInfo').textContent = later.map(x => { const d = new Date(toISO(x.datum) + 'T12:00'); d.setDate(d.getDate() + shift); return fmtDate(x.datum) + ' → ' + fmtDate(toISO(d)); }).join(', ');
+  const w = (p && iso) ? termWarnings(p, t.oko, document.getElementById('teDrug').value, iso, t.id) : [];
+  const shifting = later.length && shift && document.getElementById('teShift').checked;
+  const w2 = shifting ? w.filter(x => !later.some(l => x.indexOf(fmtDate(l.datum)) !== -1)) : w;
+  const el = document.getElementById('teWarn');
+  if (w2.length) { el.className = 'msg-warn'; el.innerHTML = '<i class="ti ti-alert-triangle"></i> Proverite:<br>• ' + w2.join('<br>• '); el.style.display = 'block'; } else el.style.display = 'none';
+  const b = document.getElementById('teSave'); b.className = 'btn btn-primary'; b.innerHTML = '<i class="ti ti-check"></i> Sačuvaj izmene';
+  return w2;
+}
+let teAck = '';
+async function saveTermEdit(){
+  const t = program.find(x => x.id === teId); if (!t) return;
+  const err = document.getElementById('teErr'); err.style.display = 'none';
+  const showErr = m => { err.className = 'msg-err'; err.textContent = m; err.style.display = 'block'; };
+  const iso = toISO(document.getElementById('teDatum').value);
+  if (!iso) return showErr('Unesite datum.');
+  if (iso < todayISO() && iso !== toISO(t.datum)) return showErr('Novi datum je u prošlosti.');
+  const w = teCheck(), sig = w.join('|') + iso;
+  const btn = document.getElementById('teSave');
+  if (w.length && teAck !== sig) { teAck = sig; btn.className = 'btn btn-danger'; btn.innerHTML = '<i class="ti ti-alert-triangle"></i> Sačuvaj uprkos upozorenju'; return; }
+  const shift = daysBetween(toISO(t.datum), iso);
+  const later = shift && document.getElementById('teShift').checked ? teLater(t) : [];
+  const nap = document.getElementById('teNap').value.trim();
+  const fields = { action:'updateProgram', id:t.id, lekar: document.getElementById('teLekar').value, brIst: document.getElementById('teBrIst').value.trim(), drug: document.getElementById('teDrug').value };
+  if (iso !== toISO(t.datum)) fields.datum = iso;
+  if (nap) fields.napomena = nap;
+  btn.disabled = true;
+  try {
+    // kasnije termine pomeramo od poslednjeg ka prvom, da se ne sudare sa pomerenim terminom
+    if (later.length) {
+      const sorted = shift > 0 ? later.slice().reverse() : later;
+      for (const x of sorted) {
+        const d = new Date(toISO(x.datum) + 'T12:00'); d.setDate(d.getDate() + shift);
+        const r = await apiWrite({ action:'updateProgram', id:x.id, datum: toISO(d), napomena: 'Pomereno zajedno sa terminom ' + fmtDate(t.datum) + (nap ? ' — ' + nap : '') }, false);
+        if (!r || !r.ok) { showErr('Termin ' + fmtDate(x.datum) + ' nije pomeren: ' + ((r && r.reason) || 'greška')); await loadData(true); return; }
+      }
+    }
+    const r = await apiWrite(fields, false);
+    if (!r || !r.ok) { showErr((r && r.reason) || 'Greška.'); await loadData(true); return; }
+    closeTermEdit();
+    showAlert('Termin sačuvan' + (later.length ? ' (pomereno i ' + later.length + ' sledećih)' : '') + '.', 'success');
+    await loadData(true);
+    if (currentPid) renderTerms();
+  } catch(e) { showErr('Nema veze sa serverom.'); }
+  finally { btn.disabled = false; }
+}
+// predlog datuma za 2. i 3. dozu od datuma prve doze (pomeren na radni dan)
+function loadingDates(firstIso){
+  return [28, 56].map(n => { const d = new Date(firstIso + 'T12:00'); d.setDate(d.getDate() + n);
+    if (d.getDay() === 6) d.setDate(d.getDate() + 2); if (d.getDay() === 0) d.setDate(d.getDate() + 1); return toISO(d); });
+}
+// posle date 1. doze: ponuda da se odmah zakažu 2. i 3.
+async function offerLoadingAfterGive(rec){
+  const no = eyeDoses(rec.pid, rec.oko).length;
+  if (no !== 1) return;
+  if (program.some(x => x.pid === rec.pid && x.oko === rec.oko && x.status === 'zakazano' && toISO(x.datum) > todayISO())) return;
+  const dates = loadingDates(todayISO());
+  const p = patients.find(x => x.id === rec.pid);
+  const ok = await showConfirm({ type:'warning', title:'Data je 1. doza — zakazati 2. i 3.?',
+    msg: '<b>' + esc(p ? p.ime + ' ' + p.prezime : '') + '</b> · ' + esc(rec.oko) + ' · ' + esc(drugShort(rec.drug)) + '<br><br>2. doza: <b>' + fmtDate(dates[0]) + '</b><br>3. doza: <b>' + fmtDate(dates[1]) + '</b><br><br><span class="op-sub">Datumi se kasnije mogu pomeriti u kartonu.</span>',
+    okLabel:'Zakaži obe', cancelLabel:'Ne sada' });
+  if (!ok) return;
+  for (const d of dates) {
+    const r = await apiWrite({ action:'addProgram', id: uuidv4(), pid: rec.pid, datum: d, oko: rec.oko, drug: rec.drug, doza:'', lekar: rec.lekar || '' });
+    if (!r || !r.ok) { showAlert('Termin ' + fmtDate(d) + ' nije zakazan: ' + ((r && r.reason) || 'greška'), 'danger'); break; }
+  }
+  await loadData(true);
+  showAlert('Zakazane 2. i 3. doza.', 'success');
+}
+
 // ---------- SCHEDULE ----------
-let schState = { pid:'', oko:'', drug:'' };
+let schState = { pid:'', oko:'', drug:'', ack:'' };
+function schSetPatient(p){
+  schState.pid = String(p.id);
+  const by = birthYear(p);
+  const box = document.getElementById('schChosen');
+  box.style.display = 'flex';
+  box.innerHTML = `<div class="avatar">${initials(p.ime,p.prezime)}</div><div><div style="font-weight:600;">${esc(p.ime+' '+p.prezime)}</div><div style="font-size:12px;color:#888;">${by ? 'god. rođ. ' + by + ' · ' : ''}${p.jmbg ? 'JMBG ' + esc(p.jmbg) + ' · ' : ''}${esc(p.dx||'')}${p.izabraniLek ? ' · plan: ' + esc(drugShort(p.izabraniLek)) + ' ' + esc(p.izabranoOko||'') : ''}</div></div>`;
+  // plan iz kartona se predlaže, ali ostaje vidljivo označen i može da se promeni
+  if (p.izabranoOko) { const b = document.querySelector('.sch-eye[data-eye="' + p.izabranoOko + '"]'); if (b) schSelectEye(b, true); }
+  if (p.izabraniLek) { const b = Array.from(document.querySelectorAll('.sch-drug-btn')).find(x => x.textContent.trim() === drugShort(p.izabraniLek)); if (b) schSelectDrug(b, p.izabraniLek, true); }
+  ensureDosesForPid(p.id).then(() => schCheck());
+}
 function openSchedule(pid) {
-  schState = { pid: pid ? String(pid) : '', oko:'', drug:'' };
+  schState = { pid:'', oko:'', drug:'', ack:'' };
   document.getElementById('schSearch').value = '';
   document.getElementById('schResults').innerHTML = '';
-  document.getElementById('schDatum').value = '';
   document.getElementById('schDatumPick').value = '';
-  setTodaySrb('schDatum');
+  document.getElementById('schBrIst').value = '';
+  document.getElementById('schLekar').innerHTML = ['<option value="">—</option>'].concat(doctorsList.map(d => `<option value="${esc(d)}">${esc(d)}</option>`)).join('');
+  // podrazumevani datum: dan koji je otvoren u operativnom programu (ako nije u prošlosti), inače danas
+  const opIso = toISO(document.getElementById('op-date-text').value);
+  document.getElementById('schDatum').value = fmtDate(opIso && opIso >= todayISO() ? opIso : todayISO());
   document.querySelectorAll('.sch-eye').forEach(b => b.classList.remove('selected'));
   document.querySelectorAll('.sch-drug-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('schError').style.display = 'none';
-  if (pid) {
-    const p = patients.find(x => x.id === String(pid));
-    if (p) {
-      schState.pid = String(pid);
-      document.getElementById('schChosen').style.display = 'flex';
-      document.getElementById('schChosen').innerHTML = `<div class="avatar">${initials(p.ime,p.prezime)}</div><div><div style="font-weight:600;">${esc(p.ime+' '+p.prezime)}</div><div style="font-size:12px;color:#888;">${esc(p.dx||'')}</div></div>`;
-    }
-  } else {
-    document.getElementById('schChosen').style.display = 'none';
-  }
+  document.getElementById('schWarn').style.display = 'none';
+  document.getElementById('schDoseNo').innerHTML = '';
+  document.getElementById('schChosen').style.display = 'none';
+  const p = pid ? patients.find(x => x.id === String(pid)) : null;
+  if (p) schSetPatient(p);
   document.getElementById('schOverlay').style.display = 'block';
+  schCheck();
 }
 function closeSchedule() { document.getElementById('schOverlay').style.display = 'none'; }
 function schSearchPatient() {
   const f = document.getElementById('schSearch').value.trim().toLowerCase();
   const el = document.getElementById('schResults');
   if (!f) { el.innerHTML = ''; return; }
-  const res = patients.filter(p => (p.ime+' '+p.prezime).toLowerCase().includes(f) || String(p.jmbg||'').includes(f) || String(p.id).includes(f)).slice(0, 20);
+  const fd = f.replace(/\D/g, '');
+  const res = patients.filter(p => (p.ime+' '+p.prezime).toLowerCase().includes(f) || (p.prezime+' '+p.ime).toLowerCase().includes(f) ||
+    (fd.length >= 3 && (String(p.jmbg||'').includes(fd) || String(p.lbo||'').includes(fd)))).slice(0, 20);
   if (!res.length) { el.innerHTML = '<div class="sch-res-empty">Nema rezultata.</div>'; return; }
-  el.innerHTML = res.map(p => `<div class="sch-res" data-pid="${p.id}" onclick="schChoose(this.dataset.pid)"><b>${esc(p.ime+' '+p.prezime)}</b><span>${esc(p.dx||'—')} · ${calcAge(p.dob)} god</span></div>`).join('');
+  el.innerHTML = res.map(p => { const by = birthYear(p); return `<div class="sch-res" data-pid="${esc(p.id)}" onclick="schChoose(this.dataset.pid)"><b>${esc(p.ime+' '+p.prezime)}</b><span>${by ? 'god. rođ. ' + by + ' · ' : ''}${esc(p.dx||'—')}${p.jmbg ? ' · JMBG ' + esc(p.jmbg) : ''}</span></div>`; }).join('');
 }
 function schChoose(pid) {
   const p = patients.find(x => x.id === String(pid));
   if (!p) return;
-  schState.pid = String(pid);
-  document.getElementById('schChosen').style.display = 'flex';
-  document.getElementById('schChosen').innerHTML = `<div class="avatar">${initials(p.ime,p.prezime)}</div><div><div style="font-weight:600;">${esc(p.ime+' '+p.prezime)}</div><div style="font-size:12px;color:#888;">${esc(p.dx||'')}</div></div>`;
   document.getElementById('schSearch').value = '';
   document.getElementById('schResults').innerHTML = '';
+  schSetPatient(p);
 }
-function schSelectEye(btn) {
+function schSelectEye(btn, silent) {
   schState.oko = btn.dataset.eye;
   document.querySelectorAll('.sch-eye').forEach(b => b.classList.toggle('selected', b === btn));
+  if (!silent) schCheck();
 }
-function schSelectDrug(btn, name) {
+function schSelectDrug(btn, name, silent) {
   schState.drug = name;
   document.querySelectorAll('.sch-drug-btn').forEach(b => b.classList.toggle('selected', b === btn));
+  if (!silent) schCheck();
+}
+// upozorenja za jedan termin (jedno oko)
+function termWarnings(p, oko, drug, iso, exceptId){
+  const w = [];
+  if (p.izabranoOko && p.izabranoOko !== 'OU' && p.izabranoOko !== oko)
+    w.push('U planu terapije je <b>' + esc(p.izabranoOko) + '</b>, a zakazujete <b>' + oko + '</b>.');
+  if (p.izabraniLek && drug && p.izabraniLek !== drug)
+    w.push('U planu terapije je <b>' + esc(drugShort(p.izabraniLek)) + '</b>, a zakazujete <b>' + esc(drugShort(drug)) + '</b>.');
+  const prev = eyeDoses(p.id, oko).map(d => toISO(d.datum)).filter(Boolean).sort();
+  const all = getDosesForPid(p.id);
+  if (!prev.length && all.length)
+    w.push('Oko <b>' + oko + '</b> do sada nije primalo injekcije — pacijent je primao samo u <b>' + esc(Array.from(new Set(all.map(d => d.oko))).join(', ')) + '</b>.');
+  const lastGiven = prev.filter(x => x <= iso).pop();
+  if (lastGiven) {
+    const n = daysBetween(lastGiven, iso);
+    if (n < 28) w.push('Od poslednje doze u oko <b>' + oko + '</b> (' + fmtDate(lastGiven) + ') prošlo bi samo <b>' + n + ' dana</b>.');
+    const lastDrug = (eyeDoses(p.id, oko).filter(d => toISO(d.datum) === lastGiven)[0] || {}).drug;
+    if (lastDrug && drug && lastDrug !== drug && !(p.izabraniLek && p.izabraniLek !== drug))
+      w.push('Poslednja doza u oko <b>' + oko + '</b> bila je <b>' + esc(drugShort(lastDrug)) + '</b>.');
+  }
+  program.filter(t => t.pid === String(p.id) && t.id !== exceptId && t.oko === oko && t.status === 'zakazano').forEach(t => {
+    const n = Math.abs(daysBetween(toISO(t.datum), iso));
+    if (n < 28) w.push('Oko <b>' + oko + '</b> već ima zakazan termin ' + fmtDate(t.datum) + (n === 0 ? ' — <b>isti dan</b>.' : ' (razmak ' + n + ' dana).'));
+  });
+  if (p.grupa === 'RFZO' && p.rfzoVaziDo && iso > toISO(p.rfzoVaziDo))
+    w.push('RFZO odobrenje važi do <b>' + fmtDate(p.rfzoVaziDo) + '</b>, a termin je posle toga.');
+  const wd = new Date(iso + 'T12:00').getDay();
+  if (wd === 0 || wd === 6) w.push('Izabrani datum je <b>vikend</b>.');
+  return w;
+}
+function schCheck(){
+  const info = document.getElementById('schDoseNo'), warnEl = document.getElementById('schWarn');
+  const btn = document.getElementById('schSaveBtn');
+  schState.ack = '';
+  btn.innerHTML = '<i class="ti ti-check"></i> Zakaži'; btn.className = 'btn btn-primary';
+  const p = patients.find(x => x.id === schState.pid);
+  const iso = toISO(document.getElementById('schDatum').value);
+  if (!p || !iso || !schState.oko) { info.innerHTML = ''; warnEl.style.display = 'none'; return []; }
+  const eyes = schState.oko === 'OU' ? ['OD','OS'] : [schState.oko];
+  const dayCnt = program.filter(t => t.status !== 'otkazano' && toISO(t.datum) === iso).length;
+  const firstDose = eyes.every(e => plannedDoseNo(p.id, e, iso) === 1);
+  const lb = document.getElementById('schLoadBox');
+  lb.style.display = firstDose ? 'flex' : 'none';
+  const ld = loadingDates(iso);
+  document.getElementById('schLoadDates').textContent = '2. doza ' + fmtDate(ld[0]) + ' · 3. doza ' + fmtDate(ld[1]) + ' — kasnije se mogu pomeriti';
+  info.innerHTML = '<span class="op-sub">Na dan ' + fmtDate(iso) + ' već zakazano: <b>' + dayCnt + '</b></span><br>' +
+    eyes.map(e => 'Biće <b>' + plannedDoseNo(p.id, e, iso) + '. doza</b> u oko <b>' + e + '</b> (' + eyeName(e) + ')').join('<br>') +
+    (schState.oko === 'OU' ? '<br><span style="color:var(--text-3);">Za OU se prave dva termina — svako oko se posebno proverava pre injekcije.</span>' : '');
+  let w = [];
+  eyes.forEach(e => { w = w.concat(termWarnings(p, e, schState.drug, iso)); });
+  if (w.length) { warnEl.className = 'msg-warn'; warnEl.innerHTML = '<i class="ti ti-alert-triangle"></i> Proverite:<br>• ' + w.join('<br>• '); warnEl.style.display = 'block'; }
+  else warnEl.style.display = 'none';
+  return w;
 }
 async function saveSchedule() {
   const err = document.getElementById('schError');
+  const showErr = t => { err.textContent = t; err.className = 'msg-err'; err.style.display = 'block'; };
   err.style.display = 'none';
-  if (!schState.pid) { err.textContent = 'Izaberite pacijenta.'; err.className='msg-err'; err.style.display='block'; return; }
+  if (!schState.pid) return showErr('Izaberite pacijenta.');
   const datumISO = toISO(document.getElementById('schDatum').value);
-  if (!datumISO) { err.textContent = 'Unesite datum.'; err.className='msg-err'; err.style.display='block'; return; }
-  if (!schState.oko) { err.textContent = 'Izaberite oko.'; err.className='msg-err'; err.style.display='block'; return; }
-  if (!schState.drug) { err.textContent = 'Izaberite lek.'; err.className='msg-err'; err.style.display='block'; return; }
-  
-  // RFZO provera
+  if (!datumISO) return showErr('Unesite datum.');
+  if (datumISO < todayISO()) return showErr('Datum je u prošlosti.');
+  if (!schState.oko) return showErr('Izaberite oko.');
+  if (!schState.drug) return showErr('Izaberite lek.');
   const p = patients.find(x => x.id === schState.pid);
-  if (p && p.grupa === 'RFZO' && p.rfzoVaziDo && p.rfzoVaziDo.trim()) {
-    if (datumISO > p.rfzoVaziDo) {
-      const proceed = await showConfirm({ type: 'danger', title: 'Termin preko roka RFZO',
-        msg: 'Odobrenje ističe <strong>' + fmtDate(p.rfzoVaziDo) + '</strong>, a zakazujete za <strong>' + fmtDate(datumISO) + '</strong>.<br><br>Da li želite da nastavite?',
-        okLabel: 'Nastavi' });
-      if (!proceed) return;
-    }
+  if (p && p.grupa === 'RFZO' && p.statusTh !== 'Odobreno') return showErr('RFZO još nije odobrio terapiju — zakazivanje nije moguće.');
+  await ensureDosesForPid(schState.pid);
+  const w = schCheck();
+  const sig = w.join('|') + '#' + datumISO + schState.oko + schState.drug;
+  const btn = document.getElementById('schSaveBtn');
+  if (w.length && schState.ackSig !== sig) {
+    // prvi klik samo prikazuje upozorenja; drugi klik zakazuje
+    schState.ackSig = sig;
+    btn.innerHTML = '<i class="ti ti-alert-triangle"></i> Zakaži uprkos upozorenju'; btn.className = 'btn btn-danger';
+    return;
   }
-
-  const payload = {
-    action:'addProgram', id: uuidv4(),
-    pid: schState.pid, datum: datumISO, oko: schState.oko, drug: schState.drug, doza:''
-  };
+  const eyes = schState.oko === 'OU' ? ['OD','OS'] : [schState.oko];
+  const lekar = document.getElementById('schLekar').value, brIst = document.getElementById('schBrIst').value.trim();
+  btn.disabled = true;
   try {
-    const res = await apiWrite(payload);
-    if (res && res.ok) {
-      closeSchedule();
-      showAlert('Termin zakazan.', 'success');
-      await loadData(true);
-      switchTab('program');
-    } else {
-      err.textContent = (res && res.reason) || 'Greška.';
-      err.className = 'msg-err'; err.style.display = 'block';
+    const out = [];
+    const withLoad = document.getElementById('schLoadBox').style.display !== 'none' && document.getElementById('schLoad').checked;
+    for (const e of eyes) {
+      const res = await apiWrite({ action:'addProgram', id: uuidv4(), pid: schState.pid, datum: datumISO, oko: e,
+        drug: schState.drug, doza:'', lekar, brIst, napomena: w.length ? 'Zakazano uprkos upozorenju' : '' });
+      out.push(res);
+      if (!res || !res.ok) break;
+      if (withLoad) for (const d of loadingDates(datumISO)) {
+        const r2 = await apiWrite({ action:'addProgram', id: uuidv4(), pid: schState.pid, datum: d, oko: e, drug: schState.drug, doza:'', lekar });
+        out.push(r2); if (!r2 || !r2.ok) break;
+      }
     }
-  } catch(e) { err.textContent = 'Nema veze sa serverom.'; err.className='msg-err'; err.style.display='block'; }
+    const bad = out.find(r => !r || !r.ok);
+    if (bad) { showErr((bad && bad.reason) || 'Greška.'); await loadData(true); return; }
+    if (w.length) writeLog('Zakazano uprkos upozorenju', (p ? p.ime + ' ' + p.prezime : '') + ' — ' + schState.oko + ' ' + drugShort(schState.drug) + ' ' + fmtDate(datumISO) + ': ' + w.map(x => x.replace(/<[^>]+>/g, '')).join(' / '));
+    closeSchedule();
+    showAlert('Zakazano termina: ' + out.length + '.', 'success');
+    await loadData(true);
+    if (document.getElementById('overlay').style.display === 'block' && currentPid) renderTerms();
+    else { setOpDate(datumISO); switchTab('program'); }
+  } catch(e) { showErr('Nema veze sa serverom.'); }
+  finally { btn.disabled = false; }
 }
 
-// Auto-zakazivanje 2. i 3. doze
+// Udarne doze: 2. i 3. doza u isto oko, na 4 i 8 nedelja od PRVE doze tog oka
 async function scheduleNextTwoDoses() {
   if (!currentPid) return;
   const p = patients.find(x => x.id === currentPid);
   if (!p) return;
-  
-  if (p.grupa === 'RFZO' && p.statusTh === 'Cekanje') {
-    showAlert('Pacijent čeka RFZO odobrenje. Ne možete zakazati.', 'danger');
-    return;
-  }
-  
-  const doses = getDosesForPid(currentPid);
-  if (doses.length === 0) { showAlert('Pacijent nema evidentiranu prvu dozu.', 'warn'); return; }
-  
-  // Uzmi datum prve doze (najraniju)
-  const firstDose = doses.sort((a,b) => parseDate(a.datum) - parseDate(b.datum))[0];
-  const baseDate = parseDate(firstDose.datum);
-  if (!baseDate) return;
-  
-  // Pripremi 2. i 3. dozu (+4 i +8 nedelja)
-  const d2 = new Date(baseDate); d2.setDate(d2.getDate() + 28);
-  const d3 = new Date(baseDate); d3.setDate(d3.getDate() + 56);
-  
-  const drug = firstDose.drug;
-  const oko = firstDose.oko;
-  
-  if (p.grupa === 'RFZO' && p.rfzoVaziDo && p.rfzoVaziDo.trim()) {
-    if (toISO(d2) > p.rfzoVaziDo || toISO(d3) > p.rfzoVaziDo) {
-      const proceed = await showConfirm({ type: 'danger', title: 'Termini preko roka RFZO',
-        msg: 'Neki termini padaju nakon isteka RFZO odobrenja (' + fmtDate(p.rfzoVaziDo) + '). Da li želite da nastavite?',
-        okLabel: 'Nastavi' });
-      if (!proceed) return;
+  if (p.grupa === 'RFZO' && p.statusTh !== 'Odobreno') { showAlert('Pacijent čeka RFZO odobrenje. Ne možete zakazati.', 'danger'); return; }
+  await ensureDosesForPid(currentPid);
+  const all = getDosesForPid(currentPid).slice().sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum)));
+  if (!all.length) { showAlert('Pacijent nema upisanu prvu dozu.', 'danger'); return; }
+  const last = all[all.length - 1];
+  const eyes = p.izabranoOko === 'OU' ? ['OD','OS'] : (p.izabranoOko === 'OD' || p.izabranoOko === 'OS') ? [p.izabranoOko]
+             : last.oko === 'OU' ? ['OD','OS'] : [last.oko];
+  const today = todayISO(), plan = [], notes = [];
+  eyes.forEach(e => {
+    const ed = eyeDoses(currentPid, e).slice().sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum)));
+    if (!ed.length) { notes.push(e + ': nema prve doze.'); return; }
+    if (ed.length >= 3) { notes.push(e + ': već ima ' + ed.length + ' doze — udarne doze su završene.'); return; }
+    const first = toISO(ed[0].datum), drug = p.izabraniLek || ed[ed.length - 1].drug;
+    for (let n = ed.length + 1; n <= 3; n++) {
+      const d = new Date(first + 'T12:00'); d.setDate(d.getDate() + 28 * (n - 1));
+      let iso = toISO(d), moved = false;
+      if (iso < today) { iso = today; moved = true; }
+      const lastIso = plan.filter(x => x.oko === e).map(x => x.datum).concat(ed.map(x => toISO(x.datum))).sort().pop();
+      if (lastIso && daysBetween(lastIso, iso) < 28) { const d2 = new Date(lastIso + 'T12:00'); d2.setDate(d2.getDate() + 28); iso = toISO(d2); moved = true; }
+      const dup = program.find(t => t.pid === currentPid && t.oko === e && t.status === 'zakazano' && Math.abs(daysBetween(toISO(t.datum), iso)) < 21);
+      if (dup) { notes.push(e + ': ' + n + '. doza već ima termin ' + fmtDate(dup.datum) + '.'); continue; }
+      plan.push({ oko:e, drug, datum:iso, n, moved });
     }
-  }
-  
-  const ok = await showConfirm({
-    type: 'warning',
-    title: 'Automatsko zakazivanje',
-    msg: 'Zakazati 2. dozu za <strong>' + fmtDate(d2) + '</strong> i 3. dozu za <strong>' + fmtDate(d3) + '</strong>?<br><br>Lek: ' + drugShort(drug) + ' · Oko: ' + oko,
-    okLabel: 'Zakaži obe'
   });
+  if (!plan.length) { showAlert(notes.join(' ') || 'Nema šta da se zakaže.', 'danger'); return; }
+  const rfzoOver = p.grupa === 'RFZO' && p.rfzoVaziDo && plan.some(x => x.datum > toISO(p.rfzoVaziDo));
+  const ok = await showConfirm({ type: rfzoOver ? 'danger' : 'warning', title: 'Zakazivanje udarnih doza',
+    msg: plan.map(x => '<b>' + x.n + '. doza ' + x.oko + '</b> — ' + fmtDate(x.datum) + ' · ' + esc(drugShort(x.drug)) + (x.moved ? ' <i>(pomereno — prvobitni datum je prošao ili je razmak bio kraći od 4 nedelje)</i>' : '')).join('<br>') +
+      (notes.length ? '<br><br>' + esc(notes.join(' ')) : '') +
+      (rfzoOver ? '<br><br><b>Pažnja:</b> neki termini su posle isteka RFZO odobrenja (' + fmtDate(p.rfzoVaziDo) + ').' : ''),
+    okLabel: 'Zakaži' });
   if (!ok) return;
-  
-  const btn = document.getElementById('btnSchedule23');
-  const orig = btn.innerHTML;
-  btn.disabled = true; btn.innerHTML = '<div class="spinner" style="border-top-color:#fff;"></div> Zakačujem...';
-  
+  const btn = document.getElementById('btnSchedule23'); const orig = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Zakazujem...';
   try {
-    const p1 = apiWrite({ action:'addProgram', id: uuidv4(), pid: currentPid, datum: toISO(d2), oko, drug, doza:'' });
-    const p2 = apiWrite({ action:'addProgram', id: uuidv4(), pid: currentPid, datum: toISO(d3), oko, drug, doza:'' });
-    const [r1, r2] = await Promise.all([p1, p2]);
-    
-    if (r1 && r1.ok && r2 && r2.ok) {
-      showAlert('Uspešno zakazane 2. i 3. doza.', 'success');
-      await loadData(true);
-    } else {
-      showAlert('Greška pri zakazivanju: ' + ((r1&&r1.reason)||(r2&&r2.reason)||'Nepoznato'), 'danger');
+    const errs = [];
+    for (const x of plan) {
+      const r = await apiWrite({ action:'addProgram', id: uuidv4(), pid: currentPid, datum: x.datum, oko: x.oko, drug: x.drug, doza:'' });
+      if (!r || !r.ok) errs.push(x.n + '. doza ' + x.oko + ': ' + ((r && r.reason) || 'greška'));
     }
+    await loadData(true);
+    if (errs.length) showAlert('Neki termini nisu zakazani: ' + errs.join('; '), 'danger');
+    else showAlert('Zakazano termina: ' + plan.length + '.', 'success');
   } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
   finally { btn.disabled = false; btn.innerHTML = orig; }
 }
@@ -2073,16 +2462,17 @@ function renderProgram() {
     return `<div class="op-row ${rowClass}">
       <div class="op-num">${idx+1}</div>
       <div>
-        <div class="patient-name">${esc(name)}</div>
-        <div class="patient-meta">${pData ? esc(pData.dx || '—') : ''} ${p.brIst ? '· ist. '+esc(p.brIst) : ''}</div>
+        <div class="patient-name">${esc(name)} ${pData && birthYear(pData) ? '<span class="dob-badge">' + birthYear(pData) + '.</span>' : ''}</div>
+        <div class="patient-meta">${view !== 'day' ? '<b>' + fmtDate(p.datum) + '</b> · ' : ''}${pData ? esc(pData.dx || '—') : ''}${p.brIst ? ' · ist. '+esc(p.brIst) : ''}${p.lekar ? ' · ' + esc(p.lekar) : ''}</div>
       </div>
-      <div><span class="eye-tag eye-${p.oko}">${esc(p.oko)}</span></div>
-      <div style="font-size:12px;color:#555;"><i class="ti ti-syringe"></i> ${esc((p.drug||'').split(' ')[0])}</div>
+      <div><span class="eye-tag eye-${esc(p.oko)}">${esc(p.oko)}</span></div>
+      <div style="font-size:12px;color:#555;"><i class="ti ti-syringe"></i> ${esc(drugShort(p.drug))}${!isDato && !isOtk ? '<div class="op-sub">' + plannedDoseNo(p.pid, p.oko, toISO(p.datum), p.id) + '. doza</div>' : ''}</div>
       <div class="op-actions">
         ${canGive ? `<button class="btn btn-success" data-pid="${p.id}" onclick="startGive(this.dataset.pid)"><i class="ti ti-check"></i> Daj injekciju</button>` : ''}
         ${isDato ? '<span class="badge badge-green">Dato</span>' : ''}
         ${isOtk ? '<span class="badge badge-amber">Otkazano</span>' : ''}
-        ${!isDato && !isOtk ? `<button class="btn" data-pid="${p.id}" onclick="cancelTerm(this.dataset.pid)"><i class="ti ti-x"></i></button>` : ''}
+        ${!isDato ? `<button class="btn" data-pid="${p.id}" onclick="openTermEdit(this.dataset.pid)" title="Pomeri / izmeni"><i class="ti ti-calendar-repeat"></i></button>` : ''}
+        ${!isDato ? `<button class="btn" data-pid="${p.id}" onclick="cancelTerm(this.dataset.pid)" title="${isOtk ? 'Vrati' : 'Otkaži'}">${isOtk ? '<i class="ti ti-arrow-back-up"></i>' : '<i class="ti ti-x"></i>'}</button>` : ''}
         ${!isDato ? `<button class="btn btn-danger" data-pid="${p.id}" onclick="deleteTerm(this.dataset.pid)"><i class="ti ti-trash"></i></button>` : ''}
       </div>
     </div>`;
@@ -2098,8 +2488,8 @@ async function cancelTerm(pid) {
     okLabel: t.status === 'otkazano' ? 'Vrati' : 'Otkaži' });
   if (!ok) return;
   try {
-    const r = await apiWrite({ action:'updateProgram', id: pid, status: newStatus });
-    if (r && r.ok) { await loadData(true); showAlert(newStatus === 'otkazano' ? 'Termin otkazan.' : 'Termin vraćen.', 'success'); }
+    const r = await apiWrite({ action:'updateProgram', id: pid, status: newStatus }, false);
+    if (r && r.ok) { await loadData(true); if (currentPid) renderTerms(); showAlert(newStatus === 'otkazano' ? 'Termin otkazan.' : 'Termin vraćen.', 'success'); }
     else showAlert((r && r.reason) || 'Greška.', 'danger');
   } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
 }
@@ -2123,9 +2513,10 @@ let vzState = { programId:'', step:1 };
 function startGive(programId) {
   const rec = program.find(x => x.id === programId);
   if (!rec) return;
-  vzState = { programId, step:1 };
+  vzState = { programId, step:1, doseId: uuidv4() };
   document.getElementById('vzOverlay').style.display = 'block';
   renderVz();
+  ensureDosesForPid(rec.pid);
 }
 function closeVz() { document.getElementById('vzOverlay').style.display = 'none'; vzState = { programId:'', step:1 }; }
 function renderVz() {
@@ -2147,14 +2538,24 @@ function renderVz() {
   document.getElementById('vzChips').innerHTML = chips.join('');
 
   if (vzState.step === 1) {
-    body.innerHTML = `<div class="vz-card">
+    const by = birthYear(p);
+    body.innerHTML = by ? `<div class="vz-card">
       <div class="vz-label">Pacijent</div>
       <div class="vz-big">${esc(name)}</div>
-      <div class="vz-sub">${p ? esc(p.dx || '') + ' · ' + calcAge(p.dob) + ' god' : ''}</div>
-      <div class="vz-hint">Proverite da je ovo pravi pacijent.</div>
-      <button class="vz-btn vz-ok" onclick="vzNext()">Potvrđujem</button>
-      <button class="vz-btn vz-stop" onclick="vzStop()">Nije tačno — prekini</button>
+      <div class="vz-hint">Pitajte pacijenta: <b>„Koje godine ste rođeni?“</b> i upišite godinu koju izgovori.</div>
+      <input class="vz-input" id="vzYear" inputmode="numeric" maxlength="4" autocomplete="off" onkeydown="if(event.key==='Enter')vzCheckYear()" />
+      <div id="vzYearErr"></div>
+      <button class="vz-btn vz-ok" onclick="vzCheckYear()">Proveri</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Nije pravi pacijent — prekini</button>
+    </div>` : `<div class="vz-card">
+      <div class="vz-label">Pacijent</div>
+      <div class="vz-big">${esc(name)}</div>
+      <div class="msg-warn">U kartonu nema datuma rođenja ni JMBG-a, pa provera godine nije moguća. Proverite identitet uvidom u ličnu kartu ili zdravstvenu knjižicu.</div>
+      <label class="checkbox-row" style="justify-content:center;margin-top:1rem;font-size:15px;"><input type="checkbox" id="vzDocOk" onchange="document.getElementById('vzDocBtn').disabled=!this.checked" /> Identitet proveren u dokumentu</label>
+      <button class="vz-btn vz-ok" id="vzDocBtn" disabled onclick="vzNext()">Potvrđujem</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Nije pravi pacijent — prekini</button>
     </div>`;
+    setTimeout(() => { const i = document.getElementById('vzYear'); if (i) i.focus(); }, 50);
   } else if (vzState.step === 2) {
     const eyeColor = rec.oko === 'OD' ? '#1557a0' : '#0f7a55';
     body.innerHTML = `<div class="vz-card">
@@ -2215,6 +2616,7 @@ function renderVz() {
           <div><span>Oko</span><b>${esc(rec.oko)}</b></div>
           <div><span>Lek</span><b>${esc(drugShort(rec.drug))}</b></div>
           <div><span>Datum</span><b>${fmtDate(rec.datum)}</b></div>
+          <div><span>Redni broj</span><b>${plannedDoseNo(rec.pid, rec.oko, toISO(rec.datum), rec.id)}. doza ${esc(rec.oko)}</b></div>
         </div>
       </div>
       <div id="vzError" style="display:none;margin-top:1rem;"></div>
@@ -2224,6 +2626,21 @@ function renderVz() {
   }
 }
 function vzNext() { vzState.step++; renderVz(); }
+function vzCheckYear() {
+  const rec = program.find(x => x.id === vzState.programId); if (!rec) return;
+  const p = patients.find(x => x.id === String(rec.pid));
+  const typed = (document.getElementById('vzYear').value || '').trim();
+  const err = document.getElementById('vzYearErr');
+  if (!/^\d{4}$/.test(typed)) { err.className = 'msg-err'; err.textContent = 'Upišite godinu sa 4 cifre.'; return; }
+  if (Number(typed) !== birthYear(p)) {
+    writeLog('Neuspela provera identiteta', (p ? p.ime + ' ' + p.prezime : '') + ' — upisana godina ' + typed);
+    document.getElementById('vzBody').innerHTML = `<div class="vz-card"><div class="vz-date-bad"><div class="vz-big" style="font-size:26px;">✗ Godina rođenja se ne slaže</div></div>
+      <div class="vz-hint">Upisana godina <b>${esc(typed)}</b> ne odgovara pacijentu iz programa. <b>Injekcija se ne daje.</b> Proverite identitet i program.</div>
+      <button class="vz-btn vz-stop" onclick="closeVz()">Zatvori</button></div>`;
+    return;
+  }
+  vzNext();
+}
 function vzStop() {
   writeLog('Prekinuta provera', 'Korisnik prekinuo proveru pre injekcije');
   closeVz();
@@ -2239,17 +2656,21 @@ async function vzConfirmGive() {
   const rec = program.find(x => x.id === vzState.programId);
   if (!rec) return;
   const payload = {
-    action:'giveInjection', programId: vzState.programId, doseId: uuidv4(),
+    action:'giveInjection', programId: vzState.programId, doseId: vzState.doseId,
     pid: rec.pid, oko: rec.oko, drug: rec.drug,
     lekar, brIst, kontrola
   };
   try {
+    const btnG = document.querySelector('#vzBody .vz-ok'); if (btnG) btnG.disabled = true;
     const res = await apiWrite(payload);
+    if (btnG) btnG.disabled = false;
     if (res && (res.ok || res.alreadyGiven)) {
       closeVz();
       invalidateDoses();
       await loadData();
       showAlert('Injekcija upisana.', 'success');
+      await ensureDosesForPid(rec.pid, true);
+      await offerLoadingAfterGive(Object.assign({}, rec, { lekar }));
     } else {
       errEl.className = 'msg-err'; errEl.textContent = (res && res.reason) || 'Greška.'; errEl.style.display = 'block';
     }
@@ -2262,18 +2683,22 @@ async function vzConfirmGive() {
 function printProgram() {
   const opDate = toISO(document.getElementById('op-date-text').value) || todayISO();
   const list = program.filter(p => toISO(p.datum) === opDate && p.status !== 'otkazano');
-  if (!list.length) { showAlert('Nema termina za štampu.', 'info'); return; }
-  list.sort((a,b) => String(a.oko).localeCompare(String(b.oko)) || String(a.pid).localeCompare(String(b.pid)));
+  if (!list.length) { showAlert('Nema termina za štampu.', 'danger'); return; }
+  const nm = t => { const x = patients.find(y => y.id === String(t.pid)); return x ? x.prezime + ' ' + x.ime : ''; };
+  list.sort((a,b) => nm(a).localeCompare(nm(b), 'sr') || String(a.oko).localeCompare(String(b.oko)));
   const rows = list.map((p, i) => {
     const pData = patients.find(x => x.id === String(p.pid));
     const name = pData ? (pData.ime + ' ' + pData.prezime) : '—';
+    const no = p.status === 'dato' ? '' : plannedDoseNo(p.pid, p.oko, opDate, p.id) + '. doza';
     return `<tr>
       <td class="c">${i+1}</td>
-      <td>${esc(name)}</td>
-      <td class="c"><span class="eye">${esc(p.oko)}</span></td>
-      <td>${esc((p.drug||'').split(' ')[0])}</td>
-      <td>${esc(p.brIst||'')}</td>
-      <td>${esc(p.lekar||'')}</td>
+      <td><b>${esc(name)}</b>${p.status === 'dato' ? ' <span class="s">(dato)</span>' : ''}</td>
+      <td class="c">${pData ? fmtDate(pData.dob) : ''}</td>
+      <td class="c">${pData ? esc(pData.jmbg || '') : ''}</td>
+      <td>${esc(p.brIst || '')}</td>
+      <td class="eye">${esc(p.oko)}</td>
+      <td>${esc(drugShort(p.drug))}<div class="s">${no}</div></td>
+      <td>${esc(p.lekar || '')}</td>
       <td class="c"><span class="pr-box"></span></td>
       <td></td>
     </tr>`;
@@ -2282,37 +2707,23 @@ function printProgram() {
   const dani = ['nedelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
   document.getElementById('printArea').innerHTML = `
     <div class="pr-head">
-      <div>
-        <div class="pr-title">Anti-VEGF — Operativni program</div>
-        <div class="pr-sub">Klinička baza podataka</div>
-      </div>
-      <div class="pr-date">
-        <div>${dani[d.getDay()]}</div>
-        <b>${fmtDate(opDate)}</b>
-      </div>
+      <div><div class="pr-title">Anti-VEGF — Operativni program</div><div class="pr-sub">Klinika za očne bolesti, UKCV</div></div>
+      <div class="pr-date"><div>${dani[d.getDay()]}</div><b>${fmtDate(opDate)}</b></div>
     </div>
     <table class="pr-table">
       <thead><tr>
-        <th style="width:30px;">#</th>
-        <th>Pacijent</th>
-        <th style="width:50px;">Oko</th>
-        <th style="width:90px;">Lek</th>
-        <th style="width:100px;">Br. ist.</th>
-        <th style="width:140px;">Lekar</th>
-        <th style="width:40px;">✓</th>
-        <th style="width:100px;">Potpis</th>
+        <th style="width:28px;">Rb.</th><th>Pacijent</th><th style="width:80px;">Datum rođenja</th><th style="width:105px;">JMBG</th>
+        <th style="width:85px;">Br. istorije</th><th style="width:48px;">Oko</th><th style="width:90px;">Lek / br. doze</th>
+        <th style="width:140px;">Lekar</th><th style="width:48px;">Provera</th><th style="width:90px;">Potpis</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="pr-sign">
-      <div>_______________________<br>Glavna sestra</div>
-      <div>_______________________<br>Lekar</div>
-    </div>
-    <div class="pr-foot">Štampano: ${new Date().toLocaleString('sr-RS')} · Ukupno: ${list.length}</div>`;
+    <div class="pr-note">Pre svake injekcije: ime i prezime + godina rođenja (pacijent izgovara), oko, lek na pakovanju, datum — kroz proveru u aplikaciji.</div>
+    <div class="pr-sign"><div>_______________________<br>Medicinska sestra</div><div>_______________________<br>Lekar</div></div>
+    <div class="pr-foot">Štampano: ${new Date().toLocaleString('sr-RS')} · Ukupno termina: ${list.length}</div>`;
   window.print();
-  writeLog('Štampan program', 'Datum: ' + opDate + ' · ' + list.length + ' termina');
+  writeLog('Štampa operativnog programa', fmtDate(opDate) + ' · ' + list.length + ' termina');
 }
-
 // ---------- REPORT ----------
 function generateReport() {
   const p = patients.find(x => x.id === currentPid);
@@ -2364,27 +2775,28 @@ function copyReport() {
 }
 
 // ---------- EXCEL EXPORT ----------
-function exportExcel() {
+async function exportExcel() {
+  showAlert('Pripremam Excel sa svim dozama...', 'success');
+  const data = await api('getAll');   // pun izvoz: sve doze svih pacijenata
+  if (!data || !data.doses) { showAlert('Izvoz nije uspeo — nema veze sa serverom.', 'danger'); return; }
   try {
+    const rowsToObj = rows => { const h = (rows[0] || []).map(String); return rows.slice(1).map(r => { const o = {}; h.forEach((k,i) => o[k] = r[i]); return o; }); };
+    const allDoses = rowsToObj(data.doses), allPats = rowsToObj(data.patients || []);
     const wb = XLSX.utils.book_new();
-    const pacData = [['ID','Ime','Prezime','Datum rođenja','Pol','JMBG','Kontakt','Dijagnoza','Grupa','Lek','Oko','StatusTh','RFZO važi do','Napomena']];
-    patients.forEach(p => pacData.push([p.id, p.ime, p.prezime, p.dob, p.pol, p.jmbg, p.kontakt, p.dx, p.grupa, p.izabraniLek, p.izabranoOko, p.statusTh, p.rfzoVaziDo, p.napomena]));
+    const pacData = [['ID','Ime','Prezime','Datum rođenja','Pol','JMBG','LBO','Kontakt','Dijagnoza','Grupa','Lek (plan)','Oko (plan)','RFZO status','RFZO važi do','Broj doza','Napomena']];
+    allPats.forEach(p => pacData.push([p.id, p.ime, p.prezime, fmtDate(p.dob), p.pol, p.jmbg, p.lbo, p.kontakt, p.dx, p.grupa, p.izabraniLek, p.izabranoOko, p.statusTh, p.rfzoVaziDo ? fmtDate(p.rfzoVaziDo) : '', allDoses.filter(d => String(d.pid) === String(p.id)).length, p.napomena]));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pacData), 'Pacijenti');
-
-    const dozData = [['ID','Pacijent','Br. istorije','Datum','Oko','Lek','Redni broj','Lekar','VOD Vn','VOD BCVA','VOS Vn','VOS BCVA','IOP OD','IOP OS','CMT OD','CMT OS','OCT','Neželjeni događaji','Kontrola','Kontrola obavljena']];
-    Object.keys(dosesByPid).forEach(pid => {
-      const p = patients.find(x => x.id === pid);
-      const pName = p ? (p.ime + ' ' + p.prezime) : pid;
-      dosesByPid[pid].forEach(d => {
-        dozData.push([d.id, pName, d.brIst, d.datum, d.oko, d.drug, d.redniBroj, d.lekar, d.vodVn, d.vodBcva, d.vosVn, d.vosBcva, d.iopOd, d.iopOs, d.cmtOd, d.cmtOs, d.oct, d.nezeljeniDogadjaji, d.kontrola, d.completed]);
-      });
+    const dozData = [['ID doze','Pacijent','JMBG','Br. istorije','Datum','Oko','Lek','Br. doze u oko','Lekar','VOD Vn','VOD BCVA','VOS Vn','VOS BCVA','IOP OD','IOP OS','CMT OD','CMT OS','OCT','Neželjeni događaji','Kontrola','Kontrola obavljena','Napomena']];
+    allDoses.slice().sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum))).forEach(d => {
+      const p = allPats.find(x => String(x.id) === String(d.pid));
+      dozData.push([d.id, p ? p.ime + ' ' + p.prezime : d.pid, p ? p.jmbg : '', d.brIst, fmtDate(d.datum), d.oko, d.drug, d.redniBroj, d.lekar, d.vodVn, d.vodBcva, d.vosVn, d.vosBcva, d.iopOd, d.iopOs, d.cmtOd, d.cmtOs, d.oct,
+        String(d.nezeljeniDogadjaji || '').split(';').filter(Boolean).map(a => ADV_LABELS[a] || a).join(', '), d.kontrola ? fmtDate(d.kontrola) : '', d.completed, d.napomena]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dozData), 'Doze');
-
     XLSX.writeFile(wb, 'anti-vegf-export-' + todayISO() + '.xlsx');
-  } catch(e) { showAlert('Greška pri exportu: ' + e.message, 'danger'); }
+    writeLog('Izvoz u Excel', allPats.length + ' pacijenata, ' + allDoses.length + ' doza');
+  } catch(e) { showAlert('Greška pri izvozu: ' + e.message, 'danger'); }
 }
-
 // ---------- USERS ----------
 let _umMode = 'add', _umTarget = '';
 function openAddUser() {

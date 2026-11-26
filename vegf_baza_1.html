@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d3d6e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Anti-VEGF">
+<meta name="format-detection" content="telephone=no">
+<title>Anti-VEGF Studija — Baza pacijenata</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --blue:#1557a0;--blue-light:#1e7ad4;--blue-pale:#e8f2fb;--blue-dark:#0d3d6e;
+  --bg:#f0f4f8;--surface:#ffffff;--border:#d0dce8;--border-light:#e8eef5;
+  --text:#0f2133;--text-2:#3d5470;--text-3:#7a95b0;
+  --green:#1a7f5a;--green-bg:#e6f4ea;--red:#c0392b;--red-bg:#fdf0ef;--amber:#b06000;--amber-bg:#fef7e0;
+  --radius:10px;--radius-lg:14px;--shadow:0 2px 8px rgba(21,87,160,0.08);--shadow-lg:0 8px 32px rgba(21,87,160,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+button,a,.patient-row,.sch-res,.op-row{-webkit-tap-highlight-color:rgba(21,87,160,0.12);touch-action:manipulation;}
+.topbar-sync,.lbl-short{display:none;}
+.btn-schedule-big{width:100%;justify-content:center;font-size:16px;font-weight:600;padding:14px 18px;min-height:54px;border-radius:12px;margin:2px 0 18px;box-shadow:0 4px 14px rgba(21,87,160,0.25);}
+.btn-schedule-big i{font-size:20px;}
+.record-given{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px;padding:10px 12px;border:1px dashed var(--border);border-radius:10px;font-size:12px;color:var(--text-3);}
+.record-given .btn{font-size:12px;padding:6px 10px;min-height:0;}
+body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.topbar{background:var(--blue-dark);padding:0 2rem;display:flex;align-items:center;gap:16px;height:60px;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(13,61,110,0.25);}
+.topbar-title{font-size:15px;font-weight:600;color:#fff;letter-spacing:0.02em;}
+.topbar-sub{font-size:12px;color:rgba(255,255,255,0.6);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.container{max-width:960px;margin:0 auto;padding:2rem 1rem;}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:1.5rem;}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text-3);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s;}
+.tab.active{color:var(--blue);border-bottom:3px solid var(--blue);font-weight:600;}
+.tab:hover:not(.active){color:var(--text-2);}
+.section{display:none;}
+.section.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border-light);}
+.card-title{font-size:15px;font-weight:600;color:var(--blue-dark);display:flex;align-items:center;gap:8px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+.field input,.field select{border:1.5px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:14px;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;}
+.field input:focus,.field select:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(30,122,212,0.12);}
+.field textarea{resize:vertical;min-height:64px;padding:9px 12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);border-radius:var(--radius);font-family:inherit;font-size:14px;outline:none;}
+.field textarea:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(30,122,212,0.12);}
+.btn{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.btn:hover{background:var(--blue-pale);border-color:var(--blue-light);color:var(--blue);}
+.btn:active{transform:scale(0.97);}
+.btn:disabled{opacity:0.45;cursor:not-allowed;}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-light);border-color:var(--blue-light);color:#fff;}
+.btn-danger{color:var(--red);border-color:#f5c6c2;}
+.btn-danger:hover{background:var(--red-bg);border-color:var(--red);}
+.btn-success{color:var(--green);border-color:#b6e4d3;background:#fff;}
+.btn-success:hover{background:var(--green-bg);}
+.btn-edit{color:var(--blue);border-color:#c5d9f8;}
+.btn-edit:hover{background:var(--blue-pale);}
+.patient-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer;transition:all .12s;}
+.patient-row:last-child{border-bottom:none;}
+@media(hover:hover){.patient-row:hover{background:var(--blue-pale);margin:0 -1.5rem;padding:12px 1.5rem;border-radius:var(--radius);}}
+.patient-row:active{background:var(--blue-pale);}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(21,87,160,0.25);}
+.patient-info{flex:1;min-width:0;}
+.patient-name{font-size:14px;font-weight:600;color:var(--text);}
+.patient-meta{font-size:12px;color:var(--text-3);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+.badge-blue{background:var(--blue-pale);color:var(--blue);}
+.badge-green{background:var(--green-bg);color:var(--green);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);}
+.dose-row{display:grid;grid-template-columns:110px 50px 90px 110px 1fr auto;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;}
+.dose-row:last-child{border-bottom:none;}
+.dose-header{display:grid;grid-template-columns:110px 50px 90px 110px 1fr auto;gap:8px;padding:7px 0;margin-bottom:2px;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid var(--border);}
+.dose-actions{display:flex;gap:4px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:1.5rem;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow);border-top:3px solid var(--blue);}
+.stat-label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:6px;}
+.stat-value{font-size:26px;font-weight:700;color:var(--blue-dark);}
+.empty-state{text-align:center;padding:2.5rem;color:var(--text-3);font-size:14px;}
+.overlay{position:fixed;inset:0;background:rgba(13,61,110,0.35);display:flex;align-items:flex-start;justify-content:center;z-index:100;padding:2rem 1rem;overflow-y:auto;backdrop-filter:blur(2px);}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.75rem;width:660px;max-width:100%;border:1px solid var(--border);margin:auto;box-shadow:var(--shadow-lg);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--border-light);}
+.notice{font-size:12px;color:var(--text-2);background:var(--blue-pale);border-left:3px solid var(--blue);border-radius:0 var(--radius) var(--radius) 0;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.notice-edit{background:var(--blue-pale);color:var(--blue-dark);border-left:3px solid var(--blue-light);border-radius:0 var(--radius) var(--radius) 0;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;}
+.search-wrap{position:relative;margin-bottom:1rem;}
+.search-wrap input{width:100%;padding-left:36px;border:1.5px solid var(--border);border-radius:var(--radius);padding-top:9px;padding-bottom:9px;font-size:14px;outline:none;}
+.search-wrap input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(30,122,212,0.12);}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none;}
+.drug-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.drug-btn{padding:10px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);text-align:center;}
+.drug-btn.selected{border-color:var(--blue);background:var(--blue-pale);color:var(--blue);font-weight:600;}
+.drug-btn:hover:not(.selected){background:var(--blue-pale);border-color:var(--blue-light);}
+.divider{border:none;border-top:1px solid var(--border-light);margin:1.25rem 0;}
+.flex-end{display:flex;justify-content:flex-end;gap:8px;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.section-subtitle{font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-bottom:10px;}
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-weight:500;}
+.alert-success{background:var(--green-bg);color:var(--green);border-left:3px solid var(--green);}
+.alert-danger{background:var(--red-bg);color:var(--red);border-left:3px solid var(--red);}
+.alert-info{background:var(--blue-pale);color:var(--blue);border-left:3px solid var(--blue);}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;}
+.checkbox-row input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:var(--blue);}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.date-combo{position:relative;display:flex;align-items:center;}
+.date-combo input[type="text"]{flex:1;padding-right:32px;}
+.date-combo .cal-btn{position:absolute;right:6px;background:none;border:none;cursor:pointer;color:var(--text-3);padding:0;font-size:16px;line-height:1;display:flex;align-items:center;}
+.date-combo .cal-btn:hover{color:var(--blue);}
+.date-combo input[type="date"]{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:0;right:0;}
+.loading{text-align:center;padding:2rem;color:var(--text-3);font-size:14px;}
+.clin-section{background:var(--blue-pale);border:1.5px solid #c5d9f8;border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;}
+.clin-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.clin-badge{display:inline-block;font-size:10px;background:#1a73e8;color:#fff;border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:1px;text-transform:none;letter-spacing:0;}
+.va-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.va-row input{border:1px solid #c5d9f8;border-radius:6px;padding:6px 7px;font-size:14px;background:#fff;outline:none;min-width:0;}
+.va-row input:focus{border-color:#1a73e8;}
+.va-row .va-lbl{font-size:12px;color:#1a4f8a;font-weight:500;white-space:nowrap;}
+.va-row .va-sign{font-size:14px;color:#1a4f8a;font-weight:600;padding:0 1px;}
+.va-row .w-vn{width:58px;}.va-row .w-sph{width:66px;}.va-row .w-cyl{width:66px;}.va-row .w-ax{width:70px;}.va-row .w-bcva{width:62px;}
+.va-group{background:#fff;border:1px solid #c5d9f8;border-radius:8px;padding:8px 10px;margin-bottom:8px;}
+.va-group-title{font-size:11px;font-weight:600;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.report-overlay{position:fixed;inset:0;background:rgba(13,61,110,0.35);display:flex;align-items:flex-start;justify-content:center;z-index:150;padding:2rem 1rem;overflow-y:auto;backdrop-filter:blur(2px);}
+.report-modal{background:#fff;border-radius:var(--radius-lg);padding:1.75rem;width:680px;max-width:100%;border:1px solid var(--border);margin:auto;box-shadow:var(--shadow-lg);}
+.report-text{font-family:'Menlo','Consolas',monospace;font-size:12px;line-height:1.8;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem;white-space:pre-wrap;color:var(--text);min-height:200px;max-height:60vh;overflow-y:auto;user-select:all;}
+.copy-success{background:var(--green-bg);color:var(--green);border-radius:var(--radius);padding:6px 12px;font-size:12px;display:none;align-items:center;gap:6px;font-weight:500;}
+.dr-manager{background:#f0f4ff;border:1px solid #c5d9f8;border-radius:8px;padding:10px 12px;margin-top:6px;}
+.dr-manager-title{font-size:12px;font-weight:500;color:#1a4f8a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.dr-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.dr-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:5px 10px;font-size:13px;}
+.dr-add-row{display:flex;gap:6px;}
+.dr-add-row input{flex:1;border:1px solid #c5d9f8;border-radius:6px;padding:6px 10px;font-size:13px;outline:none;background:#fff;}
+.confirm-overlay{position:fixed;inset:0;background:rgba(13,61,110,0.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem;backdrop-filter:blur(2px);}
+.confirm-box{background:#fff;border-radius:var(--radius-lg);padding:1.75rem;width:400px;max-width:100%;border:1px solid var(--border);box-shadow:var(--shadow-lg);}
+.confirm-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 1rem;}
+.confirm-icon-danger{background:var(--red-bg);color:var(--red);}
+.confirm-icon-warning{background:var(--amber-bg);color:var(--amber);}
+.confirm-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--text);}
+.confirm-msg{font-size:13px;color:var(--text-2);text-align:center;line-height:1.6;margin-bottom:1.5rem;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;}
+.pat-view{font-size:13px;}
+.pat-view .info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:.75rem;}
+.pat-view .info-item{background:var(--bg);border-radius:var(--radius);padding:10px 12px;border:1px solid var(--border-light);}
+.pat-view .info-item span{color:var(--text-3);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px;}
+.pat-view .info-item strong{font-size:14px;color:var(--text);}
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue) 60%,var(--blue-light) 100%);display:flex;align-items:center;justify-content:center;z-index:999;}
+.login-box{background:#fff;border-radius:20px;padding:2.5rem;width:400px;max-width:90vw;box-shadow:0 20px 60px rgba(13,61,110,0.35);}
+.login-logo{display:flex;align-items:center;gap:14px;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border-light);}
+.login-logo-icon{width:52px;height:52px;background:var(--blue);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(21,87,160,0.35);}
+.login-title{font-size:20px;font-weight:700;color:var(--blue-dark);}
+.login-sub{font-size:13px;color:var(--text-3);margin-top:3px;}
+.login-field{margin-bottom:14px;}
+.login-field label{font-size:11px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;}
+.login-field input{width:100%;border:1.5px solid var(--border);border-radius:var(--radius);padding:11px 14px;font-size:14px;outline:none;color:var(--text);}
+.login-field input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(30,122,212,0.12);}
+.login-btn{width:100%;padding:12px;border-radius:var(--radius);background:var(--blue);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;box-shadow:0 4px 12px rgba(21,87,160,0.3);}
+.login-btn:hover{background:var(--blue-light);}
+.login-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.login-error{background:var(--red-bg);color:var(--red);border-radius:var(--radius);border-left:3px solid var(--red);padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;font-weight:500;}
+.user-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.15);border-radius:20px;padding:5px 12px;border:1px solid rgba(255,255,255,0.25);}
+.log-row{display:grid;grid-template-columns:140px 100px 90px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;align-items:start;}
+.log-row:last-child{border-bottom:none;}
+.log-header{display:grid;grid-template-columns:140px 100px 90px 1fr;gap:8px;padding:7px 0;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);margin-bottom:4px;}
+.log-badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+.log-add{background:var(--green-bg);color:var(--green);}.log-edit{background:var(--blue-pale);color:var(--blue);}.log-delete{background:var(--red-bg);color:var(--red);}.log-login{background:var(--amber-bg);color:var(--amber);}
+.op-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
+.op-date-input{width:150px;border:1.5px solid var(--border);border-radius:var(--radius);padding:9px 32px 9px 12px;font-size:15px;font-weight:600;color:var(--blue-dark);outline:none;}
+.op-date-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(30,122,212,0.12);}
+.op-day{font-size:13px;color:var(--text-2);font-weight:600;text-transform:capitalize;}
+.op-summary{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
+.op-row{display:grid;grid-template-columns:34px minmax(0,1fr) 150px 110px auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-light);}
+.op-row:last-child{border-bottom:none;}
+.op-num{width:30px;height:30px;border-radius:50%;background:var(--blue-pale);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.op-actions{display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap;}
+.op-dato{background:#f6fbf8;}
+.op-otkazano{opacity:.5;}
+.op-otkazano .patient-name{text-decoration:line-through;}
+.eye-tag{display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;padding:6px 10px;border-radius:8px;letter-spacing:.04em;white-space:nowrap;}
+.eye-OD{background:#1557a0;color:#fff;}.eye-OS{background:#0f7a55;color:#fff;}
+.sch-chosen{display:flex;align-items:center;gap:12px;background:var(--blue-pale);border:1.5px solid #c5d9f8;border-radius:var(--radius);padding:10px 12px;}
+.sch-results{border:1px solid var(--border);border-radius:var(--radius);margin-top:6px;max-height:240px;overflow-y:auto;background:#fff;}
+.sch-results:empty{display:none;}
+.sch-res{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border-light);display:flex;flex-direction:column;gap:2px;font-size:14px;}
+.sch-res span{font-size:12px;color:var(--text-3);}
+.sch-res:hover{background:var(--blue-pale);}
+.sch-res-empty{padding:10px 12px;font-size:13px;color:var(--text-3);}
+.sch-eyes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.sch-eye{padding:14px 8px;border-radius:var(--radius);border:2px solid var(--border);background:#fff;cursor:pointer;font-size:14px;font-weight:800;color:var(--text-2);display:flex;flex-direction:column;align-items:center;gap:2px;}
+.sch-eye small{font-size:11px;font-weight:600;opacity:.8;}
+.sch-eye.selected[data-eye="OD"]{background:#1557a0;border-color:#1557a0;color:#fff;}
+.sch-eye.selected[data-eye="OS"]{background:#0f7a55;border-color:#0f7a55;color:#fff;}
+.sch-eye.selected[data-eye="OU"]{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.sch-drug-btn{padding:10px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);text-align:center;}
+.sch-drug-btn.selected{border-color:var(--blue);background:var(--blue-pale);color:var(--blue);font-weight:700;}
+.msg-err{background:var(--red-bg);color:var(--red);border-left:4px solid var(--red);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;font-weight:600;margin:8px 0;text-align:left;}
+.msg-warn{background:var(--amber-bg);color:var(--amber);border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;font-weight:600;margin:8px 0;text-align:left;}
+.msg-info{background:var(--blue-pale);color:var(--blue-dark);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;margin:8px 0;text-align:left;}
+#vzOverlay{position:fixed;inset:0;background:var(--bg);z-index:180;overflow-y:auto;}
+.vz-box{width:740px;max-width:100%;margin:0 auto;padding:1.5rem 1rem 3rem;}
+.vz-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:12px;}
+.vz-top-title{font-size:15px;font-weight:700;color:var(--blue-dark);}
+.vz-top-sub{font-size:12px;color:var(--text-3);}
+.vz-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1rem;}
+.vz-step{height:6px;border-radius:3px;background:var(--border);}
+.vz-step.done{background:var(--green);}
+.vz-step.cur{background:var(--blue);}
+.vz-steplbl{font-size:11px;color:var(--text-3);margin-top:4px;font-weight:600;}
+.vz-steplbl.cur{color:var(--blue);}
+.vz-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+.vz-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 10px;border-radius:20px;background:var(--green-bg);color:var(--green);}
+.vz-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:2rem;box-shadow:var(--shadow-lg);text-align:center;}
+.vz-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:1rem;}
+.vz-big{font-size:38px;font-weight:800;color:var(--blue-dark);line-height:1.15;word-break:break-word;}
+.vz-sub{font-size:16px;color:var(--text-2);margin-top:.5rem;}
+.vz-hint{font-size:15px;color:var(--text-2);margin:1.25rem auto 0;max-width:520px;line-height:1.5;}
+.vz-ask{font-size:14px;font-weight:700;color:var(--text);margin-top:1.25rem;}
+.vz-input{font-size:34px;font-weight:700;text-align:center;width:200px;padding:10px;border:2px solid var(--border);border-radius:12px;letter-spacing:.25em;margin-top:.5rem;outline:none;color:var(--blue-dark);}
+.vz-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 4px rgba(30,122,212,0.15);}
+.vz-eye{border-radius:16px;padding:2rem 1rem;color:#fff;}
+.vz-eye .vz-big{color:#fff;font-size:54px;}
+.vz-eyecode{font-size:26px;font-weight:800;opacity:.85;margin-top:.25rem;letter-spacing:.1em;}
+.vz-drug{border:3px solid var(--blue);border-radius:16px;padding:1.5rem 1rem;}
+.vz-date-ok{border:3px solid var(--green);border-radius:16px;padding:1.5rem 1rem;color:var(--green);}
+.vz-date-bad{border:3px solid var(--red);border-radius:16px;padding:1.5rem 1rem;color:var(--red);}
+.vz-btn{display:block;width:100%;padding:18px;font-size:18px;font-weight:700;border-radius:14px;border:none;cursor:pointer;margin-top:1rem;}
+.vz-btn:disabled{opacity:.5;cursor:not-allowed;}
+.vz-ok{background:var(--green);color:#fff;margin-top:1.5rem;}
+.vz-ok:hover:not(:disabled){filter:brightness(1.07);}
+.vz-go{background:var(--blue);color:#fff;}
+.vz-stop{background:#fff;color:var(--red);border:2px solid #f5c6c2;font-size:15px;padding:13px;}
+.vz-sum{text-align:left;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:.5rem;}
+.vz-sum div{display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border-light);font-size:15px;}
+.vz-sum div:last-child{border-bottom:none;}
+.vz-sum span{color:var(--text-3);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.vz-sum span.eye-tag{color:#fff;font-size:12px;text-transform:none;}
+.vz-sel{width:100%;font-size:16px;padding:12px;border:2px solid var(--border);border-radius:12px;margin-top:.5rem;outline:none;}
+#printArea{display:none;}
+.pr-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:12px;}
+.pr-title{font-size:18px;font-weight:700;}
+.pr-sub{font-size:12px;}
+.pr-date{text-align:right;font-size:13px;}
+.pr-date b{font-size:20px;}
+.pr-table{width:100%;border-collapse:collapse;font-size:12px;}
+.pr-table th{background:#e8e8e8;border:1px solid #000;padding:6px;text-align:left;font-size:11px;}
+.pr-table td{border:1px solid #000;padding:7px 6px;vertical-align:middle;}
+.pr-table .c{text-align:center;}
+.pr-table .eye{text-align:center;font-weight:800;font-size:14px;letter-spacing:.03em;border:2.5px solid #000;}
+.pr-table .s{font-size:11px;}
+.pr-box{display:inline-block;width:16px;height:16px;border:1.5px solid #000;}
+.pr-note{font-size:11px;margin-top:10px;}
+.pr-sign{display:flex;justify-content:space-between;margin-top:36px;font-size:12px;}
+.pr-foot{font-size:10px;margin-top:18px;color:#444;}
+#undoToast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0d3d6e;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:500;gap:12px;align-items:center;font-size:14px;}
+@media print{
+  body{background:#fff !important;}
+  body > *:not(#printArea){display:none !important;}
+  #printArea{display:block !important;color:#000;font-family:Arial,Helvetica,sans-serif;}
+  @page{size:A4 landscape;margin:10mm;}
+  .pr-table tr{page-break-inside:avoid;}
+}
+@media(max-width:700px){
+  input,select,textarea,.field input,.field select,.field textarea,.search-wrap input,.login-field input,.va-row input,.dr-add-row input,.op-date-input{font-size:16px !important;}
+  .topbar{padding:env(safe-area-inset-top) 12px 0;height:auto;min-height:56px;gap:10px;}
+  .topbar > div:first-child{display:none !important;}
+  .topbar-title{font-size:15px;}
+  .topbar-sub,.tb-sync,.user-chip,.tb-excel{display:none !important;}
+  .topbar-sync{display:block;font-size:11px;color:rgba(255,255,255,0.6);margin-top:1px;}
+  .topbar .lbl{display:none;}
+  .topbar .btn{width:42px;height:42px;padding:0;justify-content:center;font-size:19px;}
+  .container{padding:12px 12px calc(84px + env(safe-area-inset-bottom));}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(13,61,110,0.08);}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 7px;font-size:11px;border-bottom:none;border-top:3px solid transparent;margin:0;}
+  .tab i{font-size:22px;}
+  .tab.active{border-bottom:none;border-top:3px solid var(--blue);}
+  .lbl-long{display:none;}.lbl-short{display:inline;}
+  .card{padding:14px;border-radius:12px;}
+  .btn{min-height:42px;}
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+  .stat{padding:10px 12px;}.stat-value{font-size:22px;}.stat-label{font-size:10px;}
+  .grid4{grid-template-columns:1fr 1fr;}
+  .drug-selector{grid-template-columns:repeat(2,1fr);}
+  .drug-btn,.sch-drug-btn{min-height:46px;font-size:14px;}
+  .overlay,.report-overlay{padding:0;align-items:stretch;}
+  .modal,.report-modal{width:100%;min-height:100%;border-radius:0;border:none;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));margin:0;}
+  .modal-header{flex-wrap:wrap;gap:10px;}
+  .dose-row,.dose-header{grid-template-columns:90px 45px 1fr auto;}
+  .dose-row > div:nth-child(3),.dose-row > div:nth-child(4){display:none;}
+  .dose-header > div:nth-child(3),.dose-header > div:nth-child(4){display:none;}
+  .op-row{grid-template-columns:30px minmax(0,1fr);row-gap:8px;}
+  .op-row > div:nth-child(3),.op-row > div:nth-child(4),.op-row > div:nth-child(5){grid-column:2;}
+  .op-actions{justify-content:flex-start;}
+  .vz-big{font-size:30px;}.vz-eye .vz-big{font-size:40px;}
+  .sch-eyes{grid-template-columns:1fr 1fr;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .log-header{display:none;}
+  .log-row{grid-template-columns:1fr auto;row-gap:4px;}
+  .log-row > div:nth-child(1){order:1;}.log-row > div:nth-child(3){order:2;justify-self:end;}
+  .log-row > div:nth-child(2){order:3;grid-column:1/-1;}.log-row > div:nth-child(4){order:4;grid-column:1/-1;}
+  .pat-view .info-grid{grid-template-columns:1fr 1fr;}
+  .login-box{padding:1.75rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i class="ti ti-eye" style="font-size:26px;color:#fff;"></i></div>
+      <div>
+        <div class="login-title">Anti-VEGF Studija</div>
+        <div class="login-sub">Klinička baza podataka</div>
+      </div>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-field">
+      <label>Korisničko ime</label>
+      <input type="text" id="loginUser" placeholder="Unesite korisničko ime" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label>Lozinka</label>
+      <input type="password" id="loginPass" placeholder="Unesite lozinku" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password" />
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Prijavi se</button>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.25);">
+    <i class="ti ti-eye" style="font-size:18px;color:#fff;"></i>
+  </div>
+  <div>
+    <div class="topbar-title">Anti-VEGF Studija</div>
+    <div class="topbar-sub">Klinička baza podataka</div>
+    <div class="topbar-sync" id="syncLabelM"></div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn" onclick="loadData()" id="refreshBtn" aria-label="Osveži" title="Osveži" style="color:rgba(255,255,255,0.85);border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);"><i class="ti ti-refresh"></i><span class="lbl"> Osveži</span></button>
+    <button class="btn tb-excel" onclick="exportExcel()" aria-label="Export Excel" title="Export Excel" style="color:#4ade80;border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.1);"><i class="ti ti-file-spreadsheet"></i><span class="lbl"> Export Excel</span></button>
+    <span id="syncLabel" class="tb-sync" style="font-size:12px;color:rgba(255,255,255,0.6);white-space:nowrap;"></span>
+    <div class="user-chip" id="userChip" style="display:none;"><i class="ti ti-user"></i><span id="userChipName"></span></div>
+    <button class="btn btn-danger" id="logoutBtn" style="display:none;" onclick="doLogout()" aria-label="Odjavi se" title="Odjavi se"><i class="ti ti-logout"></i><span class="lbl"> Odjavi se</span></button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="alertBox" style="display:none;"></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="patients" onclick="switchTab('patients')"><i class="ti ti-users"></i> <span>Pacijenti</span></button>
+    <button class="tab" data-tab="program" onclick="switchTab('program')"><i class="ti ti-calendar-event"></i> <span class="lbl-long">Operativni program</span><span class="lbl-short">Program</span></button>
+    <button class="tab" data-tab="add" onclick="switchTab('add')"><i class="ti ti-user-plus"></i> <span class="lbl-long">Novi pacijent</span><span class="lbl-short">Novi</span></button>
+    <button class="tab" data-tab="log" onclick="switchTab('log')"><i class="ti ti-history"></i> <span>Log</span></button>
+    <button class="tab" data-tab="users" onclick="switchTab('users')" id="tab-users" style="display:none;"><i class="ti ti-users-cog"></i> <span class="lbl-long">Korisnici</span><span class="lbl-short">Nalozi</span></button>
+  </div>
+
+  <!-- PACIJENTI -->
+  <div id="sec-patients" class="section active">
+    <div class="stats" id="statsBar"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Uključeni pacijenti</span>
+        <span id="patCount" style="font-size:13px;color:#888;"></span>
+      </div>
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon"></i>
+        <input type="text" placeholder="Pretraži po imenu, dijagnozi, ID-u..." id="patSearch" oninput="renderPatients(this.value)" style="padding-left:34px;" />
+      </div>
+      <div id="patientList"><div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div></div>
+    </div>
+  </div>
+
+  <!-- NOVI PACIJENT -->
+  <div id="sec-add" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" id="formTitle">Novi pacijent</span>
+        <button class="btn" id="cancelEditBtn" onclick="cancelEditPatient()" style="display:none;"><i class="ti ti-x"></i> Otkaži izmene</button>
+      </div>
+      <div class="notice" id="formNotice"><i class="ti ti-cloud"></i> Podaci se čuvaju u Google Sheets — vidljivi svim korisnicima u realnom vremenu.</div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="field"><label>Ime</label><input type="text" id="f-ime" placeholder="Npr. Marko" /></div>
+        <div class="field"><label>Prezime</label><input type="text" id="f-prezime" placeholder="Npr. Jovanović" /></div>
+      </div>
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="field"><label>Datum rođenja</label>
+          <div class="date-combo">
+            <input type="text" id="f-dob" placeholder="DD.MM.YYYY." maxlength="11" />
+            <input type="date" id="f-dob-pick" onchange="pickToText('f-dob-pick','f-dob')" />
+            <button class="cal-btn" onclick="document.getElementById('f-dob-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+          </div>
+        </div>
+        <div class="field"><label>Pol</label>
+          <select id="f-pol"><option value="">—</option><option value="M">Muški</option><option value="Ž">Ženski</option></select>
+        </div>
+        <div class="field"><label>Broj istorije</label><div style="padding:9px 12px;border:1.5px dashed var(--border);border-radius:var(--radius);font-size:12px;color:var(--text-3);background:var(--bg);">Unosi se uz svaku injekciju</div></div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="field"><label>JMBG</label><input type="text" id="f-jmbg" placeholder="13 cifara" maxlength="13" inputmode="numeric" autocomplete="off" /></div>
+        <div class="field"><label>Kontakt</label><input type="text" id="f-kontakt" inputmode="tel" placeholder="Npr. 064/123-4567" /></div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Dijagnoza</label>
+        <select id="f-dx">
+          <option value="">— Izaberi —</option>
+          <option value="nAMD">nAMD — neovaskularni AMD</option>
+          <option value="DME">DME — dijabetesni makularni edem</option>
+          <option value="BRVO">BRVO — okluzija grane retinalne vene</option>
+          <option value="CRVO">CRVO — okluzija centralne retinalne vene</option>
+          <option value="mCNV">mCNV — miopična horoidalna neovaskularizacija</option>
+          <option value="Ostalo">Ostalo</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Napomena</label>
+        <textarea id="f-napomena" placeholder="Anamneza, komorbiditeti, kontraindikacije..."></textarea>
+      </div>
+      <div class="flex-end">
+        <button class="btn" onclick="clearForm()"><i class="ti ti-x"></i> Poništi</button>
+        <button class="btn btn-primary" onclick="savePatient()" id="savePatBtn"><i class="ti ti-check"></i> Sačuvaj pacijenta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPERATIVNI PROGRAM -->
+  <div id="sec-program" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="ti ti-calendar-event"></i> Operativni program</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn" onclick="printProgram()"><i class="ti ti-printer"></i> Štampaj listu</button>
+          <button class="btn btn-primary" onclick="openSchedule()"><i class="ti ti-calendar-plus"></i> Zakaži novu dozu</button>
+        </div>
+      </div>
+      <div class="op-toolbar">
+        <button class="btn" onclick="opShift(-1)" aria-label="Prethodni dan"><i class="ti ti-chevron-left"></i></button>
+        <div class="date-combo">
+          <input type="text" id="op-date-text" class="op-date-input" maxlength="11" placeholder="DD.MM.YYYY." onchange="opDateTyped()" onkeydown="if(event.key==='Enter')opDateTyped()" />
+          <input type="date" id="op-date-pick" onchange="if(this.value)setOpDate(this.value)" />
+          <button class="cal-btn" type="button" onclick="document.getElementById('op-date-pick').showPicker()"><i class="ti ti-calendar"></i></button>
+        </div>
+        <button class="btn" onclick="opShift(1)" aria-label="Sledeći dan"><i class="ti ti-chevron-right"></i></button>
+        <button class="btn" onclick="setOpDate(todayISO())">Danas</button>
+        <span id="op-day-label" class="op-day"></span>
+        <span id="op-summary" class="op-summary"></span>
+      </div>
+      <div class="op-toolbar" style="border-top:1px solid var(--border-light);padding-top:10px;margin-top:10px;">
+        <select id="op-view" onchange="renderProgram()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;">
+          <option value="day">Izabrani dan</option>
+          <option value="week">Sledećih 7 dana</option>
+          <option value="month">Sledećih 30 dana</option>
+          <option value="active">Svi zakazani</option>
+          <option value="cancelled">Svi otkazani</option>
+        </select>
+        <select id="op-doctor-filter" onchange="renderProgram()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;">
+          <option value="">Svi lekari</option>
+        </select>
+        <select id="op-drug-filter" onchange="renderProgram()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;">
+          <option value="">Svi lekovi</option>
+          <option value="Lucentis">Lucentis</option>
+          <option value="Eylea">Eylea</option>
+          <option value="Vabysmo">Vabysmo</option>
+          <option value="Beovu">Beovu</option>
+          <option value="Byooviz">Byooviz</option>
+        </select>
+      </div>
+      <div id="opList"></div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div id="sec-log" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Dnevnik aktivnosti</span>
+        <button class="btn" onclick="loadLog()" id="logRefreshBtn"><i class="ti ti-refresh"></i> Osveži</button>
+      </div>
+      <div id="logContent"><div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam log...</div></div>
+    </div>
+  </div>
+
+  <!-- KORISNICI -->
+  <div id="sec-users" class="section">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Korisnički nalozi</span>
+        <button class="btn btn-primary" onclick="openAddUser()"><i class="ti ti-user-plus"></i> Novi nalog</button>
+      </div>
+      <div id="usersList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Detalji pacijenta -->
+<div id="overlay" style="display:none;" onclick="closeOverlay(event)">
+  <div class="overlay">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="avatar" id="m-avatar" style="width:44px;height:44px;font-size:15px;"></div>
+          <div>
+            <div style="font-size:16px;font-weight:500;" id="m-ime"></div>
+            <div style="font-size:13px;color:#888;" id="m-meta"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="btn" onclick="generateReport()" style="color:#1a7f5a;border-color:#b6e4d3;"><i class="ti ti-file-text"></i> Izveštaj</button>
+          <button class="btn btn-edit" onclick="editPatient()"><i class="ti ti-edit"></i> Izmeni podatke</button>
+          <button class="btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+      <div id="patView" class="pat-view">
+        <div class="info-grid">
+          <div class="info-item"><span>Dijagnoza</span><strong id="m-dx"></strong></div>
+          <div class="info-item"><span>Datum rođenja</span><strong id="m-dob"></strong></div>
+          <div class="info-item"><span>Pol</span><strong id="m-pol"></strong></div>
+          <div class="info-item"><span>JMBG</span><strong id="m-jmbg"></strong></div>
+          <div class="info-item"><span>Kontakt</span><strong id="m-kontakt"></strong></div>
+          <div class="info-item"><span>Poslednja br. istorije</span><strong id="m-pid"></strong></div>
+        </div>
+        <div style="font-size:13px;color:#888;" id="m-napomena"></div>
+      </div>
+      <hr class="divider">
+      <div class="card-header"><span class="card-title">Doze anti-VEGF</span></div>
+      <button class="btn btn-primary btn-schedule-big" onclick="openSchedule(currentPid)"><i class="ti ti-calendar-plus"></i> Zakaži novu dozu</button>
+      <div id="doseForm" style="display:none;background:#f9f9f7;border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <div class="section-subtitle" id="doseFormTitle">Upis primljene doze</div>
+        <div class="drug-selector" id="drugSelector">
+          <button class="drug-btn" onclick="selectDrug(this,'Lucentis (ranibizumab)')">Lucentis</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Eylea (aflibercept)')">Eylea</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Vabysmo (faricimab)')">Vabysmo</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Beovu (brolucizumab)')">Beovu</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Byooviz (ranibizumab BS)')">Byooviz</button>
+          <button class="drug-btn" onclick="selectDrug(this,'Drugi')">Drugi</button>
+        </div>
+        <div class="grid3" style="margin-bottom:10px;">
+          <div class="field"><label>Datum</label>
+            <div class="date-combo">
+              <input type="text" id="d-datum" placeholder="DD.MM.YYYY." maxlength="11" oninput="updateDoseNo()" onchange="suggestControlDate()" />
+              <input type="date" id="d-datum-pick" onchange="pickToText('d-datum-pick','d-datum');updateDoseNo();suggestControlDate();" />
+              <button class="cal-btn" onclick="document.getElementById('d-datum-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+            </div>
+          </div>
+          <div class="field"><label>Oko</label>
+            <select id="d-oko" onchange="updateDoseNo()"><option value="OD">OD (desno)</option><option value="OS">OS (levo)</option><option value="OU">OU (oba)</option></select>
+          </div>
+          <div class="field"><label>Redni broj doze</label><div id="d-doseno" style="padding:9px 12px;border:1.5px dashed var(--border);border-radius:var(--radius);font-size:14px;font-weight:700;color:var(--blue-dark);background:var(--bg);">—</div></div>
+        </div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div class="field"><label>Broj istorije (za ovu primenu)</label><input type="text" id="d-brist" placeholder="npr. 12345/2026" /></div>
+          <div></div>
+        </div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div class="field"><label>Kontrolni pregled</label>
+            <div class="date-combo">
+              <input type="text" id="d-kontrola" placeholder="DD.MM.YYYY." maxlength="11" />
+              <input type="date" id="d-kontrola-pick" onchange="pickToText('d-kontrola-pick','d-kontrola')" />
+              <button class="cal-btn" onclick="document.getElementById('d-kontrola-pick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+            </div>
+          </div>
+          <div class="field" style="justify-content:flex-end;padding-top:4px;">
+            <label style="visibility:hidden;font-size:12px;">x</label>
+            <label class="checkbox-row"><input type="checkbox" id="d-completed" /> Kontrola obavljena</label>
+          </div>
+        </div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div class="field"><label>Lekar</label><select id="d-lekar" style="width:100%;"></select></div>
+          <div class="field" style="justify-content:flex-end;padding-top:4px;">
+            <label style="visibility:hidden;font-size:12px;">x</label>
+            <button class="btn" style="font-size:12px;padding:5px 10px;" type="button" onclick="toggleDrManager()"><i class="ti ti-settings"></i> Uredi listu lekara</button>
+          </div>
+        </div>
+        <div class="dr-manager" id="drManager" style="display:none;margin-bottom:10px;">
+          <div class="dr-manager-title"><i class="ti ti-stethoscope"></i> Lista lekara</div>
+          <div class="dr-list" id="drList"></div>
+          <div class="dr-add-row">
+            <input type="text" id="drNewName" placeholder="Ime i prezime lekara..." />
+            <button class="btn btn-primary" style="font-size:12px;" type="button" onclick="addDoctor()"><i class="ti ti-plus"></i> Dodaj</button>
+          </div>
+        </div>
+        <div class="clin-section">
+          <div class="clin-title"><i class="ti ti-eye"></i> Klinička merenja <span style="font-size:10px;font-weight:400;color:#5580b0;">(pre injekcije)</span></div>
+          <div class="va-group">
+            <div class="va-group-title">VOD</div>
+            <div class="va-row">
+              <span class="va-lbl">Vn</span>
+              <input class="w-vn" type="number" id="d-vod-vn" placeholder="0.1" step="0.05" min="0" max="1.2" />
+              <span class="va-lbl" style="margin-left:4px;">c/c</span>
+              <span class="va-sign">±</span>
+              <input class="w-sph" type="number" id="d-vod-sph" placeholder="DSph" step="0.25" />
+              <span class="va-lbl">D</span>
+              <span class="va-sign">±</span>
+              <input class="w-cyl" type="number" id="d-vod-cyl" placeholder="DCyl" step="0.25" />
+              <span class="va-lbl">D ×</span>
+              <input class="w-ax" type="number" id="d-vod-ax" placeholder="Ax" step="1" min="0" max="180" />
+              <span class="va-lbl">° =</span>
+              <input class="w-bcva" type="number" id="d-vod-bcva" placeholder="BCVA" step="0.05" min="0" max="1.2" />
+            </div>
+          </div>
+          <div class="va-group">
+            <div class="va-group-title">VOS</div>
+            <div class="va-row">
+              <span class="va-lbl">Vn</span>
+              <input class="w-vn" type="number" id="d-vos-vn" placeholder="0.1" step="0.05" min="0" max="1.2" />
+              <span class="va-lbl" style="margin-left:4px;">c/c</span>
+              <span class="va-sign">±</span>
+              <input class="w-sph" type="number" id="d-vos-sph" placeholder="DSph" step="0.25" />
+              <span class="va-lbl">D</span>
+              <span class="va-sign">±</span>
+              <input class="w-cyl" type="number" id="d-vos-cyl" placeholder="DCyl" step="0.25" />
+              <span class="va-lbl">D ×</span>
+              <input class="w-ax" type="number" id="d-vos-ax" placeholder="Ax" step="1" min="0" max="180" />
+              <span class="va-lbl">° =</span>
+              <input class="w-bcva" type="number" id="d-vos-bcva" placeholder="BCVA" step="0.05" min="0" max="1.2" />
+            </div>
+          </div>
+          <div class="grid4" style="margin-bottom:8px;">
+            <div class="field"><label>IOP OD <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-od" placeholder="—" step="1" min="0" max="60" /></div>
+            <div class="field"><label>IOP OS <span class="clin-badge">mmHg</span></label><input type="number" id="d-iop-os" placeholder="—" step="1" min="0" max="60" /></div>
+            <div class="field"><label>CMT OD <span class="clin-badge">&micro;m</span></label><input type="number" id="d-cmt-od" placeholder="—" step="1" min="0" max="1000" /></div>
+            <div class="field"><label>CMT OS <span class="clin-badge">&micro;m</span></label><input type="number" id="d-cmt-os" placeholder="—" step="1" min="0" max="1000" /></div>
+          </div>
+          <div class="field" style="margin-bottom:8px;">
+            <label>OCT nalaz makule</label>
+            <input type="text" id="d-oct" placeholder="Npr. subfovealni fluid, druze..." />
+          </div>
+          <div class="field">
+            <label>Neželjeni događaji</label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+              <label class="checkbox-row"><input type="checkbox" data-adv="endoftalmitis" /> Endoftalmitis</label>
+              <label class="checkbox-row"><input type="checkbox" data-adv="odvajanje" /> Odvajanje retine</label>
+              <label class="checkbox-row"><input type="checkbox" data-adv="tromboza" /> Tromboza</label>
+              <label class="checkbox-row"><input type="checkbox" data-adv="iop_skok" /> IOP skok</label>
+              <label class="checkbox-row"><input type="checkbox" data-adv="katarakta" /> Katarakta</label>
+              <label class="checkbox-row"><input type="checkbox" data-adv="drugo" /> Drugo</label>
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Napomena</label>
+          <textarea id="d-napomena" placeholder="Ostale napomene..."></textarea>
+        </div>
+        <div class="flex-end">
+          <button class="btn" onclick="closeDoseForm()">Otkaži</button>
+          <button class="btn btn-primary" onclick="saveDose()" id="saveDoseBtn"><i class="ti ti-check"></i> Sačuvaj dozu</button>
+        </div>
+      </div>
+      <div id="doseList"></div>
+      <div class="record-given">
+        <span>Injekcija data mimo operativnog programa ili ranije?</span>
+        <button class="btn" onclick="openAddDose()"><i class="ti ti-pencil-plus"></i> Upiši primljenu dozu</button>
+      </div>
+      <hr class="divider">
+      <div class="flex-end">
+        <button class="btn btn-danger" onclick="deletePatient()"><i class="ti ti-trash"></i> Obriši pacijenta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Zakaži dozu -->
+<div id="schOverlay" style="display:none;position:fixed;inset:0;background:rgba(13,61,110,0.35);z-index:150;overflow-y:auto;padding:2rem 1rem;backdrop-filter:blur(2px);">
+  <div style="background:#fff;border-radius:14px;padding:1.75rem;width:600px;max-width:100%;margin:auto;box-shadow:var(--shadow-lg);">
+    <div class="modal-header">
+      <span class="card-title"><i class="ti ti-calendar-plus"></i> Zakaži novu dozu</span>
+      <button class="btn" onclick="closeSchedule()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Pacijent</label>
+      <div class="sch-chosen" id="schChosen" style="display:none;"></div>
+      <input type="text" id="schSearch" placeholder="Traži po imenu ili ID-u..." style="margin-top:6px;" oninput="schSearchPatient()" />
+      <div class="sch-results" id="schResults"></div>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Datum</label>
+      <div class="date-combo">
+        <input type="text" id="schDatum" placeholder="DD.MM.YYYY." maxlength="11" />
+        <input type="date" id="schDatumPick" onchange="pickToText('schDatumPick','schDatum')" />
+        <button class="cal-btn" onclick="document.getElementById('schDatumPick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Oko</label>
+      <div class="sch-eyes">
+        <button class="sch-eye" data-eye="OD" onclick="schSelectEye(this)">OD<small>desno</small></button>
+        <button class="sch-eye" data-eye="OS" onclick="schSelectEye(this)">OS<small>levo</small></button>
+        <button class="sch-eye" data-eye="OU" onclick="schSelectEye(this)">OU<small>oba</small></button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Lek</label>
+      <div class="drug-selector" id="schDrugSelector">
+        <button class="sch-drug-btn" onclick="schSelectDrug(this,'Lucentis (ranibizumab)')">Lucentis</button>
+        <button class="sch-drug-btn" onclick="schSelectDrug(this,'Eylea (aflibercept)')">Eylea</button>
+        <button class="sch-drug-btn" onclick="schSelectDrug(this,'Vabysmo (faricimab)')">Vabysmo</button>
+        <button class="sch-drug-btn" onclick="schSelectDrug(this,'Beovu (brolucizumab)')">Beovu</button>
+        <button class="sch-drug-btn" onclick="schSelectDrug(this,'Byooviz (ranibizumab BS)')">Byooviz</button>
+      </div>
+    </div>
+    <div id="schError" style="display:none;"></div>
+    <div class="flex-end">
+      <button class="btn" onclick="closeSchedule()">Otkaži</button>
+      <button class="btn btn-primary" onclick="saveSchedule()"><i class="ti ti-check"></i> Zakaži</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Provera u koracima -->
+<div id="vzOverlay" style="display:none;">
+  <div class="vz-box">
+    <div class="vz-top">
+      <div>
+        <div class="vz-top-title">Provera pre injekcije</div>
+        <div class="vz-top-sub" id="vzSub">Korak 1 od 5</div>
+      </div>
+      <button class="btn" onclick="closeVz()"><i class="ti ti-x"></i> Otkaži</button>
+    </div>
+    <div class="vz-steps">
+      <div class="vz-step cur" data-vzstep="1"></div>
+      <div class="vz-step" data-vzstep="2"></div>
+      <div class="vz-step" data-vzstep="3"></div>
+      <div class="vz-step" data-vzstep="4"></div>
+      <div class="vz-step" data-vzstep="5"></div>
+    </div>
+    <div class="vz-chips" id="vzChips"></div>
+    <div id="vzBody"></div>
+  </div>
+</div>
+
+<!-- MODAL: Izveštaj -->
+<div id="reportOverlay" class="report-overlay" style="display:none;">
+  <div class="report-modal">
+    <div class="modal-header">
+      <span class="card-title"><i class="ti ti-file-text"></i> Izveštaj pacijenta</span>
+      <button class="btn" onclick="closeReport()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="report-text" id="reportText"></div>
+    <div class="flex-end" style="margin-top:1rem;">
+      <span class="copy-success" id="copySuccess"><i class="ti ti-check"></i> Kopirano</span>
+      <button class="btn" onclick="copyReport()"><i class="ti ti-copy"></i> Kopiraj</button>
+      <button class="btn btn-primary" onclick="closeReport()">Zatvori</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Korisnik -->
+<div id="userModal" style="display:none;position:fixed;inset:0;background:rgba(13,61,110,0.4);z-index:400;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:12px;padding:1.5rem;width:400px;max-width:100%;">
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem;" id="userModalTitle">Novi nalog</div>
+    <div class="field" style="margin-bottom:10px;"><label>Korisničko ime</label><input type="text" id="um-username" /></div>
+    <div class="field" style="margin-bottom:10px;"><label>Lozinka (min 6 znakova)</label><input type="password" id="um-password" /></div>
+    <div class="field" style="margin-bottom:14px;" id="um-role-field">
+      <label>Uloga</label>
+      <select id="um-role"><option value="user">Korisnik</option><option value="admin">Administrator</option></select>
+    </div>
+    <div class="flex-end">
+      <button class="btn" onclick="closeUserModal()">Otkaži</button>
+      <button class="btn btn-primary" onclick="saveUser()">Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirmOverlay" class="confirm-overlay" style="display:none;">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon"></div>
+    <div class="confirm-title" id="confirmTitle">Potvrda</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="btn" id="confirmCancelBtn" onclick="confirmResolve(false)">Otkaži</button>
+      <button class="btn" id="confirmOkBtn" onclick="confirmResolve(true)">Potvrdi</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNDO TOAST -->
+<div id="undoToast">
+  <span class="undo-msg"></span>
+  <button class="btn undo-btn" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);padding:6px 12px;">Poništi</button>
+</div>
+
+<!-- PRINT AREA -->
+<div id="printArea"></div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbzUcXdXLwh8o4cpi_Kv8bmJg8V_7dJqBpNXkAjgTYWVjJtlIswi5Q6qVhonVcheIINOCA/exec';
+
+// ---------- STATE ----------
+let currentUser = null;
+let role = 'user';
+let authToken = null;
+let patients = [], program = [];
+let doctorsList = [];
+let currentPid = null;
+let selectedDrug = '', editingDoseId = null, editingPatientId = null;
+let editingPatientVersion = '', editingDoseVersion = '';
+let dosesByPid = {};
+let dosesSummary = {};
+let totalDoses = 0;
+let lastVersion = '';
+
+function uuidv4() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+const DRUG_CONTROL_DAYS = {
+  'Lucentis (ranibizumab)': 28,
+  'Eylea (aflibercept)': 56,
+  'Vabysmo (faricimab)': 56,
+  'Beovu (brolucizumab)': 56,
+  'Byooviz (ranibizumab BS)': 28
+};
+const ADV_LABELS = {
+  endoftalmitis: 'Endoftalmitis',
+  odvajanje: 'Odvajanje retine',
+  tromboza: 'Tromboza',
+  iop_skok: 'IOP skok',
+  katarakta: 'Katarakta',
+  drugo: 'Drugo'
+};
+
+function getDosesForPid(pid) { return dosesByPid[String(pid)] || []; }
+function invalidateDoses(pid) {
+  if (pid) delete dosesByPid[String(pid)];
+  else dosesByPid = {};
+}
+
+// ---------- CONFIRM ----------
+let _confirmResolve = null;
+function showConfirm(opts) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    const icon = document.getElementById('confirmIcon');
+    icon.className = 'confirm-icon ' + (opts.type === 'danger' ? 'confirm-icon-danger' : 'confirm-icon-warning');
+    icon.innerHTML = '<i class="ti ti-' + (opts.type === 'danger' ? 'trash' : 'alert-triangle') + '"></i>';
+    document.getElementById('confirmTitle').textContent = opts.title || 'Potvrda';
+    document.getElementById('confirmMsg').innerHTML = opts.msg || '';
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = opts.okLabel || 'Potvrdi';
+    okBtn.className = 'btn ' + (opts.type === 'danger' ? 'btn-danger' : 'btn-primary');
+    document.getElementById('confirmCancelBtn').textContent = opts.cancelLabel || 'Otkaži';
+    document.getElementById('confirmOverlay').style.display = 'flex';
+  });
+}
+function confirmResolve(val) {
+  document.getElementById('confirmOverlay').style.display = 'none';
+  if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+}
+
+// ---------- UNDO ----------
+function showUndoToast(msg, onUndo, duration) {
+  const el = document.getElementById('undoToast');
+  if (!el) return;
+  el.querySelector('.undo-msg').textContent = msg;
+  el.style.display = 'flex';
+  el.querySelector('.undo-btn').onclick = async () => {
+    el.style.display = 'none';
+    try { await onUndo(); }
+    catch(e) { showAlert('Poništavanje nije uspelo.', 'danger'); }
+  };
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.display = 'none'; }, duration || 15000);
+}
+
+// ---------- UTIL ----------
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initials(ime, prez) { return ((ime||'?')[0] + (prez||'?')[0]).toUpperCase(); }
+function todayISO(){ const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0'); }
+function brIstMatch(p, f){ const s = dosesSummary[p.id]; return s && s.lastBrIst ? String(s.lastBrIst).toLowerCase().includes(f) : false; }
+function lastBrIst(p) { const s = dosesSummary[p.id]; return s && s.lastBrIst ? s.lastBrIst : ''; }
+
+// ---------- DATE ----------
+function parseDate(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    if (/(Z|[+-]\d{2}:?\d{2})$/.test(s)) { const z = new Date(s); if (!isNaN(z)) return new Date(z.getFullYear(), z.getMonth(), z.getDate(), 12); }
+    const dp = s.substring(0, 10);
+    const d = new Date(dp + 'T12:00:00');
+    return isNaN(d) ? null : d;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s + 'T12:00:00');
+  const dot = s.replace(/\.+$/, '').split('.');
+  if (dot.length === 3 && dot[2].length === 4)
+    return new Date(dot[2] + '-' + dot[1].padStart(2,'0') + '-' + dot[0].padStart(2,'0') + 'T12:00:00');
+  const slash = s.split('/');
+  if (slash.length === 3)
+    return new Date(slash[2] + '-' + slash[0].padStart(2,'0') + '-' + slash[1].padStart(2,'0') + 'T12:00:00');
+  return null;
+}
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = parseDate(v);
+  if (!d || isNaN(d)) return String(v);
+  return String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear() + '.';
+}
+function toISO(v) {
+  if (!v) return '';
+  const d = parseDate(v);
+  if (!d || isNaN(d)) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function pickToText(pickId, textId) {
+  const iso = document.getElementById(pickId).value;
+  if (!iso) return;
+  const p = iso.split('-');
+  document.getElementById(textId).value = p[2] + '.' + p[1] + '.' + p[0] + '.';
+}
+function setTodaySrb(id) {
+  const t = new Date();
+  document.getElementById(id).value = String(t.getDate()).padStart(2,'0') + '.' + String(t.getMonth()+1).padStart(2,'0') + '.' + t.getFullYear() + '.';
+}
+function calcAge(dob) {
+  if (!dob) return '—';
+  const d = parseDate(dob);
+  if (!d || isNaN(d)) return '—';
+  const now = new Date();
+  return now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+}
+
+// ---------- API ----------
+async function api(params, body, quiet) {
+  try {
+    let r;
+    if (body) {
+      const b = Object.assign({}, body);
+      if (authToken && b.action !== 'login') b.token = authToken;
+      r = await fetch(API, { method: 'POST', body: JSON.stringify(b) });
+    } else {
+      r = await fetch(API + '?action=' + params + (authToken ? '&token=' + encodeURIComponent(authToken) : ''));
+    }
+    const data = await r.json();
+    if (data && data.auth === false) { sessionExpired(data.reason); return null; }
+    return data;
+  } catch(e) { if (!quiet) showAlert('Greška pri komunikaciji sa serverom.', 'danger'); return null; }
+}
+async function apiWrite(body, retry) {
+  if (!authToken) throw new Error('Nema sesije');
+  const delays = retry === false ? [0] : [0, 2000, 5000, 10000];
+  let lastErr;
+  for (let i = 0; i < delays.length; i++) {
+    if (delays[i] > 0) {
+      setSyncLabel(true, 'Ponovni pokušaj ' + i + '/' + (delays.length - 1) + ' (' + (delays[i]/1000) + 's)');
+      await new Promise(r => setTimeout(r, delays[i]));
+    }
+    try {
+      const payload = Object.assign({}, body, { token: authToken });
+      const r = await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      if (data && data.auth === false) { sessionExpired(data.reason); throw new Error('Sesija istekla'); }
+      setSyncLabel(false);
+      return data;
+    } catch (e) { lastErr = e; }
+  }
+  setSyncLabel(true, 'Nesinhronizovano', true);
+  throw lastErr;
+}
+
+// ---------- AUTH ----------
+function showLoggedIn() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('userChip').style.display = 'flex';
+  document.getElementById('userChipName').textContent = currentUser;
+  document.getElementById('logoutBtn').style.display = 'inline-flex';
+  switchTabUsersHook();
+}
+function switchTabUsersHook() {
+  const show = (role === 'admin' || currentUser === 'admin');
+  document.getElementById('tab-users').style.display = show ? '' : 'none';
+}
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (!username || !password) { showLoginError('Unesite korisničko ime i lozinku.'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Proveravam...';
+  const res = await api(null, { action: 'login', username, password }, true);
+  btn.disabled = false; btn.textContent = 'Prijavi se';
+  document.getElementById('loginPass').value = '';
+  if (res && res.ok && res.token) {
+    currentUser = res.username; authToken = res.token; role = res.role || 'user';
+    try { sessionStorage.setItem('vegf_user', currentUser); sessionStorage.setItem('vegf_token', authToken); sessionStorage.setItem('vegf_role', role); } catch(e) {}
+    document.getElementById('loginError').style.display = 'none';
+    showLoggedIn(); loadData();
+  } else if (res) { showLoginError('Pogrešno korisničko ime ili lozinka.'); }
+  else { showLoginError('Nema veze sa serverom. Pokušajte ponovo.'); }
+}
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg; el.style.display = 'block';
+}
+function clearSession() {
+  currentUser = null; authToken = null; role = 'user';
+  try { sessionStorage.removeItem('vegf_user'); sessionStorage.removeItem('vegf_token'); sessionStorage.removeItem('vegf_role'); } catch(e) {}
+  ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('userChip').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('tab-users').style.display = 'none';
+  patients = []; program = []; editingPatientId = null; editingDoseId = null; currentPid = null;
+  dosesByPid = {}; dosesSummary = {}; totalDoses = 0; lastVersion = '';
+  document.getElementById('patientList').innerHTML = '';
+  document.getElementById('statsBar').innerHTML = '';
+  const op = document.getElementById('opList'); if (op) op.innerHTML = '';
+  const dl = document.getElementById('doseList'); if (dl) dl.innerHTML = '';
+}
+function doLogout() { if (authToken) api(null, { action: 'logout' }, true); clearSession(); }
+function sessionExpired(reason) {
+  if (!currentUser && !authToken) return;
+  clearSession();
+  showLoginError(reason || 'Sesija je istekla. Prijavite se ponovo.');
+}
+function writeLog(action, details) {
+  if (!authToken) return;
+  api(null, { action: 'writeLog', logAction: action, details: details }, true);
+}
+async function loadLog() {
+  const el = document.getElementById('logContent');
+  el.innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam...</div>';
+  const data = await api('getLog', null, true);
+  if (!data) { el.innerHTML = '<div class="empty-state">Greška pri učitavanju loga.</div>'; return; }
+  const rows = (data.log || []).reverse();
+  if (!rows.length) { el.innerHTML = '<div class="empty-state">Nema zabeleženih aktivnosti.</div>'; return; }
+  el.innerHTML = '<div class="log-header"><div>Vreme</div><div>Korisnik</div><div>Akcija</div><div>Detalji</div></div>' +
+    rows.map(row => {
+      const action = String(row[1]||'');
+      const badgeClass = /Dodat|Prijavl|Zakazan|Injekcija data/.test(action) ? 'log-add' :
+        /Izmen|prebačen|Vraćen/.test(action) ? 'log-edit' :
+        /Obrisan|Uklonjen|Otkazan|Neusp|Prekinut|Konflikt/.test(action) ? 'log-delete' : 'log-login';
+      const ts = row[0] ? fmtDate(row[0]) + ' ' + (String(row[0]).includes('T') ? new Date(row[0]).toTimeString().substring(0,5) : '') : '—';
+      return `<div class="log-row">
+        <div style="font-size:12px;color:#666;">${ts}</div>
+        <div style="font-size:12px;font-weight:500;">${esc(row[2]||'—')}</div>
+        <div><span class="log-badge ${badgeClass}">${esc(action)}</span></div>
+        <div style="font-size:12px;color:#555;">${esc(row[3]||'')}</div>
+      </div>`;
+    }).join('');
+}
+(function checkSession() {
+  let u = null, t = null, r = 'user';
+  try { u = sessionStorage.getItem('vegf_user'); t = sessionStorage.getItem('vegf_token'); r = sessionStorage.getItem('vegf_role') || 'user'; } catch(e) {}
+  if (u && t) { currentUser = u; authToken = t; role = r; showLoggedIn(); }
+})();
+
+// ---------- LOAD DATA ----------
+let lastLoad = 0, loadingNow = false;
+async function ensureDosesForPid(pid, force) {
+  pid = String(pid);
+  if (!force && dosesByPid[pid]) return dosesByPid[pid];
+  const data = await api('getDoses&pid=' + encodeURIComponent(pid));
+  if (!data || !data.doses) return [];
+  const dRows = data.doses, dH = dRows[0] || [];
+  const arr = dRows.slice(1).map(r => {
+    const o = {}; dH.forEach((h, i) => o[h] = r[i]);
+    o.id = String(o.id || '').trim(); o.pid = String(o.pid || '').trim();
+    return o;
+  });
+  dosesByPid[pid] = arr;
+  return arr;
+}
+async function loadData(silent) {
+  if (!currentUser || loadingNow) return;
+  loadingNow = true;
+  const btn = document.getElementById('refreshBtn');
+  if (!silent) {
+    btn.innerHTML = '<div class="spinner"></div><span class="lbl"> Učitavam...</span>'; btn.disabled = true;
+    document.getElementById('patientList').innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam podatke...</div>';
+  }
+  let url = 'getAll&dosesMode=summary';
+  if (lastVersion) url += '&since=' + encodeURIComponent(lastVersion);
+  const data = await api(url, null, silent);
+  btn.innerHTML = '<i class="ti ti-refresh"></i><span class="lbl"> Osveži</span>'; btn.disabled = false;
+  loadingNow = false;
+  if (!data) { if (silent) setSyncLabel(true); return; }
+  lastLoad = Date.now(); setSyncLabel(false);
+
+  if (data.unchanged) return;
+  lastVersion = data.version || '';
+
+  const pRows = data.patients || [], pH = pRows[0] || [];
+  patients = pRows.slice(1).map(r => {
+    const o = {}; pH.forEach((h,i)=>o[h]=r[i]);
+    o.id = String(o.id || '').trim();
+    return o;
+  });
+  dosesSummary = data.dosesSummary || {};
+  totalDoses = Number(data.totalDoses) || 0;
+
+  const gRows = data.program || [], gH = (gRows[0] || []).map(h => String(h).trim());
+  program = gRows.slice(1).map(r => {
+    const o = {}; gH.forEach((h,i)=>o[h]=r[i]);
+    o.id = String(o.id || '').trim(); o.pid = String(o.pid || '').trim();
+    o.oko = String(o.oko || '').trim(); o.status = String(o.status || 'zakazano').trim();
+    return o;
+  }).filter(o => o.id);
+
+  patients.forEach(p => { const j = String(p.jmbg||'').trim(); if (/^\d{12}$/.test(j)) p.jmbg = '0' + j; });
+  if (data.doctors) doctorsList = data.doctors.filter(d => d && String(d).trim());
+  else await loadDoctors();
+
+  if (currentPid && document.getElementById('overlay').style.display === 'block') {
+    await ensureDosesForPid(currentPid, true);
+    renderDoses();
+  }
+  const q = document.getElementById('patSearch');
+  renderPatients(q ? q.value : '');
+  renderProgram();
+  populateDoctorFilter();
+}
+function setSyncLabel(failed, message, sticky) {
+  const t = new Date();
+  const txt = message || (failed
+    ? 'Nema veze sa serverom'
+    : 'Ažurirano ' + String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0'));
+  ['syncLabel','syncLabelM'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    el.textContent = txt; el.style.color = failed ? '#ffb4a8' : 'rgba(255,255,255,0.6)';
+  });
+  clearTimeout(window._syncTimer);
+  if (failed && !sticky) window._syncTimer = setTimeout(() => setSyncLabel(false), 30000);
+}
+async function saveVersioned(action, id, version, fields, label){
+  let res;
+  try {
+    res = await apiWrite(Object.assign({action, id, version, updatedBy: currentUser || ''}, fields), false);
+  } catch (e) {
+    showAlert('Nema veze sa serverom. Pokušajte ponovo.', 'danger');
+    return { ok:false, error:String(e) };
+  }
+  if (res && res.conflict) {
+    writeLog('Konflikt izmene', label + (res.updatedBy ? ' — prethodno menjao: ' + res.updatedBy : ''));
+    const force = await showConfirm({type:'warning', title:'Zapis je u međuvremenu izmenjen',
+      msg:'Dok ste vi menjali <strong>' + esc(label) + '</strong>, ' + (res.updatedBy ? 'korisnik <strong>' + esc(res.updatedBy) + '</strong>' : 'neko drugi') + ' je sačuvao drugačije podatke.<br><br>Ako sačuvate, izmene tog korisnika biće zamenjene vašim.',
+      okLabel:'Sačuvaj moje izmene', cancelLabel:'Odustani i učitaj nove podatke'});
+    if (!force) { await loadData(true); return {ok:false, cancelled:true}; }
+    try { res = await apiWrite(Object.assign({action, id, version:res.version, updatedBy: currentUser || ''}, fields), false); }
+    catch(e) { showAlert('Nema veze sa serverom.', 'danger'); return {ok:false}; }
+  }
+  if (res && res.notFound) { showAlert('Zapis je u međuvremenu obrisan. Podaci su ponovo učitani.', 'danger'); await loadData(true); return {ok:false, cancelled:true}; }
+  return res;
+}
+
+// ---------- AUTO REFRESH ----------
+function isBusy(){
+  const open = ['overlay','schOverlay','vzOverlay','reportOverlay','confirmOverlay','loginOverlay','userModal'].some(id => {
+    const e = document.getElementById(id); return e && e.style.display && e.style.display !== 'none';
+  });
+  return open || !!editingPatientId || !!editingDoseId;
+}
+function autoRefresh(){ if (!currentUser || document.hidden || isBusy()) return; loadData(true); }
+setInterval(autoRefresh, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastLoad > 30000) autoRefresh(); });
+window.addEventListener('focus', () => { if (Date.now() - lastLoad > 30000) autoRefresh(); });
+
+// ---------- UI HELPERS ----------
+function showAlert(msg, type) {
+  const a = document.getElementById('alertBox');
+  a.className = 'alert alert-' + type;
+  a.innerHTML = '<i class="ti ti-' + (type==='success'?'check':'alert-circle') + '"></i> ' + msg;
+  a.style.display = 'flex';
+  setTimeout(() => a.style.display = 'none', 3500);
+}
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('active');
+  if (tab === 'log') loadLog();
+  if (tab === 'program') renderProgram();
+  if (tab === 'users') loadUsers();
+}
+function closeModal() { document.getElementById('overlay').style.display='none'; editingDoseId=null; currentPid=null; }
+function closeOverlay(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+function closeDoseForm() { document.getElementById('doseForm').style.display='none'; editingDoseId=null; }
+
+// ---------- RENDER PATIENTS ----------
+function renderPatients(filter) {
+  const total = patients.length;
+  const avgDoses = total ? (totalDoses / total).toFixed(1) : 0;
+  const pending = Object.values(dosesSummary).reduce((a, s) => a + (s.pendingControls || 0), 0);
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat"><div class="stat-label">Pacijenti</div><div class="stat-value">'+total+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Ukupno doza</div><div class="stat-value">'+totalDoses+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Avg. doza/pac.</div><div class="stat-value">'+avgDoses+'</div></div>' +
+    '<div class="stat"><div class="stat-label">Zakazane kontrole</div><div class="stat-value">'+pending+'</div></div>';
+  let pts = patients;
+  if (filter) {
+    const f = filter.toLowerCase();
+    const fd = filter.replace(/\D/g,'');
+    pts = pts.filter(p =>
+      (p.ime + ' ' + p.prezime).toLowerCase().includes(f) ||
+      (p.dx || '').toLowerCase().includes(f) ||
+      String(p.jmbg||'').includes(f) ||
+      (fd && String(p.kontakt||'').replace(/\D/g,'').includes(fd)) ||
+      brIstMatch(p, f)
+    );
+  }
+  document.getElementById('patCount').textContent = pts.length + ' pacijent' + (pts.length===1?'':pts.length<5?'a':'a');
+  const el = document.getElementById('patientList');
+  if (!pts.length) { el.innerHTML='<div class="empty-state"><i class="ti ti-user-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>Nema pacijenata.</div>'; return; }
+  el.innerHTML = pts.map(p => {
+    const s = dosesSummary[p.id] || {count:0, lastDatum:'', lastBrIst:'', hasOverdue:false};
+    return `<div class="patient-row" data-pid="${p.id}" onclick="openPatient(this.dataset.pid)">
+      <div class="avatar">${initials(p.ime,p.prezime)}</div>
+      <div class="patient-info">
+        <div class="patient-name">${esc(p.ime)} ${esc(p.prezime)} <span style="font-size:12px;color:#aaa;font-weight:400;">${s.lastBrIst?'· ist. '+esc(s.lastBrIst):''}</span></div>
+        <div class="patient-meta">${calcAge(p.dob)} god · ${esc(p.pol||'—')} · ${esc(p.dx||'—')}${s.lastDatum?' · Zadnja inj: '+fmtDate(s.lastDatum):''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <span class="badge badge-blue"><i class="ti ti-syringe" style="font-size:11px;"></i> ${s.count||0}</span>
+        ${s.hasOverdue?'<span class="badge badge-amber"><i class="ti ti-alert-triangle" style="font-size:11px;"></i> Kontrola</span>':''}
+      </div>
+      <i class="ti ti-chevron-right" style="color:#ccc;"></i>
+    </div>`;
+  }).join('');
+}
+
+// ---------- OPEN PATIENT ----------
+async function openPatient(id) {
+  currentPid = String(id);
+  const p = patients.find(x => x.id === String(id));
+  if (!p) return;
+  document.getElementById('m-avatar').textContent = initials(p.ime, p.prezime);
+  document.getElementById('m-ime').textContent = p.ime + ' ' + p.prezime;
+  document.getElementById('m-meta').textContent = calcAge(p.dob) + ' god · ' + (p.pol||'—') + (lastBrIst(p)?' · ist. '+lastBrIst(p):'');
+  document.getElementById('m-dx').textContent = p.dx||'—';
+  document.getElementById('m-dob').textContent = fmtDate(p.dob);
+  document.getElementById('m-pol').textContent = p.pol||'—';
+  document.getElementById('m-jmbg').textContent = p.jmbg||'—';
+  document.getElementById('m-kontakt').textContent = p.kontakt||'—';
+  document.getElementById('m-pid').textContent = lastBrIst(p)||'—';
+  document.getElementById('m-napomena').textContent = p.napomena ? '📝 ' + p.napomena : '';
+  document.getElementById('doseForm').style.display = 'none';
+  editingDoseId = null;
+  document.getElementById('overlay').style.display = 'block';
+  setTodaySrb('d-datum');
+  document.getElementById('doseList').innerHTML = '<div class="loading"><div class="spinner" style="margin:0 auto 8px;display:block;"></div>Učitavam doze...</div>';
+  await ensureDosesForPid(currentPid);
+  renderDoses();
+}
+
+// ---------- EDIT PATIENT ----------
+function editPatient() {
+  const p = patients.find(x => x.id === currentPid);
+  if (!p) return;
+  editingPatientId = currentPid;
+  editingPatientVersion = String(p.updatedAt || p.createdAt || '');
+  document.getElementById('f-ime').value = p.ime||'';
+  document.getElementById('f-prezime').value = p.prezime||'';
+  document.getElementById('f-dob').value = fmtDate(p.dob) === '—' ? '' : fmtDate(p.dob);
+  document.getElementById('f-pol').value = p.pol||'';
+  document.getElementById('f-jmbg').value = p.jmbg||'';
+  document.getElementById('f-kontakt').value = p.kontakt||'';
+  document.getElementById('f-dx').value = p.dx||'';
+  document.getElementById('f-napomena').value = p.napomena||'';
+  document.getElementById('formTitle').textContent = 'Izmeni podatke pacijenta';
+  document.getElementById('savePatBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj izmene';
+  document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+  document.getElementById('formNotice').className = 'notice-edit';
+  document.getElementById('formNotice').innerHTML = '<i class="ti ti-edit"></i> Editujete podatke za: <strong>' + p.ime + ' ' + p.prezime + '</strong>';
+  closeModal();
+  switchTab('add');
+  window.scrollTo(0,0);
+}
+function cancelEditPatient() {
+  editingPatientId = null;
+  clearForm();
+  document.getElementById('formTitle').textContent = 'Novi pacijent';
+  document.getElementById('savePatBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj pacijenta';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('formNotice').className = 'notice';
+  document.getElementById('formNotice').innerHTML = '<i class="ti ti-cloud"></i> Podaci se čuvaju u Google Sheets — vidljivi svim korisnicima u realnom vremenu.';
+}
+
+// ---------- SAVE PATIENT ----------
+async function savePatient() {
+  const ime = document.getElementById('f-ime').value.trim();
+  const prezime = document.getElementById('f-prezime').value.trim();
+  if (!ime||!prezime) { showAlert('Unesite ime i prezime.','danger'); return; }
+  const jmbg = document.getElementById('f-jmbg').value.trim();
+  if (jmbg && !/^\d{13}$/.test(jmbg)) { showAlert('JMBG mora imati tačno 13 cifara.','danger'); return; }
+  const btn = document.getElementById('savePatBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Čuvam...';
+  const pData = {
+    ime, prezime,
+    dob: toISO(document.getElementById('f-dob').value.trim()),
+    pol: document.getElementById('f-pol').value,
+    jmbg, kontakt: document.getElementById('f-kontakt').value.trim(),
+    dx: document.getElementById('f-dx').value,
+    napomena: document.getElementById('f-napomena').value.trim()
+  };
+  if (editingPatientId) {
+    const ok = await showConfirm({ type:'warning', title:'Sačuvaj izmene',
+      msg:'Sačuvati izmene podataka za pacijenta <strong>' + esc(ime + ' ' + prezime) + '</strong>?',
+      okLabel:'Da, sačuvaj', cancelLabel:'Otkaži' });
+    if (!ok) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene'; return; }
+    const res2 = await saveVersioned('updatePatient', editingPatientId, editingPatientVersion, pData, ime + ' ' + prezime);
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene';
+    if (res2 && res2.cancelled) { cancelEditPatient(); switchTab('patients'); return; }
+    if (!res2 || !res2.ok) { showAlert((res2 && res2.reason) || 'Greška pri čuvanju.','danger'); return; }
+    const idx = patients.findIndex(x => x.id === editingPatientId);
+    if (idx !== -1) patients[idx] = Object.assign({}, patients[idx], pData, { id: editingPatientId, updatedAt: res2.updatedAt, updatedBy: currentUser });
+    cancelEditPatient();
+    showAlert('Podaci pacijenta ' + ime + ' ' + prezime + ' ažurirani.','success');
+    switchTab('patients'); renderPatients();
+  } else {
+    const newP = { action:'addPatient', id: uuidv4(), ...pData };
+    try {
+      const res = await apiWrite(newP);
+      btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj pacijenta';
+      if (res && res.ok) {
+        patients.push({ id: newP.id, ...pData, createdAt: res.createdAt || '' });
+        clearForm(); showAlert('Pacijent ' + ime + ' ' + prezime + ' uspešno dodat.','success');
+        switchTab('patients'); renderPatients();
+      } else showAlert((res && res.reason) || 'Greška.','danger');
+    } catch(e) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj pacijenta'; showAlert('Nema veze sa serverom.','danger'); }
+  }
+}
+function clearForm() {
+  ['f-ime','f-prezime','f-jmbg','f-kontakt','f-napomena','f-dob'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-pol').value='';
+  document.getElementById('f-dx').value='';
+}
+
+// ---------- DOSE NUMBER ----------
+function updateDoseNo(){
+  const el = document.getElementById('d-doseno'); if (!el) return;
+  const iso = toISO(document.getElementById('d-datum').value.trim());
+  const oko = document.getElementById('d-oko').value;
+  if (!iso || !currentPid) { el.textContent = '—'; return; }
+  if (editingDoseId) {
+    const d = getDosesForPid(currentPid).find(x => x.id === editingDoseId);
+    if (d && d.redniBroj) { el.textContent = d.redniBroj + '. doza ' + d.oko; return; }
+  }
+  const arr = getDosesForPid(currentPid).filter(x => x.oko === oko && toISO(x.datum) <= iso);
+  el.textContent = (arr.length + 1) + '. doza ' + oko;
+}
+function cardDoseNoText(d) {
+  if (d.redniBroj && String(d.redniBroj).trim()) return Number(d.redniBroj) + '. ' + d.oko;
+  const arr = getDosesForPid(String(d.pid || ''))
+    .filter(x => x.oko === d.oko).sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+  const idx = arr.findIndex(x => x.id === d.id);
+  return idx !== -1 ? (idx + 1) + '. ' + d.oko : '? ' + d.oko;
+}
+
+// ---------- RENDER DOSES ----------
+function getBaseline(pid, oko) {
+  if (oko !== 'OD' && oko !== 'OS') return null;
+  const arr = getDosesForPid(pid).filter(d => d.oko === oko)
+    .sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+  if (!arr.length) return null;
+  const f = arr[0];
+  const bcva = oko === 'OD' ? f.vodBcva : f.vosBcva;
+  const iop  = oko === 'OD' ? f.iopOd  : f.iopOs;
+  const cmt  = oko === 'OD' ? f.cmtOd  : f.cmtOs;
+  return { bcva:parseFloat(bcva)||null, iop:parseFloat(iop)||null, cmt:parseFloat(cmt)||null, datum:f.datum };
+}
+function deltaStr(now, base, unit, d) {
+  if (now === null || base === null || isNaN(now) || isNaN(base)) return '';
+  const diff = now - base;
+  if (Math.abs(diff) < 0.005) return '';
+  const sign = diff > 0 ? '+' : '';
+  return ' (' + sign + diff.toFixed(d === undefined ? 2 : d) + (unit||'') + ')';
+}
+function renderDoses() {
+  const pd = getDosesForPid(currentPid).slice().sort((a,b)=>parseDate(a.datum)-parseDate(b.datum));
+  const el = document.getElementById('doseList');
+  if (!pd.length) { el.innerHTML='<div class="empty-state" style="padding:1rem;"><i class="ti ti-syringe" style="font-size:24px;display:block;margin-bottom:6px;"></i>Još nema unesenih doza.</div>'; return; }
+  el.innerHTML = `<div class="dose-header"><div>Br. / Datum</div><div>Oko</div><div>Lek</div><div>Lekar</div><div>Napomena / Kontrola</div><div></div></div>` +
+    pd.map((d) => {
+      const completed = String(d.completed).toLowerCase()==='true';
+      const today = new Date(); today.setHours(0,0,0,0);
+      const kontrolaDate = parseDate(d.kontrola); if (kontrolaDate) kontrolaDate.setHours(0,0,0,0);
+      const overdue = d.kontrola && !completed && kontrolaDate && kontrolaDate < today;
+      const ctrl = d.kontrola ? `<span style="font-size:11px;color:${completed?'#1a7f5a':overdue?'#c0392b':'#888'};"><i class="ti ti-calendar"></i> ${fmtDate(d.kontrola)}${completed?' ✓':overdue?' ⚠':''}</span>` : '';
+      const napomena = (d.napomena||'').trim();
+      const napClean = (!napomena || /^\d{4}-\d{2}-\d{2}T/.test(napomena) || /^\d{4}-\d{2}-\d{2}$/.test(napomena)) ? '' : napomena;
+      const base = getBaseline(d.pid, d.oko);
+      const bcvaNow = parseFloat(d.oko === 'OD' ? d.vodBcva : d.oko === 'OS' ? d.vosBcva : NaN);
+      const iopNow  = parseFloat(d.oko === 'OD' ? d.iopOd  : d.oko === 'OS' ? d.iopOs  : NaN);
+      const cmtNow  = parseFloat(d.oko === 'OD' ? d.cmtOd  : d.oko === 'OS' ? d.cmtOs  : NaN);
+      const bcvaDelta = base ? deltaStr(bcvaNow, base.bcva, '') : '';
+      const iopDelta  = base ? deltaStr(iopNow, base.iop, '') : '';
+      const cmtDelta  = base ? deltaStr(cmtNow, base.cmt, ' µm', 0) : '';
+      const iopWarn = !isNaN(iopNow) && iopNow > 25;
+      const advList = String(d.nezeljeniDogadjaji || '').split(';').filter(x => x);
+      const advBadges = advList.map(a => '<span class="badge" style="background:#fdf0ef;color:#c0392b;font-size:10px;"><i class="ti ti-alert-triangle"></i> ' + esc(ADV_LABELS[a] || a) + '</span>').join(' ');
+      return `<div class="dose-row" id="drow-${d.id}">
+        <div><span style="font-size:11px;font-weight:600;color:#1a73e8;background:#e8f0fe;border-radius:4px;padding:1px 5px;margin-right:4px;white-space:nowrap;">${cardDoseNoText(d)}</span><br>${fmtDate(d.datum)}${d.brIst ? '<br><span style="font-size:11px;color:#888;">ist. '+esc(d.brIst)+'</span>' : ''}</div>
+        <div><span class="badge ${d.oko==='OD'?'badge-blue':d.oko==='OS'?'badge-green':'badge-amber'}">${esc(d.oko||'—')}</span></div>
+        <div style="font-size:12px;color:#555;">${esc((d.drug||'').split(' ')[0])}</div>
+        <div style="font-size:12px;color:#1a4f8a;">${d.lekar ? '<i class="ti ti-stethoscope" style="font-size:11px;"></i> '+esc(d.lekar) : '<span style="color:#ccc;">—</span>'}</div>
+        <div style="font-size:12px;color:#555;">
+          ${(d.vodVn||d.vodBcva||d.vosVn||d.vosBcva) ? '<span style="color:#333;font-size:11px;">VOD: <b>'+(esc(d.vodVn)||'—')+'</b>'+(d.vodBcva?' → BCVA <b>'+esc(d.vodBcva)+'</b>'+bcvaDelta:'')+' &nbsp;|&nbsp; VOS: <b>'+(esc(d.vosVn)||'—')+'</b>'+(d.vosBcva?' → BCVA <b>'+esc(d.vosBcva)+'</b>':'')+'</span><br>' : ''}
+          ${(d.cmtOd||d.cmtOs) ? '<span style="color:#555;">CMT OD: '+(esc(d.cmtOd)||'—')+' µm'+cmtDelta+' · OS: '+(esc(d.cmtOs)||'—')+' μm</span><br>' : ''}
+          ${(d.iopOd||d.iopOs) ? '<span style="color:'+(iopWarn?'#c0392b':'#555')+';'+(iopWarn?'font-weight:600;':'')+'">IOP OD: '+(esc(d.iopOd)||'—')+' · OS: '+(esc(d.iopOs)||'—')+' mmHg'+iopDelta+(iopWarn?' ⚠':'')+'</span><br>' : ''}
+          ${d.oct ? '<span style="color:#666;font-style:italic;">OCT: '+esc(d.oct)+'</span><br>' : ''}
+          ${advBadges ? advBadges+'<br>' : ''}
+          ${napClean ? esc(napClean)+'<br>' : ''}${ctrl}
+        </div>
+        <div class="dose-actions">
+          <button class="btn btn-edit" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="openEditDose(this.dataset.did)"><i class="ti ti-edit"></i></button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" data-did="${d.id}" onclick="deleteDose(this.dataset.did)"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+// ---------- ADD / EDIT DOSE ----------
+function resetDoseFormFields() {
+  ['d-kontrola','d-napomena','d-brist','d-vod-vn','d-vod-sph','d-vod-cyl','d-vod-ax','d-vod-bcva','d-vos-vn','d-vos-sph','d-vos-cyl','d-vos-ax','d-vos-bcva','d-iop-od','d-iop-os','d-cmt-od','d-cmt-os','d-oct'].forEach(id=>{ const e = document.getElementById(id); if (e) e.value=''; });
+  document.getElementById('d-completed').checked = false;
+  document.querySelectorAll('[data-adv]').forEach(c => c.checked = false);
+}
+function openAddDose() {
+  editingDoseId = null;
+  document.getElementById('doseFormTitle').textContent = 'Upis primljene doze';
+  document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj dozu';
+  document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
+  selectedDrug = '';
+  resetDoseFormFields();
+  setTodaySrb('d-datum');
+  renderDrSelect('');
+  updateDoseNo();
+  document.getElementById('doseForm').style.display = 'block';
+  document.getElementById('doseForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function openEditDose(id) {
+  id = String(id);
+  const d = getDosesForPid(currentPid).find(x => x.id === id);
+  if (!d) return;
+  editingDoseId = id;
+  editingDoseVersion = String(d.updatedAt || d.createdAt || '');
+  document.getElementById('doseFormTitle').textContent = 'Izmeni dozu';
+  document.getElementById('saveDoseBtn').innerHTML = '<i class="ti ti-check"></i> Sačuvaj izmene';
+  selectedDrug = d.drug || '';
+  document.querySelectorAll('.drug-btn').forEach(b => { b.classList.toggle('selected', b.textContent.trim() === (d.drug||'').split(' ')[0]); });
+  document.getElementById('d-datum').value = fmtDate(d.datum) === '—' ? '' : fmtDate(d.datum);
+  document.getElementById('d-oko').value = d.oko || 'OD';
+  document.getElementById('d-kontrola').value = d.kontrola ? fmtDate(d.kontrola) : '';
+  document.getElementById('d-completed').checked = String(d.completed).toLowerCase() === 'true';
+  document.getElementById('d-napomena').value = d.napomena || '';
+  document.getElementById('d-vod-vn').value = d.vodVn || '';
+  document.getElementById('d-vod-sph').value = d.vodSph || '';
+  document.getElementById('d-vod-cyl').value = d.vodCyl || '';
+  document.getElementById('d-vod-ax').value = d.vodAx || '';
+  document.getElementById('d-vod-bcva').value = d.vodBcva || '';
+  document.getElementById('d-vos-vn').value = d.vosVn || '';
+  document.getElementById('d-vos-sph').value = d.vosSph || '';
+  document.getElementById('d-vos-cyl').value = d.vosCyl || '';
+  document.getElementById('d-vos-ax').value = d.vosAx || '';
+  document.getElementById('d-vos-bcva').value = d.vosBcva || '';
+  document.getElementById('d-iop-od').value = d.iopOd || '';
+  document.getElementById('d-iop-os').value = d.iopOs || '';
+  document.getElementById('d-cmt-od').value = d.cmtOd || '';
+  document.getElementById('d-cmt-os').value = d.cmtOs || '';
+  document.getElementById('d-oct').value = d.oct || '';
+  const advList = String(d.nezeljeniDogadjaji || '').split(';').filter(x => x);
+  document.querySelectorAll('[data-adv]').forEach(c => { c.checked = advList.indexOf(c.dataset.adv) !== -1; });
+  renderDrSelect(d.lekar || '');
+  document.getElementById('d-brist').value = d.brIst || '';
+  updateDoseNo();
+  document.getElementById('doseForm').style.display = 'block';
+  document.getElementById('doseForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function selectDrug(btn, name) {
+  selectedDrug = name;
+  document.querySelectorAll('.drug-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  suggestControlDate();
+}
+function suggestControlDate() {
+  if (editingDoseId) return;
+  const drug = selectedDrug, datumRaw = document.getElementById('d-datum').value;
+  const ctrlInput = document.getElementById('d-kontrola');
+  if (!drug || !datumRaw || ctrlInput.value.trim()) return;
+  const days = DRUG_CONTROL_DAYS[drug];
+  if (!days) return;
+  const d = parseDate(datumRaw);
+  if (!d) return;
+  d.setDate(d.getDate() + days);
+  ctrlInput.value = fmtDate(d);
+}
+
+// ---------- SAVE DOSE ----------
+async function saveDose() {
+  const datumRaw = document.getElementById('d-datum').value.trim();
+  if (!datumRaw) { showAlert('Unesite datum doze.','danger'); return; }
+  if (!selectedDrug) { showAlert('Izaberite lek.','danger'); return; }
+  const datum = toISO(datumRaw);
+  const kontrolaRaw = document.getElementById('d-kontrola').value.trim();
+  const kontrola = kontrolaRaw ? toISO(kontrolaRaw) : '';
+  const btn = document.getElementById('saveDoseBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Čuvam...';
+
+  const adv = Array.from(document.querySelectorAll('[data-adv]:checked')).map(c => c.dataset.adv).join(';');
+  const doseData = {
+    pid: currentPid, datum,
+    oko: document.getElementById('d-oko').value,
+    drug: selectedDrug,
+    brIst: document.getElementById('d-brist').value.trim(),
+    doza: editingDoseId ? ((getDosesForPid(currentPid).find(x => x.id === editingDoseId) || {}).doza || '') : '',
+    kontrola, completed: document.getElementById('d-completed').checked,
+    lekar: document.getElementById('d-lekar').value,
+    vodVn: document.getElementById('d-vod-vn').value,
+    vodSph: document.getElementById('d-vod-sph').value,
+    vodCyl: document.getElementById('d-vod-cyl').value,
+    vodAx: document.getElementById('d-vod-ax').value,
+    vodBcva: document.getElementById('d-vod-bcva').value,
+    vosVn: document.getElementById('d-vos-vn').value,
+    vosSph: document.getElementById('d-vos-sph').value,
+    vosCyl: document.getElementById('d-vos-cyl').value,
+    vosAx: document.getElementById('d-vos-ax').value,
+    vosBcva: document.getElementById('d-vos-bcva').value,
+    iopOd: document.getElementById('d-iop-od').value,
+    iopOs: document.getElementById('d-iop-os').value,
+    cmtOd: document.getElementById('d-cmt-od').value,
+    cmtOs: document.getElementById('d-cmt-os').value,
+    oct: document.getElementById('d-oct').value,
+    nezeljeniDogadjaji: adv,
+    napomena: document.getElementById('d-napomena').value.trim()
+  };
+
+  if (editingDoseId) {
+    const res = await saveVersioned('updateDose', editingDoseId, editingDoseVersion, doseData, 'Doza');
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj izmene';
+    if (res && res.cancelled) return;
+    if (!res || !res.ok) { showAlert((res && res.reason) || 'Greška pri čuvanju.','danger'); return; }
+    invalidateDoses(currentPid);
+    await ensureDosesForPid(currentPid, true);
+    await loadData(true);
+    renderDoses();
+    closeDoseForm();
+    showAlert('Doza ažurirana.','success');
+  } else {
+    const payload = Object.assign({ action:'addDose', id: uuidv4() }, doseData);
+    try {
+      const res = await apiWrite(payload);
+      btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj dozu';
+      if (res && res.ok) {
+        invalidateDoses(currentPid);
+        await ensureDosesForPid(currentPid, true);
+        await loadData(true);
+        renderDoses();
+        closeDoseForm();
+        showAlert('Doza sačuvana.','success');
+      } else showAlert((res && res.reason) || 'Greška.','danger');
+    } catch(e) { btn.disabled=false; btn.innerHTML='<i class="ti ti-check"></i> Sačuvaj dozu'; showAlert('Nema veze sa serverom.','danger'); }
+  }
+}
+
+// ---------- DELETE DOSE / PATIENT ----------
+async function deleteDose(id) {
+  const ok = await showConfirm({ type:'danger', title:'Obriši dozu?',
+    msg:'Doza se može poništiti u narednih 15 sekundi.', okLabel:'Obriši' });
+  if (!ok) return;
+  try {
+    const res = await apiWrite({ action:'deleteDose', id });
+    if (res && res.ok) {
+      invalidateDoses(currentPid);
+      await ensureDosesForPid(currentPid, true);
+      await loadData(true);
+      renderDoses();
+      showUndoToast('Doza obrisana', async () => {
+        const r = await apiWrite({ action:'restoreDose', id });
+        if (r && r.ok) {
+          invalidateDoses(currentPid);
+          await ensureDosesForPid(currentPid, true);
+          await loadData(true);
+          if (document.getElementById('overlay').style.display === 'block') renderDoses();
+          showAlert('Doza vraćena.', 'success');
+        }
+      });
+    } else showAlert((res && res.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+async function deletePatient() {
+  const ok = await showConfirm({ type:'danger', title:'Obriši pacijenta?',
+    msg:'Brišu se i sve doze i termini. Može se poništiti u narednih 30 sekundi.',
+    okLabel:'Obriši pacijenta' });
+  if (!ok) return;
+  const pid = currentPid;
+  try {
+    const res = await apiWrite({ action:'deletePatient', id: pid });
+    if (res && res.ok) {
+      closeModal();
+      invalidateDoses();
+      await loadData();
+      showUndoToast('Pacijent obrisan', async () => {
+        const r = await apiWrite({ action:'restorePatient', id: pid });
+        if (r && r.ok) { await loadData(); showAlert('Pacijent vraćen.', 'success'); }
+      }, 30000);
+    } else showAlert((res && res.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+
+// ---------- DOCTORS ----------
+function renderDrSelect(current) {
+  const sel = document.getElementById('d-lekar');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">—</option>' +
+    doctorsList.map(d => `<option value="${esc(d)}" ${d === current ? 'selected' : ''}>${esc(d)}</option>`).join('');
+  if (current && !doctorsList.includes(current)) {
+    const opt = document.createElement('option');
+    opt.value = current; opt.textContent = current; opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+function renderDrManager() {
+  const el = document.getElementById('drList'); if (!el) return;
+  el.innerHTML = doctorsList.map(d =>
+    `<div class="dr-item"><span>${esc(d)}</span><button class="btn btn-danger" style="padding:2px 6px;font-size:11px;" onclick="removeDoctor('${esc(d).replace(/'/g,"\\'")}')"><i class="ti ti-x"></i></button></div>`
+  ).join('') || '<div style="font-size:12px;color:#888;">Nema lekara u listi.</div>';
+}
+function toggleDrManager() {
+  const m = document.getElementById('drManager');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  renderDrManager();
+}
+async function addDoctor() {
+  const name = document.getElementById('drNewName').value.trim();
+  if (!name) return;
+  try {
+    const r = await apiWrite({ action:'addDoctor', name });
+    if (r && r.ok) {
+      if (!doctorsList.includes(name)) doctorsList.push(name);
+      document.getElementById('drNewName').value = '';
+      renderDrManager(); renderDrSelect(name);
+    } else showAlert('Greška.','danger');
+  } catch(e) { showAlert('Nema veze sa serverom.','danger'); }
+}
+async function removeDoctor(name) {
+  try {
+    const r = await apiWrite({ action:'removeDoctor', name });
+    if (r && r.ok) {
+      doctorsList = doctorsList.filter(d => d !== name);
+      renderDrManager(); renderDrSelect('');
+    } else showAlert('Greška.','danger');
+  } catch(e) { showAlert('Nema veze sa serverom.','danger'); }
+}
+async function loadDoctors() {
+  const data = await api('getDoctors', null, true);
+  if (data && data.doctors) doctorsList = data.doctors;
+  return doctorsList;
+}
+
+// ---------- SCHEDULE ----------
+let schState = { pid:'', oko:'', drug:'' };
+function openSchedule(pid) {
+  schState = { pid: pid ? String(pid) : '', oko:'', drug:'' };
+  document.getElementById('schSearch').value = '';
+  document.getElementById('schResults').innerHTML = '';
+  document.getElementById('schDatum').value = '';
+  document.getElementById('schDatumPick').value = '';
+  setTodaySrb('schDatum');
+  document.querySelectorAll('.sch-eye').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.sch-drug-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('schError').style.display = 'none';
+  if (pid) {
+    const p = patients.find(x => x.id === String(pid));
+    if (p) {
+      schState.pid = String(pid);
+      document.getElementById('schChosen').style.display = 'flex';
+      document.getElementById('schChosen').innerHTML = `<div class="avatar">${initials(p.ime,p.prezime)}</div><div><div style="font-weight:600;">${esc(p.ime+' '+p.prezime)}</div><div style="font-size:12px;color:#888;">${esc(p.dx||'')}</div></div>`;
+    }
+  } else {
+    document.getElementById('schChosen').style.display = 'none';
+  }
+  document.getElementById('schOverlay').style.display = 'block';
+}
+function closeSchedule() { document.getElementById('schOverlay').style.display = 'none'; }
+function schSearchPatient() {
+  const f = document.getElementById('schSearch').value.trim().toLowerCase();
+  const el = document.getElementById('schResults');
+  if (!f) { el.innerHTML = ''; return; }
+  const res = patients.filter(p => (p.ime+' '+p.prezime).toLowerCase().includes(f) || String(p.jmbg||'').includes(f) || String(p.id).includes(f)).slice(0, 20);
+  if (!res.length) { el.innerHTML = '<div class="sch-res-empty">Nema rezultata.</div>'; return; }
+  el.innerHTML = res.map(p => `<div class="sch-res" data-pid="${p.id}" onclick="schChoose(this.dataset.pid)"><b>${esc(p.ime+' '+p.prezime)}</b><span>${esc(p.dx||'—')} · ${calcAge(p.dob)} god</span></div>`).join('');
+}
+function schChoose(pid) {
+  const p = patients.find(x => x.id === String(pid));
+  if (!p) return;
+  schState.pid = String(pid);
+  document.getElementById('schChosen').style.display = 'flex';
+  document.getElementById('schChosen').innerHTML = `<div class="avatar">${initials(p.ime,p.prezime)}</div><div><div style="font-weight:600;">${esc(p.ime+' '+p.prezime)}</div><div style="font-size:12px;color:#888;">${esc(p.dx||'')}</div></div>`;
+  document.getElementById('schSearch').value = '';
+  document.getElementById('schResults').innerHTML = '';
+}
+function schSelectEye(btn) {
+  schState.oko = btn.dataset.eye;
+  document.querySelectorAll('.sch-eye').forEach(b => b.classList.toggle('selected', b === btn));
+}
+function schSelectDrug(btn, name) {
+  schState.drug = name;
+  document.querySelectorAll('.sch-drug-btn').forEach(b => b.classList.toggle('selected', b === btn));
+}
+async function saveSchedule() {
+  const err = document.getElementById('schError');
+  err.style.display = 'none';
+  if (!schState.pid) { err.textContent = 'Izaberite pacijenta.'; err.className='msg-err'; err.style.display='block'; return; }
+  const datumISO = toISO(document.getElementById('schDatum').value);
+  if (!datumISO) { err.textContent = 'Unesite datum.'; err.className='msg-err'; err.style.display='block'; return; }
+  if (!schState.oko) { err.textContent = 'Izaberite oko.'; err.className='msg-err'; err.style.display='block'; return; }
+  if (!schState.drug) { err.textContent = 'Izaberite lek.'; err.className='msg-err'; err.style.display='block'; return; }
+  const payload = {
+    action:'addProgram', id: uuidv4(),
+    pid: schState.pid, datum: datumISO, oko: schState.oko, drug: schState.drug, doza:''
+  };
+  try {
+    const res = await apiWrite(payload);
+    if (res && res.ok) {
+      closeSchedule();
+      showAlert('Termin zakazan.', 'success');
+      await loadData(true);
+      switchTab('program');
+    } else {
+      err.textContent = (res && res.reason) || 'Greška.';
+      err.className = 'msg-err'; err.style.display = 'block';
+    }
+  } catch(e) { err.textContent = 'Nema veze sa serverom.'; err.className='msg-err'; err.style.display='block'; }
+}
+
+// ---------- RENDER PROGRAM ----------
+function populateDoctorFilter() {
+  const sel = document.getElementById('op-doctor-filter'); if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Svi lekari</option>' +
+    doctorsList.map(d => `<option value="${esc(d)}">${esc(d)}</option>`).join('');
+  sel.value = cur;
+}
+function opShift(delta) {
+  const iso = toISO(document.getElementById('op-date-text').value) || todayISO();
+  const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + delta);
+  setOpDate(toISO(d));
+}
+function setOpDate(iso) {
+  document.getElementById('op-date-text').value = fmtDate(iso);
+  document.getElementById('op-date-pick').value = iso;
+  renderProgram();
+}
+function opDateTyped() {
+  const iso = toISO(document.getElementById('op-date-text').value);
+  if (iso) setOpDate(iso);
+}
+function renderProgram() {
+  const opDate = toISO(document.getElementById('op-date-text').value) || todayISO();
+  if (!document.getElementById('op-date-text').value) document.getElementById('op-date-text').value = fmtDate(opDate);
+  const d = new Date(opDate + 'T12:00');
+  const dani = ['nedelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+  document.getElementById('op-day-label').textContent = dani[d.getDay()] + ', ' + fmtDate(opDate);
+
+  const view = (document.getElementById('op-view') || {}).value || 'day';
+  const docF = (document.getElementById('op-doctor-filter') || {}).value || '';
+  const drugF = (document.getElementById('op-drug-filter') || {}).value || '';
+
+  let filtered = program.slice();
+  if (view === 'day') {
+    filtered = filtered.filter(p => toISO(p.datum) === opDate);
+  } else if (view === 'week') {
+    const end = new Date(opDate + 'T12:00'); end.setDate(end.getDate() + 7);
+    filtered = filtered.filter(p => toISO(p.datum) >= opDate && toISO(p.datum) <= toISO(end));
+  } else if (view === 'month') {
+    const end = new Date(opDate + 'T12:00'); end.setDate(end.getDate() + 30);
+    filtered = filtered.filter(p => toISO(p.datum) >= opDate && toISO(p.datum) <= toISO(end));
+  } else if (view === 'active') {
+    filtered = filtered.filter(p => p.status !== 'otkazano' && p.status !== 'dato');
+  } else if (view === 'cancelled') {
+    filtered = filtered.filter(p => p.status === 'otkazano');
+  }
+  if (docF) filtered = filtered.filter(p => String(p.lekar || '') === docF);
+  if (drugF) filtered = filtered.filter(p => String(p.drug || '').toLowerCase().indexOf(drugF.toLowerCase()) === 0);
+  filtered.sort((a,b) => toISO(a.datum).localeCompare(toISO(b.datum)) || String(a.oko).localeCompare(String(b.oko)));
+
+  const total = filtered.filter(p => p.status === 'zakazano').length;
+  const dado = filtered.filter(p => p.status === 'dato').length;
+  const otk = filtered.filter(p => p.status === 'otkazano').length;
+  document.getElementById('op-summary').innerHTML =
+    (total ? `<span class="badge badge-blue">Zakazano: ${total}</span>` : '') +
+    (dado ? `<span class="badge badge-green">Dato: ${dado}</span>` : '') +
+    (otk ? `<span class="badge badge-amber">Otkazano: ${otk}</span>` : '');
+
+  const el = document.getElementById('opList');
+  if (!filtered.length) { el.innerHTML = '<div class="empty-state">Nema termina za izabrani period.</div>'; return; }
+  const today = todayISO();
+  el.innerHTML = filtered.map((p, idx) => {
+    const pData = patients.find(x => x.id === String(p.pid));
+    const name = pData ? (pData.ime + ' ' + pData.prezime) : 'Nepoznat pacijent';
+    const canGive = p.status === 'zakazano' && toISO(p.datum) === today;
+    const isDato = p.status === 'dato';
+    const isOtk = p.status === 'otkazano';
+    const rowClass = isDato ? 'op-dato' : isOtk ? 'op-otkazano' : '';
+    return `<div class="op-row ${rowClass}">
+      <div class="op-num">${idx+1}</div>
+      <div>
+        <div class="patient-name">${esc(name)}</div>
+        <div class="patient-meta">${pData ? esc(pData.dx || '—') : ''} ${p.brIst ? '· ist. '+esc(p.brIst) : ''}</div>
+      </div>
+      <div><span class="eye-tag eye-${p.oko}">${esc(p.oko)}</span></div>
+      <div style="font-size:12px;color:#555;"><i class="ti ti-syringe"></i> ${esc((p.drug||'').split(' ')[0])}</div>
+      <div class="op-actions">
+        ${canGive ? `<button class="btn btn-success" data-pid="${p.id}" onclick="startGive(this.dataset.pid)"><i class="ti ti-check"></i> Daj injekciju</button>` : ''}
+        ${isDato ? '<span class="badge badge-green">Dato</span>' : ''}
+        ${isOtk ? '<span class="badge badge-amber">Otkazano</span>' : ''}
+        ${!isDato && !isOtk ? `<button class="btn" data-pid="${p.id}" onclick="cancelTerm(this.dataset.pid)"><i class="ti ti-x"></i></button>` : ''}
+        ${!isDato ? `<button class="btn btn-danger" data-pid="${p.id}" onclick="deleteTerm(this.dataset.pid)"><i class="ti ti-trash"></i></button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function cancelTerm(pid) {
+  const t = program.find(x => x.id === pid);
+  if (!t) return;
+  const newStatus = t.status === 'otkazano' ? 'zakazano' : 'otkazano';
+  const ok = await showConfirm({ type: t.status === 'otkazano' ? 'warning' : 'danger',
+    title: t.status === 'otkazano' ? 'Vrati termin?' : 'Otkaži termin?',
+    msg: 'Termin: <strong>' + esc(fmtDate(t.datum) + ' ' + t.oko + ' ' + drugShort(t.drug)) + '</strong>',
+    okLabel: t.status === 'otkazano' ? 'Vrati' : 'Otkaži' });
+  if (!ok) return;
+  try {
+    const r = await apiWrite({ action:'updateProgram', id: pid, status: newStatus });
+    if (r && r.ok) { await loadData(true); showAlert(newStatus === 'otkazano' ? 'Termin otkazan.' : 'Termin vraćen.', 'success'); }
+    else showAlert((r && r.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+async function deleteTerm(pid) {
+  const ok = await showConfirm({ type:'danger', title:'Obriši termin?', msg:'Termin se može poništiti u narednih 15 sekundi.', okLabel:'Obriši' });
+  if (!ok) return;
+  try {
+    const r = await apiWrite({ action:'deleteProgram', id: pid });
+    if (r && r.ok) {
+      await loadData(true);
+      showUndoToast('Termin obrisan', async () => {
+        const rr = await apiWrite({ action:'restoreProgram', id: pid });
+        if (rr && rr.ok) { await loadData(true); showAlert('Termin vraćen.', 'success'); }
+      });
+    } else showAlert((r && r.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+
+// ---------- GIVE INJECTION (verifikacioni overlay) ----------
+let vzState = { programId:'', step:1 };
+function startGive(programId) {
+  const rec = program.find(x => x.id === programId);
+  if (!rec) return;
+  vzState = { programId, step:1 };
+  document.getElementById('vzOverlay').style.display = 'block';
+  renderVz();
+}
+function closeVz() { document.getElementById('vzOverlay').style.display = 'none'; vzState = { programId:'', step:1 }; }
+function renderVz() {
+  const rec = program.find(x => x.id === vzState.programId);
+  if (!rec) { closeVz(); return; }
+  const p = patients.find(x => x.id === String(rec.pid));
+  const name = p ? (p.ime + ' ' + p.prezime) : 'Nepoznat';
+  const body = document.getElementById('vzBody');
+  const sub = document.getElementById('vzSub');
+  sub.textContent = 'Korak ' + vzState.step + ' od 5';
+  document.querySelectorAll('.vz-step').forEach(el => {
+    const n = Number(el.dataset.vzstep);
+    el.className = 'vz-step' + (n < vzState.step ? ' done' : n === vzState.step ? ' cur' : '');
+  });
+  const chips = [];
+  chips.push(`<span class="vz-chip"><i class="ti ti-check"></i> ${esc(name)}</span>`);
+  chips.push(`<span class="vz-chip"><i class="ti ti-check"></i> ${esc(rec.oko)}</span>`);
+  chips.push(`<span class="vz-chip"><i class="ti ti-check"></i> ${esc(drugShort(rec.drug))}</span>`);
+  document.getElementById('vzChips').innerHTML = chips.join('');
+
+  if (vzState.step === 1) {
+    body.innerHTML = `<div class="vz-card">
+      <div class="vz-label">Pacijent</div>
+      <div class="vz-big">${esc(name)}</div>
+      <div class="vz-sub">${p ? esc(p.dx || '') + ' · ' + calcAge(p.dob) + ' god' : ''}</div>
+      <div class="vz-hint">Proverite da je ovo pravi pacijent.</div>
+      <button class="vz-btn vz-ok" onclick="vzNext()">Potvrđujem</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Nije tačno — prekini</button>
+    </div>`;
+  } else if (vzState.step === 2) {
+    const eyeColor = rec.oko === 'OD' ? '#1557a0' : '#0f7a55';
+    body.innerHTML = `<div class="vz-card">
+      <div class="vz-eye" style="background:${eyeColor};">
+        <div class="vz-label" style="color:rgba(255,255,255,0.8);">Oko</div>
+        <div class="vz-big">${esc(rec.oko)}</div>
+        <div class="vz-eyecode">${rec.oko === 'OD' ? 'DESNO' : 'LEVO'}</div>
+      </div>
+      <div class="vz-hint">Proverite da li se oko slaže sa zakazanim terminom.</div>
+      <button class="vz-btn vz-ok" onclick="vzNext()">Potvrđujem</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Nije tačno — prekini</button>
+    </div>`;
+  } else if (vzState.step === 3) {
+    body.innerHTML = `<div class="vz-card">
+      <div class="vz-drug">
+        <div class="vz-label">Lek</div>
+        <div class="vz-big">${esc(drugShort(rec.drug))}</div>
+        <div class="vz-sub">${esc(rec.drug)}</div>
+      </div>
+      <div class="vz-hint">Proverite naziv leka na pakovanju.</div>
+      <button class="vz-btn vz-ok" onclick="vzNext()">Potvrđujem</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Nije tačno — prekini</button>
+    </div>`;
+  } else if (vzState.step === 4) {
+    const today = todayISO();
+    const ok = toISO(rec.datum) === today;
+    body.innerHTML = `<div class="vz-card">
+      <div class="vz-label">Datum</div>
+      <div class="vz-big">${fmtDate(rec.datum)}</div>
+      <div class="${ok ? 'vz-date-ok' : 'vz-date-bad'}">
+        <div class="vz-big" style="font-size:24px;">${ok ? '✓ Danas' : '✗ Nije danas'}</div>
+      </div>
+      ${ok ? '<div class="vz-hint">Datum je ispravan.</div><button class="vz-btn vz-ok" onclick="vzNext()">Nastavi</button>' : '<div class="vz-hint">Termin je zakazan za drugi datum — injekcija se ne može dati.</div><button class="vz-btn vz-stop" onclick="vzStop()">Zatvori</button>'}
+    </div>`;
+  } else if (vzState.step === 5) {
+    const defaultLekar = rec.lekar || '';
+    body.innerHTML = `<div class="vz-card">
+      <div class="vz-label">Unos podataka</div>
+      <div style="text-align:left;margin-top:1rem;">
+        <div class="field" style="margin-bottom:12px;">
+          <label>Broj istorije *</label>
+          <input type="text" id="vzBrIst" value="${esc(rec.brIst||'')}" />
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label>Lekar</label>
+          <select id="vzLekar">${[''].concat(doctorsList).map(d => `<option value="${esc(d)}" ${d===defaultLekar?'selected':''}>${esc(d||'—')}</option>`).join('')}</select>
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label>Datum kontrole (opciono)</label>
+          <div class="date-combo">
+            <input type="text" id="vzKontrola" placeholder="DD.MM.YYYY." maxlength="11" />
+            <input type="date" id="vzKontrolaPick" onchange="pickToText('vzKontrolaPick','vzKontrola')" />
+            <button class="cal-btn" onclick="document.getElementById('vzKontrolaPick').showPicker()" type="button"><i class="ti ti-calendar"></i></button>
+          </div>
+        </div>
+        <div class="vz-sum">
+          <div><span>Pacijent</span><b>${esc(name)}</b></div>
+          <div><span>Oko</span><b>${esc(rec.oko)}</b></div>
+          <div><span>Lek</span><b>${esc(drugShort(rec.drug))}</b></div>
+          <div><span>Datum</span><b>${fmtDate(rec.datum)}</b></div>
+        </div>
+      </div>
+      <div id="vzError" style="display:none;margin-top:1rem;"></div>
+      <button class="vz-btn vz-ok" onclick="vzConfirmGive()">Daj injekciju</button>
+      <button class="vz-btn vz-stop" onclick="vzStop()">Odustani</button>
+    </div>`;
+  }
+}
+function vzNext() { vzState.step++; renderVz(); }
+function vzStop() {
+  writeLog('Prekinuta provera', 'Korisnik prekinuo proveru pre injekcije');
+  closeVz();
+}
+async function vzConfirmGive() {
+  const brIst = document.getElementById('vzBrIst').value.trim();
+  const lekar = document.getElementById('vzLekar').value;
+  const kontrolaRaw = document.getElementById('vzKontrola').value.trim();
+  const kontrola = kontrolaRaw ? toISO(kontrolaRaw) : '';
+  const errEl = document.getElementById('vzError');
+  errEl.style.display = 'none';
+  if (!brIst) { errEl.className='msg-err'; errEl.textContent='Broj istorije je obavezan.'; errEl.style.display='block'; return; }
+  const rec = program.find(x => x.id === vzState.programId);
+  if (!rec) return;
+  const payload = {
+    action:'giveInjection', programId: vzState.programId, doseId: uuidv4(),
+    pid: rec.pid, oko: rec.oko, drug: rec.drug,
+    lekar, brIst, kontrola
+  };
+  try {
+    const res = await apiWrite(payload);
+    if (res && (res.ok || res.alreadyGiven)) {
+      closeVz();
+      invalidateDoses();
+      await loadData();
+      showAlert('Injekcija upisana.', 'success');
+    } else {
+      errEl.className = 'msg-err'; errEl.textContent = (res && res.reason) || 'Greška.'; errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.className = 'msg-err'; errEl.textContent = 'Nema veze sa serverom. Pokušajte ponovo.'; errEl.style.display = 'block';
+  }
+}
+
+// ---------- PRINT ----------
+function printProgram() {
+  const opDate = toISO(document.getElementById('op-date-text').value) || todayISO();
+  const list = program.filter(p => toISO(p.datum) === opDate && p.status !== 'otkazano');
+  if (!list.length) { showAlert('Nema termina za štampu.', 'info'); return; }
+  list.sort((a,b) => String(a.oko).localeCompare(String(b.oko)) || String(a.pid).localeCompare(String(b.pid)));
+  const rows = list.map((p, i) => {
+    const pData = patients.find(x => x.id === String(p.pid));
+    const name = pData ? (pData.ime + ' ' + pData.prezime) : '—';
+    return `<tr>
+      <td class="c">${i+1}</td>
+      <td>${esc(name)}</td>
+      <td class="c"><span class="eye">${esc(p.oko)}</span></td>
+      <td>${esc((p.drug||'').split(' ')[0])}</td>
+      <td>${esc(p.brIst||'')}</td>
+      <td>${esc(p.lekar||'')}</td>
+      <td class="c"><span class="pr-box"></span></td>
+      <td></td>
+    </tr>`;
+  }).join('');
+  const d = new Date(opDate + 'T12:00');
+  const dani = ['nedelja','ponedeljak','utorak','sreda','četvrtak','petak','subota'];
+  document.getElementById('printArea').innerHTML = `
+    <div class="pr-head">
+      <div>
+        <div class="pr-title">Anti-VEGF — Operativni program</div>
+        <div class="pr-sub">Klinička baza podataka</div>
+      </div>
+      <div class="pr-date">
+        <div>${dani[d.getDay()]}</div>
+        <b>${fmtDate(opDate)}</b>
+      </div>
+    </div>
+    <table class="pr-table">
+      <thead><tr>
+        <th style="width:30px;">#</th>
+        <th>Pacijent</th>
+        <th style="width:50px;">Oko</th>
+        <th style="width:90px;">Lek</th>
+        <th style="width:100px;">Br. ist.</th>
+        <th style="width:140px;">Lekar</th>
+        <th style="width:40px;">✓</th>
+        <th style="width:100px;">Potpis</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="pr-sign">
+      <div>_______________________<br>Glavna sestra</div>
+      <div>_______________________<br>Lekar</div>
+    </div>
+    <div class="pr-foot">Štampano: ${new Date().toLocaleString('sr-RS')} · Ukupno: ${list.length}</div>`;
+  window.print();
+  writeLog('Štampan program', 'Datum: ' + opDate + ' · ' + list.length + ' termina');
+}
+
+// ---------- REPORT ----------
+function generateReport() {
+  const p = patients.find(x => x.id === currentPid);
+  if (!p) return;
+  const arr = getDosesForPid(currentPid).slice().sort((a,b) => parseDate(a.datum) - parseDate(b.datum));
+  let txt = 'ANTI-VEGF IZVEŠTAJ\n';
+  txt += '='.repeat(50) + '\n\n';
+  txt += 'Pacijent: ' + p.ime + ' ' + p.prezime + '\n';
+  txt += 'Datum rođenja: ' + fmtDate(p.dob) + ' (' + calcAge(p.dob) + ' god)\n';
+  txt += 'Pol: ' + (p.pol || '—') + '\n';
+  txt += 'JMBG: ' + (p.jmbg || '—') + '\n';
+  txt += 'Dijagnoza: ' + (p.dx || '—') + '\n';
+  txt += 'Kontakt: ' + (p.kontakt || '—') + '\n\n';
+  if (p.napomena) txt += 'Napomena: ' + p.napomena + '\n\n';
+  txt += 'DOZE (' + arr.length + ')\n';
+  txt += '-'.repeat(50) + '\n';
+  arr.forEach((d, i) => {
+    txt += (i+1) + '. ' + fmtDate(d.datum) + ' · ' + (d.oko||'—') + ' · ' + (d.drug||'—') + '\n';
+    if (d.brIst) txt += '   Br. istorije: ' + d.brIst + '\n';
+    if (d.lekar) txt += '   Lekar: ' + d.lekar + '\n';
+    if (d.vodVn || d.vodBcva) txt += '   VOD: ' + (d.vodVn||'—') + ' → BCVA ' + (d.vodBcva||'—') + '\n';
+    if (d.vosVn || d.vosBcva) txt += '   VOS: ' + (d.vosVn||'—') + ' → BCVA ' + (d.vosBcva||'—') + '\n';
+    if (d.iopOd || d.iopOs) txt += '   IOP: OD ' + (d.iopOd||'—') + ' / OS ' + (d.iopOs||'—') + ' mmHg\n';
+    if (d.cmtOd || d.cmtOs) txt += '   CMT: OD ' + (d.cmtOd||'—') + ' / OS ' + (d.cmtOs||'—') + ' µm\n';
+    if (d.oct) txt += '   OCT: ' + d.oct + '\n';
+    if (d.nezeljeniDogadjaji) txt += '   Neželjeni događaji: ' + String(d.nezeljeniDogadjaji).split(';').map(a => ADV_LABELS[a] || a).join(', ') + '\n';
+    if (d.kontrola) txt += '   Kontrola: ' + fmtDate(d.kontrola) + (String(d.completed).toLowerCase()==='true' ? ' (obavljena)' : '') + '\n';
+    if (d.napomena && !/^\d{4}-\d{2}-\d{2}/.test(d.napomena)) txt += '   Napomena: ' + d.napomena + '\n';
+    txt += '\n';
+  });
+  txt += '='.repeat(50) + '\n';
+  txt += 'Generisano: ' + new Date().toLocaleString('sr-RS') + '\n';
+  document.getElementById('reportText').textContent = txt;
+  document.getElementById('copySuccess').style.display = 'none';
+  document.getElementById('reportOverlay').style.display = 'flex';
+}
+function closeReport() { document.getElementById('reportOverlay').style.display = 'none'; }
+function copyReport() {
+  const txt = document.getElementById('reportText').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const s = document.getElementById('copySuccess');
+    s.style.display = 'inline-flex';
+    setTimeout(() => s.style.display = 'none', 2000);
+  });
+}
+
+// ---------- EXCEL EXPORT ----------
+function exportExcel() {
+  try {
+    const wb = XLSX.utils.book_new();
+    const pacData = [['ID','Ime','Prezime','Datum rođenja','Pol','JMBG','Kontakt','Dijagnoza','Napomena']];
+    patients.forEach(p => pacData.push([p.id, p.ime, p.prezime, p.dob, p.pol, p.jmbg, p.kontakt, p.dx, p.napomena]));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pacData), 'Pacijenti');
+
+    const dozData = [['ID','Pacijent','Br. istorije','Datum','Oko','Lek','Redni broj','Lekar','VOD Vn','VOD BCVA','VOS Vn','VOS BCVA','IOP OD','IOP OS','CMT OD','CMT OS','OCT','Neželjeni događaji','Kontrola','Kontrola obavljena']];
+    Object.keys(dosesByPid).forEach(pid => {
+      const p = patients.find(x => x.id === pid);
+      const pName = p ? (p.ime + ' ' + p.prezime) : pid;
+      dosesByPid[pid].forEach(d => {
+        dozData.push([d.id, pName, d.brIst, d.datum, d.oko, d.drug, d.redniBroj, d.lekar, d.vodVn, d.vodBcva, d.vosVn, d.vosBcva, d.iopOd, d.iopOs, d.cmtOd, d.cmtOs, d.oct, d.nezeljeniDogadjaji, d.kontrola, d.completed]);
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dozData), 'Doze');
+
+    XLSX.writeFile(wb, 'anti-vegf-export-' + todayISO() + '.xlsx');
+  } catch(e) { showAlert('Greška pri exportu: ' + e.message, 'danger'); }
+}
+
+// ---------- USERS ----------
+let _umMode = 'add', _umTarget = '';
+function openAddUser() {
+  _umMode = 'add';
+  document.getElementById('userModalTitle').textContent = 'Novi nalog';
+  document.getElementById('um-username').value = ''; document.getElementById('um-username').disabled = false;
+  document.getElementById('um-password').value = '';
+  document.getElementById('um-role-field').style.display = '';
+  document.getElementById('userModal').style.display = 'flex';
+}
+function changePassword(username) {
+  _umMode = 'change'; _umTarget = username;
+  document.getElementById('userModalTitle').textContent = 'Promena lozinke — ' + username;
+  document.getElementById('um-username').value = username; document.getElementById('um-username').disabled = true;
+  document.getElementById('um-password').value = '';
+  document.getElementById('um-role-field').style.display = 'none';
+  document.getElementById('userModal').style.display = 'flex';
+}
+function closeUserModal() { document.getElementById('userModal').style.display = 'none'; }
+async function saveUser() {
+  const un = document.getElementById('um-username').value.trim();
+  const pw = document.getElementById('um-password').value;
+  try {
+    if (_umMode === 'add') {
+      const r = await apiWrite({ action:'addUser', username:un, password:pw, role: document.getElementById('um-role').value });
+      if (r && r.ok) { showAlert('Korisnik dodat.', 'success'); closeUserModal(); loadUsers(); }
+      else showAlert((r && r.reason) || 'Greška.', 'danger');
+    } else {
+      const r = await apiWrite({ action:'changeUserPassword', username:_umTarget, password:pw });
+      if (r && r.ok) { showAlert('Lozinka promenjena.', 'success'); closeUserModal(); }
+      else showAlert((r && r.reason) || 'Greška.', 'danger');
+    }
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+async function deleteUser(username) {
+  const ok = await showConfirm({ type:'danger', title:'Obriši korisnika?', msg:'Obrisati nalog <strong>' + esc(username) + '</strong>?', okLabel:'Obriši' });
+  if (!ok) return;
+  try {
+    const r = await apiWrite({ action:'deleteUser', username });
+    if (r && r.ok) { showAlert('Korisnik obrisan.', 'success'); loadUsers(); }
+    else showAlert((r && r.reason) || 'Greška.', 'danger');
+  } catch(e) { showAlert('Nema veze sa serverom.', 'danger'); }
+}
+async function loadUsers() {
+  const data = await api('getUsers', null, true);
+  const el = document.getElementById('usersList');
+  if (!data || !data.users) { el.innerHTML = '<div class="empty-state">Greška pri učitavanju.</div>'; return; }
+  el.innerHTML = data.users.map(u => `
+    <div class="patient-row" style="cursor:default;">
+      <div class="avatar">${u.username[0].toUpperCase()}</div>
+      <div class="patient-info">
+        <div class="patient-name">${esc(u.username)} ${u.role === 'admin' ? '<span class="badge badge-blue">admin</span>' : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn" onclick="changePassword('${esc(u.username)}')"><i class="ti ti-key"></i></button>
+        ${u.username !== currentUser ? `<button class="btn btn-danger" onclick="deleteUser('${esc(u.username)}')"><i class="ti ti-trash"></i></button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---------- INIT ----------
+(function initOnLoad() {
+  if (currentUser && authToken) { loadData(); }
+  setOpDate(todayISO());
+})();
+</script>
+</body>
+</html>

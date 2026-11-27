@@ -337,6 +337,26 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
 .cal-cl{color:var(--text-3);font-size:11px;}
 .cal-mv{position:absolute;top:6px;right:5px;border:1px solid var(--border);background:#fff;border-radius:6px;padding:2px 4px;cursor:pointer;color:var(--blue);}
 .cal-empty{color:var(--text-3);text-align:center;padding:10px;}
+.cal-wrap{display:flex;gap:14px;align-items:flex-start;}
+.cal-wrap > #calBody{flex:1;min-width:0;}
+.cal-legend{width:190px;flex-shrink:0;background:var(--bg);border-radius:10px;padding:10px;position:sticky;top:10px;}
+.cal-lg-t{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;}
+.cal-lg{display:flex;align-items:center;gap:8px;width:100%;border:1.5px solid transparent;background:#fff;border-radius:8px;padding:6px 8px;margin-bottom:5px;cursor:pointer;font-size:12px;text-align:left;color:var(--text);}
+.cal-lg:hover{border-color:var(--border);}
+.cal-lg.active{border-color:var(--blue);box-shadow:0 0 0 2px rgba(21,87,160,.15);}
+.cal-lg.dim{opacity:.45;}
+.cal-lg-n{flex:1;line-height:1.25;}
+.cal-lg b{font-size:12px;color:var(--text-2);}
+.cal-lg-all{width:100%;margin-top:4px;border:none;background:none;color:var(--blue);font-weight:600;cursor:pointer;font-size:12px;}
+.cal-sw{display:inline-block;width:14px;height:14px;border-radius:4px;flex-shrink:0;background:var(--dc,#8a8f98);vertical-align:-2px;margin-right:4px;}
+.cal-it{border-left:4px solid var(--dc,#8a8f98);background:color-mix(in srgb, var(--dc,#8a8f98) 14%, #fff);border-radius:3px;padding:0 3px;margin-bottom:2px;}
+.cal-card{border-left:6px solid var(--dc,#8a8f98) !important;background:color-mix(in srgb, var(--dc,#8a8f98) 9%, #fff) !important;}
+.cal-cl{color:var(--text-2) !important;font-weight:600;}
+.cal-dots{display:none;gap:3px;flex-wrap:wrap;margin-top:2px;}
+.cal-dots i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.cal-day.lvl1,.cal-day.lvl2,.cal-day.lvl3,.cal-day.lvl4{background:#fff;}
+.cal-day.we.lvl1,.cal-day.we.lvl2,.cal-day.we.lvl3,.cal-day.we.lvl4{background:#f7f7f5;}
+.cal-eye,.cal-eye.eye-OS{background:#3b4250;}
 .cal-sum{font-size:13px;color:var(--text-2);margin-top:10px;line-height:1.6;}
 .pr-day td{background:#eee;padding-top:8px !important;}
 #undoToast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0d3d6e;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:500;gap:12px;align-items:center;font-size:14px;}
@@ -395,6 +415,12 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   .cal-month{grid-template-columns:repeat(7,minmax(0,1fr));}
   .cal-week{grid-template-columns:1fr;}
   .cal-wcol{min-height:0;}
+  .cal-wrap{flex-direction:column-reverse;align-items:stretch;}
+  .cal-legend{width:100%;position:static;display:flex;flex-wrap:wrap;gap:6px;padding:8px;}
+  .cal-lg-t{width:100%;margin:0;}
+  .cal-lg{width:auto;margin:0;}
+  .cal-legend .op-sub{width:100%;}
+  .cal-dots{display:flex;}
   .cal-empty{padding:2px;}
   .cal-title{font-size:15px;width:100%;margin:6px 0 0;}
   .cal-nav{flex-wrap:wrap;}
@@ -627,7 +653,10 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
         <span style="flex:1"></span>
         <button class="btn" onclick="printCalendarWeek()"><i class="ti ti-printer"></i> Štampaj nedelju</button>
       </div>
-      <div id="calBody"></div>
+      <div class="cal-wrap">
+        <div id="calBody"></div>
+        <aside class="cal-legend" id="calLegend"></aside>
+      </div>
       <div class="cal-sum" id="calSum"></div>
       <div class="op-sub" style="margin-top:6px;">Klik na dan otvara operativni program tog dana · u nedeljnom prikazu klik na pacijenta otvara karton, a <i class="ti ti-calendar-repeat"></i> pomera termin.</div>
     </div>
@@ -2253,6 +2282,10 @@ const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','se
 const DANI_KR = ['pon','uto','sre','čet','pet','sub','ned'];
 let cal = { view:'month', anchor:'', lekar:'', drug:'', showGiven:true };
 try { Object.assign(cal, JSON.parse(sessionStorage.getItem('vegf_cal') || '{}')); } catch(e) {}
+// svaki lekar ima svoju stalnu boju (redosled iz liste lekara)
+const DOC_COLORS = ['#2563eb','#e07b00','#16a34a','#c026d3','#dc2626','#0891b2','#7c3aed','#ca8a04','#db2777','#0d9488'];
+function calDoctors(){ return Array.from(new Set(doctorsList.concat(program.map(t => t.lekar).filter(Boolean).sort()))); }
+function docColor(name){ if (!name) return '#8a8f98'; const i = calDoctors().indexOf(name); return DOC_COLORS[(i < 0 ? 0 : i) % DOC_COLORS.length]; }
 function calSave(){ try { sessionStorage.setItem('vegf_cal', JSON.stringify(cal)); } catch(e) {} }
 function isoAdd(iso, n){ const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n); return toISO(d); }
 function mondayOf(iso){ const d = new Date(iso + 'T12:00'); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return toISO(d); }
@@ -2315,16 +2348,19 @@ function renderCalendar(){
       const list = (byDay[d] || []).slice().sort((x, y) => calInfo(x).name.localeCompare(calInfo(y).name, 'sr'));
       const inMonth = d >= first && d <= last, wd = (new Date(d + 'T12:00').getDay() + 6) % 7;
       const lvl = list.length ? Math.ceil(4 * list.length / max) : 0;
+      const docsHere = Array.from(new Set(list.map(t => t.lekar || '')));
       html += `<div class="cal-day ${inMonth ? '' : 'out'} ${wd > 4 ? 'we' : ''} ${d === today ? 'today' : ''} lvl${lvl}" data-d="${d}" onclick="calOpenDay(this.dataset.d)">
         <div class="cal-dn"><span>${Number(d.slice(8))}.</span>${list.length ? `<b class="cal-cnt">${list.length}</b>` : ''}</div>
+        ${list.length ? `<div class="cal-dots">${docsHere.map(n => `<i style="background:${docColor(n)}"></i>`).join('')}</div>` : ''}
         <div class="cal-items">${list.slice(0, 5).map(t => { const i = calInfo(t);
-          return `<div class="cal-it ${t.status === 'dato' ? 'given' : ''}" title="${esc(i.name + ' · ' + t.oko + ' · ' + drugShort(t.drug) + (i.no ? ' · ' + i.no + '. doza' : '') + (t.lekar ? ' · ' + t.lekar : ''))}"><span class="cal-eye eye-${esc(t.oko)}">${esc(t.oko)}</span>${esc(i.short)}${i.no ? ' <i>' + i.no + '.</i>' : ''}</div>`; }).join('')}
+          return `<div class="cal-it ${t.status === 'dato' ? 'given' : ''}" style="--dc:${docColor(t.lekar)}" title="${esc(i.name + ' · ' + t.oko + ' · ' + drugShort(t.drug) + (i.no ? ' · ' + i.no + '. doza' : '') + (t.lekar ? ' · ' + t.lekar : ''))}"><span class="cal-eye eye-${esc(t.oko)}">${esc(t.oko)}</span>${esc(i.short)}${i.no ? ' <i>' + i.no + '.</i>' : ''}</div>`; }).join('')}
           ${list.length > 5 ? `<div class="cal-more">+ još ${list.length - 5}</div>` : ''}</div>
       </div>`;
     }
     body.innerHTML = html + '</div>';
     const tot = terms.filter(t => toISO(t.datum) >= first && toISO(t.datum) <= last);
     document.getElementById('calSum').innerHTML = calSummary(tot);
+    calLegend(tot);
   } else {
     const mon = mondayOf(cal.anchor), sun = isoAdd(mon, 6);
     title.textContent = fmtDate(mon).slice(0, 6) + ' – ' + fmtDate(sun);
@@ -2337,16 +2373,28 @@ function renderCalendar(){
       return `<div class="cal-wcol ${d === today ? 'today' : ''}">
         <div class="cal-wh" data-d="${d}" onclick="calOpenDay(this.dataset.d)"><b>${DANI_KR[wd]}</b> ${fmtDate(d).slice(0, 6)} <span class="cal-cnt">${list.length}</span></div>
         ${list.length ? list.map(t => { const i = calInfo(t);
-          return `<div class="cal-card ${t.status === 'dato' ? 'given' : ''}" data-pid="${esc(t.pid)}" onclick="openPatient(this.dataset.pid)">
+          return `<div class="cal-card ${t.status === 'dato' ? 'given' : ''}" style="--dc:${docColor(t.lekar)}" data-pid="${esc(t.pid)}" onclick="openPatient(this.dataset.pid)">
             <div class="cal-cn">${esc(i.name)}</div>
             <div class="cal-cm"><span class="eye-tag eye-${esc(t.oko)}">${esc(t.oko)}</span> ${i.no ? '<b>' + i.no + '. doza</b> · ' : '<b>dato</b> · '}${esc(drugShort(t.drug))}</div>
-            <div class="cal-cl">${t.lekar ? '<i class="ti ti-stethoscope"></i> ' + esc(t.lekar) : '<span style="color:var(--amber);">lekar nije određen</span>'}</div>
+            <div class="cal-cl"><span class="cal-sw"></span>${t.lekar ? esc(t.lekar) : 'lekar nije određen'}</div>
             ${t.status !== 'dato' ? `<button class="cal-mv" data-id="${esc(t.id)}" onclick="event.stopPropagation();openTermEdit(this.dataset.id)" title="Pomeri / izmeni"><i class="ti ti-calendar-repeat"></i></button>` : ''}
           </div>`; }).join('') : '<div class="cal-empty">—</div>'}
       </div>`;
     }).join('') + '</div>';
     document.getElementById('calSum').innerHTML = calSummary(terms);
+    calLegend(terms);
   }
+}
+// legenda: boja + lekar + broj termina u prikazanom periodu; klik filtrira po lekaru
+function calLegend(list){
+  const cnt = {}; list.forEach(t => { const k = t.lekar || ''; cnt[k] = (cnt[k] || 0) + 1; });
+  const docs = calDoctors();
+  if (cnt['']) docs.push('');
+  document.getElementById('calLegend').innerHTML = '<div class="cal-lg-t">Lekari</div>' + docs.map(n => {
+    const key = n || '__none', act = cal.lekar === key, dim = cal.lekar && !act;
+    return `<button class="cal-lg ${act ? 'active' : ''} ${dim ? 'dim' : ''}" data-k="${esc(key)}" onclick="calSet('lekar', cal.lekar === this.dataset.k ? '' : this.dataset.k)">
+      <span class="cal-sw" style="background:${docColor(n)}"></span><span class="cal-lg-n">${n ? esc(n) : 'bez lekara'}</span><b>${cnt[n] || 0}</b></button>`;
+  }).join('') + (cal.lekar ? '<button class="cal-lg-all" onclick="calSet(\'lekar\',\'\')">prikaži sve lekare</button>' : '<div class="op-sub" style="margin-top:6px;">Klik na lekara prikazuje samo njegove pacijente.</div>');
 }
 function calSummary(list){
   if (!list.length) return 'Nema termina za izabrane filtere.';

@@ -300,6 +300,45 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
 #termOverlay{display:none;position:fixed;inset:0;background:rgba(13,61,110,0.35);z-index:155;overflow-y:auto;padding:2rem 1rem;}
 .sch-load{display:flex;gap:10px;align-items:flex-start;background:var(--green-bg);border:1px solid #b6e4d3;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;}
 .sch-load input{width:20px;height:20px;margin-top:1px;}
+
+.cal-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.cal-bar select{padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;background:#fff;}
+.cal-nav{display:flex;gap:6px;align-items:center;flex:1;}
+.cal-title{font-size:18px;font-weight:700;color:var(--blue-dark);margin-left:8px;text-transform:capitalize;}
+.cal-vt{display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.cal-vbtn{padding:8px 14px;border:none;background:#fff;font-weight:600;color:var(--text-2);cursor:pointer;font-size:13px;}
+.cal-vbtn.active{background:var(--blue);color:#fff;}
+.cal-month{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) repeat(2,minmax(0,.55fr));border-top:1px solid var(--border);border-left:1px solid var(--border);}
+.cal-dh{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-3);padding:6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg);}
+.cal-day{min-height:96px;padding:4px 5px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;background:#fff;overflow:hidden;}
+.cal-day:hover{outline:2px solid var(--blue-light);outline-offset:-2px;}
+.cal-day.out{background:#fafafa;opacity:.55;}
+.cal-day.we{background:#f7f7f5;}
+.cal-day.lvl1{background:#f2f8fe;}.cal-day.lvl2{background:#e3effb;}.cal-day.lvl3{background:#d0e3f7;}.cal-day.lvl4{background:#bcd6f3;}
+.cal-day.today .cal-dn span{background:var(--blue);color:#fff;border-radius:6px;padding:0 5px;}
+.cal-dn{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:3px;}
+.cal-cnt{background:var(--blue-dark);color:#fff;border-radius:10px;padding:0 7px;font-size:11px;}
+.cal-it{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.55;}
+.cal-it i{color:var(--text-3);font-style:normal;}
+.cal-it.given{opacity:.5;text-decoration:line-through;}
+.cal-eye{display:inline-block;font-size:9px;font-weight:700;border-radius:4px;padding:0 3px;margin-right:3px;color:#fff;background:var(--blue);}
+.cal-eye.eye-OS{background:var(--green);}
+.cal-more{font-size:11px;color:var(--blue);font-weight:600;}
+.cal-week{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:8px;}
+.cal-wcol{background:var(--bg);border-radius:10px;padding:6px;min-height:120px;}
+.cal-wcol.today{outline:2px solid var(--blue);}
+.cal-wh{font-size:13px;padding:4px 4px 8px;cursor:pointer;display:flex;gap:6px;align-items:center;}
+.cal-wh .cal-cnt{margin-left:auto;}
+.cal-card{position:relative;background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 30px 7px 8px;margin-bottom:6px;cursor:pointer;font-size:12px;}
+.cal-card:hover{border-color:var(--blue-light);}
+.cal-card.given{opacity:.55;}
+.cal-cn{font-weight:700;font-size:13px;margin-bottom:3px;}
+.cal-cm{margin-bottom:2px;}
+.cal-cl{color:var(--text-3);font-size:11px;}
+.cal-mv{position:absolute;top:6px;right:5px;border:1px solid var(--border);background:#fff;border-radius:6px;padding:2px 4px;cursor:pointer;color:var(--blue);}
+.cal-empty{color:var(--text-3);text-align:center;padding:10px;}
+.cal-sum{font-size:13px;color:var(--text-2);margin-top:10px;line-height:1.6;}
+.pr-day td{background:#eee;padding-top:8px !important;}
 #undoToast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0d3d6e;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:500;gap:12px;align-items:center;font-size:14px;}
 @media print{
   body{background:#fff !important;}
@@ -350,6 +389,15 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   .login-box{padding:1.75rem 1.25rem;}
   .rf-grid,.rfzo-fields,.plan-grid{grid-template-columns:1fr 1fr;}
   .term-row{grid-template-columns:90px 44px minmax(0,1fr);}
+  .cal-day{min-height:58px;padding:3px;}
+  .cal-items{display:none;}
+  .cal-dn{flex-direction:column;gap:3px;align-items:flex-start;}
+  .cal-month{grid-template-columns:repeat(7,minmax(0,1fr));}
+  .cal-week{grid-template-columns:1fr;}
+  .cal-wcol{min-height:0;}
+  .cal-empty{padding:2px;}
+  .cal-title{font-size:15px;width:100%;margin:6px 0 0;}
+  .cal-nav{flex-wrap:wrap;}
   .term-row .t-act{grid-column:1/-1;justify-content:flex-start;}
   #rfzoOverlay,#schOverlay{padding:0 !important;}
   .rf-box{border-radius:0;min-height:100%;}
@@ -405,6 +453,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   <div class="tabs">
     <button class="tab active" data-tab="patients" onclick="switchTab('patients')"><i class="ti ti-users"></i> <span>Pacijenti</span></button>
     <button class="tab" data-tab="program" onclick="switchTab('program')"><i class="ti ti-calendar-event"></i> <span class="lbl-long">Operativni program</span><span class="lbl-short">Program</span></button>
+    <button class="tab" data-tab="calendar" onclick="switchTab('calendar')"><i class="ti ti-calendar-month"></i> <span>Kalendar</span></button>
     <button class="tab" data-tab="add" onclick="switchTab('add')"><i class="ti ti-user-plus"></i> <span class="lbl-long">Novi pacijent</span><span class="lbl-short">Novi</span></button>
     <button class="tab" data-tab="log" onclick="switchTab('log')"><i class="ti ti-history"></i> <span>Log</span></button>
     <button class="tab" data-tab="users" onclick="switchTab('users')" id="tab-users" style="display:none;"><i class="ti ti-users-cog"></i> <span class="lbl-long">Korisnici</span><span class="lbl-short">Nalozi</span></button>
@@ -560,6 +609,30 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;backgrou
   </div>
 
   <!-- LOG -->
+  <div id="sec-calendar" class="section">
+    <div class="card">
+      <div class="cal-bar">
+        <div class="cal-nav">
+          <button class="btn" onclick="calShift(-1)" title="Prethodni"><i class="ti ti-chevron-left"></i></button>
+          <button class="btn" onclick="calToday()">Danas</button>
+          <button class="btn" onclick="calShift(1)" title="Sledeći"><i class="ti ti-chevron-right"></i></button>
+          <span class="cal-title" id="calTitle"></span>
+        </div>
+        <div class="cal-vt"><button class="cal-vbtn" data-v="month" onclick="calSet('view','month')">Mesec</button><button class="cal-vbtn" data-v="week" onclick="calSet('view','week')">Nedelja</button></div>
+      </div>
+      <div class="cal-bar">
+        <select id="cal-lekar" onchange="calSet('lekar', this.value)"></select>
+        <select id="cal-drug" onchange="calSet('drug', this.value)"></select>
+        <label class="checkbox-row" style="font-size:13px;"><input type="checkbox" id="cal-given" onchange="calSet('showGiven', this.checked)"> prikaži i date</label>
+        <span style="flex:1"></span>
+        <button class="btn" onclick="printCalendarWeek()"><i class="ti ti-printer"></i> Štampaj nedelju</button>
+      </div>
+      <div id="calBody"></div>
+      <div class="cal-sum" id="calSum"></div>
+      <div class="op-sub" style="margin-top:6px;">Klik na dan otvara operativni program tog dana · u nedeljnom prikazu klik na pacijenta otvara karton, a <i class="ti ti-calendar-repeat"></i> pomera termin.</div>
+    </div>
+  </div>
+
   <div id="sec-log" class="section">
     <div class="card">
       <div class="card-header">
@@ -1313,6 +1386,7 @@ async function loadData(silent) {
   const q = document.getElementById('patSearch');
   renderPatients(q ? q.value : '');
   renderProgram();
+  renderCalendar();
   populateDoctorFilter();
 }
 function setSyncLabel(failed, message, sticky) {
@@ -1374,6 +1448,7 @@ function switchTab(tab) {
   document.getElementById('sec-' + tab).classList.add('active');
   if (tab === 'log') loadLog();
   if (tab === 'program') renderProgram();
+  if (tab === 'calendar') renderCalendar();
   if (tab === 'users') loadUsers();
   if (tab === 'add' && !editingPatientId) { const cur = document.getElementById('f-indLekar').value; fillIndLekar(cur); if (!document.getElementById('f-indDatum').value) setTodaySrb('f-indDatum'); }
 }
@@ -2171,6 +2246,138 @@ async function offerLoadingAfterGive(rec){
   }
   await loadData(true);
   showAlert('Zakazane 2. i 3. doza.', 'success');
+}
+
+// ---------- KALENDAR (mesec / nedelja) ----------
+const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
+const DANI_KR = ['pon','uto','sre','čet','pet','sub','ned'];
+let cal = { view:'month', anchor:'', lekar:'', drug:'', showGiven:true };
+try { Object.assign(cal, JSON.parse(sessionStorage.getItem('vegf_cal') || '{}')); } catch(e) {}
+function calSave(){ try { sessionStorage.setItem('vegf_cal', JSON.stringify(cal)); } catch(e) {} }
+function isoAdd(iso, n){ const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n); return toISO(d); }
+function mondayOf(iso){ const d = new Date(iso + 'T12:00'); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return toISO(d); }
+function calFilterFill(){
+  const ls = document.getElementById('cal-lekar');
+  const docs = Array.from(new Set(doctorsList.concat(program.map(t => t.lekar).filter(Boolean))));
+  ls.innerHTML = '<option value="">Svi lekari</option>' + docs.map(d => `<option value="${esc(d)}" ${d === cal.lekar ? 'selected' : ''}>${esc(d)}</option>`).join('') +
+    `<option value="__none" ${cal.lekar === '__none' ? 'selected' : ''}>— bez lekara —</option>`;
+  const dr = document.getElementById('cal-drug');
+  const drugs = Array.from(new Set(program.map(t => t.drug).filter(Boolean)));
+  dr.innerHTML = '<option value="">Svi lekovi</option>' + drugs.map(d => `<option value="${esc(d)}" ${d === cal.drug ? 'selected' : ''}>${esc(drugShort(d))}</option>`).join('');
+  document.getElementById('cal-given').checked = cal.showGiven;
+  document.querySelectorAll('.cal-vbtn').forEach(b => b.classList.toggle('active', b.dataset.v === cal.view));
+}
+function calSet(k, v){ cal[k] = v; calSave(); renderCalendar(); }
+function calShift(dir){
+  const a = cal.anchor || todayISO();
+  if (cal.view === 'month') { const d = new Date(a + 'T12:00'); d.setDate(1); d.setMonth(d.getMonth() + dir); cal.anchor = toISO(d); }
+  else cal.anchor = isoAdd(a, 7 * dir);
+  calSave(); renderCalendar();
+}
+function calToday(){ cal.anchor = todayISO(); calSave(); renderCalendar(); }
+// termini u opsegu, posle filtera
+function calTerms(from, to){
+  return program.filter(t => {
+    const iso = toISO(t.datum);
+    if (!iso || iso < from || iso > to) return false;
+    if (t.status === 'otkazano') return false;
+    if (t.status === 'dato' && !cal.showGiven) return false;
+    if (cal.lekar === '__none' ? !!t.lekar : (cal.lekar && t.lekar !== cal.lekar)) return false;
+    if (cal.drug && t.drug !== cal.drug) return false;
+    return true;
+  });
+}
+function calInfo(t){
+  const p = patients.find(x => x.id === String(t.pid)) || {};
+  const no = t.status === 'dato' ? null : plannedDoseNo(t.pid, t.oko, toISO(t.datum), t.id);
+  return { p, name: (p.prezime || '') + ' ' + (p.ime || ''), short: (p.prezime || '?') + ' ' + (p.ime ? p.ime.charAt(0) + '.' : ''), no };
+}
+function renderCalendar(){
+  const sec = document.getElementById('sec-calendar');
+  if (!sec || !sec.classList.contains('active')) return;
+  if (!cal.anchor) cal.anchor = todayISO();
+  calFilterFill();
+  const today = todayISO();
+  const body = document.getElementById('calBody'), title = document.getElementById('calTitle');
+  const byDay = {};
+  let terms;
+  if (cal.view === 'month') {
+    const a = new Date(cal.anchor + 'T12:00'); const y = a.getFullYear(), m = a.getMonth();
+    const first = toISO(new Date(y, m, 1, 12)), last = toISO(new Date(y, m + 1, 0, 12));
+    const start = mondayOf(first), end = isoAdd(mondayOf(last), 6);
+    title.textContent = MESECI[m] + ' ' + y;
+    terms = calTerms(start, end);
+    terms.forEach(t => (byDay[toISO(t.datum)] = byDay[toISO(t.datum)] || []).push(t));
+    const counts = Object.keys(byDay).filter(d => d >= first && d <= last).map(d => byDay[d].length);
+    const max = Math.max(1, ...counts);
+    let html = '<div class="cal-month">' + DANI_KR.map((d, i) => `<div class="cal-dh ${i > 4 ? 'we' : ''}">${d}</div>`).join('');
+    for (let d = start; d <= end; d = isoAdd(d, 1)) {
+      const list = (byDay[d] || []).slice().sort((x, y) => calInfo(x).name.localeCompare(calInfo(y).name, 'sr'));
+      const inMonth = d >= first && d <= last, wd = (new Date(d + 'T12:00').getDay() + 6) % 7;
+      const lvl = list.length ? Math.ceil(4 * list.length / max) : 0;
+      html += `<div class="cal-day ${inMonth ? '' : 'out'} ${wd > 4 ? 'we' : ''} ${d === today ? 'today' : ''} lvl${lvl}" data-d="${d}" onclick="calOpenDay(this.dataset.d)">
+        <div class="cal-dn"><span>${Number(d.slice(8))}.</span>${list.length ? `<b class="cal-cnt">${list.length}</b>` : ''}</div>
+        <div class="cal-items">${list.slice(0, 5).map(t => { const i = calInfo(t);
+          return `<div class="cal-it ${t.status === 'dato' ? 'given' : ''}" title="${esc(i.name + ' · ' + t.oko + ' · ' + drugShort(t.drug) + (i.no ? ' · ' + i.no + '. doza' : '') + (t.lekar ? ' · ' + t.lekar : ''))}"><span class="cal-eye eye-${esc(t.oko)}">${esc(t.oko)}</span>${esc(i.short)}${i.no ? ' <i>' + i.no + '.</i>' : ''}</div>`; }).join('')}
+          ${list.length > 5 ? `<div class="cal-more">+ još ${list.length - 5}</div>` : ''}</div>
+      </div>`;
+    }
+    body.innerHTML = html + '</div>';
+    const tot = terms.filter(t => toISO(t.datum) >= first && toISO(t.datum) <= last);
+    document.getElementById('calSum').innerHTML = calSummary(tot);
+  } else {
+    const mon = mondayOf(cal.anchor), sun = isoAdd(mon, 6);
+    title.textContent = fmtDate(mon).slice(0, 6) + ' – ' + fmtDate(sun);
+    terms = calTerms(mon, sun);
+    terms.forEach(t => (byDay[toISO(t.datum)] = byDay[toISO(t.datum)] || []).push(t));
+    const days = [0,1,2,3,4,5,6].map(i => isoAdd(mon, i)).filter((d, i) => i < 5 || (byDay[d] || []).length);
+    body.innerHTML = `<div class="cal-week" style="--cols:${days.length}">` + days.map(d => {
+      const wd = (new Date(d + 'T12:00').getDay() + 6) % 7;
+      const list = (byDay[d] || []).slice().sort((x, y) => String(x.lekar || '').localeCompare(String(y.lekar || ''), 'sr') || calInfo(x).name.localeCompare(calInfo(y).name, 'sr'));
+      return `<div class="cal-wcol ${d === today ? 'today' : ''}">
+        <div class="cal-wh" data-d="${d}" onclick="calOpenDay(this.dataset.d)"><b>${DANI_KR[wd]}</b> ${fmtDate(d).slice(0, 6)} <span class="cal-cnt">${list.length}</span></div>
+        ${list.length ? list.map(t => { const i = calInfo(t);
+          return `<div class="cal-card ${t.status === 'dato' ? 'given' : ''}" data-pid="${esc(t.pid)}" onclick="openPatient(this.dataset.pid)">
+            <div class="cal-cn">${esc(i.name)}</div>
+            <div class="cal-cm"><span class="eye-tag eye-${esc(t.oko)}">${esc(t.oko)}</span> ${i.no ? '<b>' + i.no + '. doza</b> · ' : '<b>dato</b> · '}${esc(drugShort(t.drug))}</div>
+            <div class="cal-cl">${t.lekar ? '<i class="ti ti-stethoscope"></i> ' + esc(t.lekar) : '<span style="color:var(--amber);">lekar nije određen</span>'}</div>
+            ${t.status !== 'dato' ? `<button class="cal-mv" data-id="${esc(t.id)}" onclick="event.stopPropagation();openTermEdit(this.dataset.id)" title="Pomeri / izmeni"><i class="ti ti-calendar-repeat"></i></button>` : ''}
+          </div>`; }).join('') : '<div class="cal-empty">—</div>'}
+      </div>`;
+    }).join('') + '</div>';
+    document.getElementById('calSum').innerHTML = calSummary(terms);
+  }
+}
+function calSummary(list){
+  if (!list.length) return 'Nema termina za izabrane filtere.';
+  const by = {}; list.forEach(t => { const k = t.lekar || 'bez lekara'; by[k] = (by[k] || 0) + 1; });
+  const dr = {}; list.forEach(t => { const k = drugShort(t.drug); dr[k] = (dr[k] || 0) + 1; });
+  return '<b>Ukupno: ' + list.length + '</b> · ' + Object.keys(by).sort().map(k => esc(k) + ' ' + by[k]).join(' · ') +
+    '<br>' + Object.keys(dr).sort().map(k => esc(k) + ' ' + dr[k]).join(' · ');
+}
+function calOpenDay(d){ setOpDate(d); switchTab('program'); }
+// štampa nedelje: po danima, unutar dana po lekaru
+function printCalendarWeek(){
+  const mon = mondayOf(cal.view === 'week' ? cal.anchor : (cal.anchor || todayISO())), sun = isoAdd(mon, 6);
+  const terms = calTerms(mon, sun).filter(t => t.status !== 'dato');
+  if (!terms.length) { showAlert('Nema zakazanih termina u toj nedelji.', 'danger'); return; }
+  let rows = '';
+  for (let d = mon; d <= sun; d = isoAdd(d, 1)) {
+    const list = terms.filter(t => toISO(t.datum) === d).sort((x, y) => String(x.lekar || '').localeCompare(String(y.lekar || ''), 'sr') || calInfo(x).name.localeCompare(calInfo(y).name, 'sr'));
+    if (!list.length) continue;
+    const wd = (new Date(d + 'T12:00').getDay() + 6) % 7;
+    rows += `<tr class="pr-day"><td colspan="7"><b>${['ponedeljak','utorak','sreda','četvrtak','petak','subota','nedelja'][wd]} ${fmtDate(d)}</b> — ${list.length}</td></tr>` +
+      list.map((t, i) => { const x = calInfo(t); return `<tr><td class="c">${i + 1}</td><td><b>${esc(x.name)}</b></td><td class="c">${x.p.dob ? fmtDate(x.p.dob) : ''}</td><td class="eye">${esc(t.oko)}</td><td>${esc(drugShort(t.drug))}</td><td class="c">${x.no}. doza</td><td>${esc(t.lekar || '')}</td></tr>`; }).join('');
+  }
+  const flt = [cal.lekar ? (cal.lekar === '__none' ? 'bez lekara' : cal.lekar) : '', cal.drug ? drugShort(cal.drug) : ''].filter(Boolean).join(' · ');
+  document.getElementById('printArea').innerHTML = `
+    <div class="pr-head"><div><div class="pr-title">Anti-VEGF — nedeljni raspored</div><div class="pr-sub">Klinika za očne bolesti, UKCV${flt ? ' · ' + esc(flt) : ''}</div></div>
+      <div class="pr-date"><b>${fmtDate(mon)} – ${fmtDate(sun)}</b></div></div>
+    <table class="pr-table"><thead><tr><th style="width:28px;">Rb.</th><th>Pacijent</th><th style="width:85px;">Datum rođenja</th><th style="width:48px;">Oko</th><th style="width:90px;">Lek</th><th style="width:70px;">Br. doze</th><th style="width:190px;">Lekar</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <div class="pr-foot">Štampano: ${new Date().toLocaleString('sr-RS')} · Ukupno: ${terms.length}. Ovo je plan — na dan davanja se štampa operativni program i radi provera u aplikaciji.</div>`;
+  window.print();
+  writeLog('Štampa nedeljnog rasporeda', fmtDate(mon) + ' – ' + fmtDate(sun) + (flt ? ' · ' + flt : ''));
 }
 
 // ---------- SCHEDULE ----------
